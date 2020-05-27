@@ -1,0 +1,129 @@
+remote_theme: daattali/beautiful-jekyll
+
+# --- Basic options --- #
+
+# Name of website
+title: GSoC Project Blog
+
+# Short description of your site
+description: Presentation Blog for the GSoC Project
+
+# Your name to show in the footer
+author: Sakshay Mahna
+
+
+# --- List of links in the navigation bar --- #
+
+navbar-links:
+  Home: "/"
+  Project: "https://github.com/TheRoboticsClub/colab-gsoc2020-Sakshay_Mahna"
+  About me: "/about"
+
+# --- Logo --- #
+
+# Image to show in the navigation bar - works best with a square image
+# Remove this parameter if you don't want an image in the navbar
+avatar: "/assets/img/logo.png"
+
+# By default, the image is cut into a circle. You can disable this behaviour here.
+round-avatar: true
+
+# If you want to have an image logo in the top-left corner instead of the title text,
+# then specify the following parameter
+#title-img: /path/to/image
+
+# --- Footer options --- #
+
+# Select the social network links that you want to show in the footer.
+# Uncomment the links you want to show and add your information to each one.
+# If you don't want to show a link to an RSS feed, set rss to "false".
+social-network-links:
+  github: SakshayMahna
+  twitter: MahnaSakshay
+  linkedin: sakshaymahna
+#  reddit: yourname
+#  xing: yourname
+#  snapchat: deanat78
+#  instagram: deanat78
+#  youtube: user/deanat78
+#  spotify: yourname
+#  telephone: +14159998888
+#  steam: deanat78
+#  twitch: yourname
+#  yelp: yourname
+
+# --- General options --- #
+
+# Select which social network share links to show in posts
+share-links-active:
+  twitter: true
+  facebook: true
+  linkedin: true
+
+# Create a "tags" index page and make tags on each post clickable
+link-tags: true
+
+# Excerpt Word Length - Truncates the excerpt to the specified number of words on the index page
+excerpt_length: 50
+
+# --- Colours / background image --- #
+
+# Personalize the colors in your website. Colour values can be any valid CSS colour
+
+navbar-col: "#F5F5F5"
+navbar-text-col: "#404040"
+navbar-children-col: "#F5F5F5"
+page-col: "#FFFFFF"
+link-col: "#008AFF"
+hover-col: "#0085A1"
+footer-col: "#F5F5F5"
+footer-text-col: "#777777"
+footer-link-col: "#404040"
+
+# --- You don't need to touch anything below here (but you can if you want) --- #
+
+# Output options (more information on Jekyll's site)
+timezone: "India/Kolkata"
+markdown: kramdown
+theme: beautiful-jekyll-theme
+highlighter: rouge
+permalink: /:year-:month-:day-:title/
+paginate: 5
+
+kramdown:
+  input: GFM
+
+# Default YAML values (more information on Jekyll's site)
+defaults:
+  -
+    scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+      comments: true  # add comments to all blog posts
+      social-share: true # add social media sharing buttons to all blog posts
+      readtime: false # add estimated reading time on all blog posts
+  -
+    scope:
+      path: "" # all files
+    values:
+      layout: "page"
+      show-avatar: true
+
+# Exclude these files from production site
+exclude:
+  - CHANGELOG.md
+  - CNAME
+  - Dockerfile
+  - Gemfile
+  - Gemfile.lock
+  - LICENSE
+  - README.md
+  - Vagrantfile
+  - docs/
+
+plugins:
+  - jekyll-paginate
+  - jekyll-sitemap
+
