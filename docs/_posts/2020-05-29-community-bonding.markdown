@@ -3,6 +3,7 @@ layout: post
 title:  "Community Bonding"
 date:   2020-05-29 10:00:00 +0530
 categories: community-bonding
+comments: true
 ---
 Google Summer of Code starts with the Community Bonding period where we get to know about the community and get familiar with the code base and work style.
 

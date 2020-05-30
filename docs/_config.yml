@@ -80,8 +80,8 @@ footer-col: "#F5F5F5"
 footer-text-col: "#777777"
 footer-link-col: "#404040"
 
-# To use Facebook Comments, create a Facebook app and fill in the Facebook App ID
-fb_comment_id: "3885958241476700"
+# To use Disqus comments, sign up to https://disqus.com and fill in your Disqus shortname (NOT the userid)
+disqus: "theroboticsclub-gsoc2020-sakshay-mahna"
 
 # --- You don't need to touch anything below here (but you can if you want) --- #
 
