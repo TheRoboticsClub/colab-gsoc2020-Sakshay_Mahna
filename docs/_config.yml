@@ -80,6 +80,9 @@ footer-col: "#F5F5F5"
 footer-text-col: "#777777"
 footer-link-col: "#404040"
 
+# To use Facebook Comments, create a Facebook app and fill in the Facebook App ID
+fb_comment_id: "3885958241476700"
+
 # --- You don't need to touch anything below here (but you can if you want) --- #
 
 # Output options (more information on Jekyll's site)
