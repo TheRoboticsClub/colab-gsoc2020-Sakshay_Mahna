@@ -22,3 +22,8 @@ Keeping the above things in mind the logic of the code is as follows. All the co
 	- **Perceptron**: The input format for Percpetron is `network = Perceptron(input_dimension, output_dimension, activation_function)`. *input_dimension* is the number of input nodes and *output_dimension* is the number of output nodes. *activation_function* is a function, that can be implemented by the student or taken from the activation_functions module. Arbitrary weights can be assigned in the form of vectors(useful later on!) by using the function `network.load_weights_from_vector([weights_of_layer_one, bias_of_layer_one])`. The calculation is performed by the function `network.forward_propagate(input_vector)`.
 
 	- **StaticNeuralNetwork**: The input formate for StaticNeuralNetwork is `network = StaticNeuralNetwork([[nodes_in_layer_one(input), activation_function_in_layer_one], [nodes_in_layer_two, activation_function], ..., [nodes_in_output]])`. Consider a Neural Network with 2 input nodes, 3 nodes in layer one and 1 output node, to load arbitrary weights to the neural network in the form of a vector, is done by `network.load_weights_from_vector([w_11, w_21, w_12, w_22, w_13, w_23, b_1, b_2, b_3, w_11, w_21, w_31, b_1])`. Here, w_ij implies the weight between ith input node and jth output node. The input follows the same distribution as Perceptron, `weights_of_layer_one, bias_of_layer_one, weights_of_layer_two, bias_of_layer_two, ...`. The calculation is performed by the function `network.forward_propagate(input_vector)`.
+	
+### References
+[GeeksForGeeks](https://www.geeksforgeeks.org/activation-functions/)
+[Article on Medium](https://towardsdatascience.com/complete-guide-of-activation-functions-34076e95d044)
+[NeuroLab project](https://github.com/zueve/neurolab)
