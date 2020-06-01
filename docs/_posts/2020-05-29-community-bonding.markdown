@@ -43,7 +43,7 @@ The resources shared by my mentors were really amazing which helped me learn all
 
 - [Evolutionary Robotics: From Algorithms to Implementations](https://books.google.co.in/books/about/Evolutionary_Robotics.html?id=xyqpfWOjpdMC&source=kp_book_description&redir_esc=y). This book again consists of experiments, and also includes some details on Fuzzy Logic controllers. The last chapter on making robots move through Genetic Algorithms is covered in much detail.
 
-- This [website](http://www.robolabo.etsit.upm.es/subjects.php?subj=irin&tab=tab3&lang=es) consisting of the study material provided by Álvaro Sir. The material was in Spanish, which provided a very good opportunity to learn some basic spanish. Ke buena to be a part of GSoC!
+- The study material used by [Prof. Álvaro Gutiérrez](http://www.robolabo.etsit.upm.es/aguti/). The material was in Spanish, which provided a very good opportunity to learn some basic spanish. Ke buena to be a part of GSoC!
 
 - This [amazing course](https://nptel.ac.in/courses/117/105/117105084/) by Prof. Somnath Sengupta. Includes lot of mathematics, but covers Static Neural Networks really good!
 
