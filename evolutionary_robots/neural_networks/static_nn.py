@@ -5,6 +5,7 @@
 
 import numpy as np
 import pickle
+from graphviz import Digraph, Graph
 
 # Note: The weight matrix works as follows:
 # Each of the columns tune for the weights of a single input node
@@ -75,9 +76,18 @@ class StaticLayer:
 # Perceptron Class
 class Perceptron:
 	def __init__(self, input_dim, output_dim, activation_function):
+		# Initializations
+		self.input_dim = input_dim
+		self.output_dim = output_dim
+		
 		# Contains a single static layer
 		# Initialize that Layer
 		self.layer = StaticLayer(input_dim, output_dim, activation_function, "Perceptron_Layer")
+		
+		# Construct a visual component
+		# The visual component is constructed using Graphviz
+		self.visual = Digraph(comment="Perceptron", graph_attr={'rankdir': "LR", 'splines': "line"}, node_attr={'fixedsize': "true", 'label': ""})
+		self.generate_visual()
 		
 	# Function to calculate the output given an input vector
 	def forward_propagate(self, input_vector):
@@ -130,6 +140,31 @@ class Perceptron:
 		# Seperate the weights and bias and then reshape them
 		self.layer.set_weight_matrix(weight_vector[:interval].reshape(weight_dim))
 		self.layer.set_bias_vector(weight_vector[interval:].reshape(bias_dim))
+	
+	# Function to generate the visual representation	
+	# https://tgmstat.wordpress.com/2013/06/12/draw-neural-network-diagrams-graphviz/
+	def generate_visual(self):
+		# We need two subgraphs
+		subgraph_one = Digraph(name="cluster_0", graph_attr={'color': "white"}, node_attr={'style': "solid", 'color': "blue4", 'shape': "circle"})
+		for node_number in range(self.input_dim):
+			subgraph_one.node("x" + str(node_number+1))
+			
+		subgraph_two = Digraph(name="cluster_1", graph_attr={'color': 'white'}, node_attr={'style': "solid", 'color': "red2", 'shape': "circle"})
+		for node_number in range(self.output_dim):
+			subgraph_two.node("a" + str(node_number+1))
+			
+		# Declare subgraphs
+		self.visual.subgraph(subgraph_one)
+		self.visual.subgraph(subgraph_two)
+		
+		# Put the edges in the graph
+		for input_node in range(self.input_dim):
+			for output_node in range(self.output_dim):
+				self.visual.edge('x'+str(input_node+1), 'a'+str(output_node+1))
+		
+		# Render the graph		
+		self.visual.render('representation.gv', view=True)
+		
 		
 
 # Static Neural Network Class

@@ -4,7 +4,7 @@ import numpy as np
 
 
 print("Perceptron:")
-nn = Perceptron(2, 1, activation_functions.linear_function)
+nn = Perceptron(2, 2, activation_functions.linear_function)
 nn.load_weights_from_vector([0.5, 0.5, 1])		# The format followed is weights and then bias
 print("The weights are: " + str(nn.return_weights_as_vector()))
 input_vector = [1, 1]
