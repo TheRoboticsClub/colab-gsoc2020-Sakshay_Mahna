@@ -11,7 +11,7 @@ input_vector = [1, 1]
 print("The input is: " + str(input_vector))
 output = nn.forward_propagate(input_vector)			# Pass input as an array
 print("The output is: " + str(output))
-
+nn.generate_visual('Perceptron', True)
 print("\n")
 
 print("Static Neural Network: ")
@@ -25,3 +25,4 @@ input_vector = [1, 0.5]
 print("The input is: " + str(input_vector))
 output = nn.forward_propagate(input_vector)
 print("The output is: " + str(output))
+nn.generate_visual('MutliLayerPerceptron', True)
