@@ -87,7 +87,7 @@ class Perceptron:
 		# Construct a visual component
 		# The visual component is constructed using Graphviz
 		self.visual = Digraph(comment="Perceptron", graph_attr={'rankdir': "LR", 'splines': "line"}, node_attr={'fixedsize': "true", 'label': ""})
-		self.generate_visual()
+		#self.generate_visual()
 		
 	# Function to calculate the output given an input vector
 	def forward_propagate(self, input_vector):
@@ -139,17 +139,16 @@ class Perceptron:
 		
 		# Seperate the weights and bias and then reshape them
 		self.layer.set_weight_matrix(weight_vector[:interval].reshape(weight_dim))
-		self.layer.set_bias_vector(weight_vector[interval:].reshape(bias_dim))
+		self.layer.set_bias_vector(weight_vector[interval:].reshape(bias_dim[0],))
 	
 	# Function to generate the visual representation	
-	# https://tgmstat.wordpress.com/2013/06/12/draw-neural-network-diagrams-graphviz/
-	def generate_visual(self):
+	def generate_visual(self, filename, view=False):
 		# We need two subgraphs
-		subgraph_one = Digraph(name="cluster_0", graph_attr={'color': "white"}, node_attr={'style': "solid", 'color': "blue4", 'shape': "circle"})
+		subgraph_one = Digraph(name="cluster_0", graph_attr={'color': "white", 'label': "Layer 0"}, node_attr={'style': "solid", 'color': "blue4", 'shape': "circle"})
 		for node_number in range(self.input_dim):
 			subgraph_one.node("x" + str(node_number+1))
 			
-		subgraph_two = Digraph(name="cluster_1", graph_attr={'color': 'white'}, node_attr={'style': "solid", 'color': "red2", 'shape': "circle"})
+		subgraph_two = Digraph(name="cluster_1", graph_attr={'color': 'white', 'label': "Layer 1"}, node_attr={'style': "solid", 'color': "red2", 'shape': "circle"})
 		for node_number in range(self.output_dim):
 			subgraph_two.node("a" + str(node_number+1))
 			
@@ -163,7 +162,7 @@ class Perceptron:
 				self.visual.edge('x'+str(input_node+1), 'a'+str(output_node+1))
 		
 		# Render the graph		
-		self.visual.render('representation.gv', view=True)
+		self.visual.render('representations/' + filename + '.gv', view=view)
 		
 		
 
@@ -178,6 +177,12 @@ class StaticNeuralNetwork:
 		# Append the Layer classes
 		for i in range(len(layer_dimensions) - 1):
 			self.layer_vector.append(StaticLayer(layer_dimensions[i][0], layer_dimensions[i+1][0], layer_dimensions[i][1], "Layer_"+str(i)))
+			
+		# Number of layers
+		self.number_of_layers = len(self.layer_vector)
+		# Construct a visual component
+		self.visual = Digraph(comment="Static Neural Network", graph_attr={'rankdir': "LR", 'splines': "line"}, node_attr={'fixedsize': "true", 'label': ""})
+		# self.generate_visual(len(self.layer_vector))
 		
 	# Function to get output from input_vector
 	def forward_propagate(self, input_vector):
@@ -245,7 +250,49 @@ class StaticNeuralNetwork:
 			layer.set_weight_matrix(weight_vector[interval_counter:interval_counter + weight_interval].reshape(weight_dim))
 			interval_counter = interval_counter + weight_interval
 			layer.set_bias_vector(weight_vector[interval_counter:interval_counter + bias_interval].reshape(bias_dim[0],))
-			interval_counter = interval_counter + bias_interval		
+			interval_counter = interval_counter + bias_interval
+			
+	
+	# Function to generate the visual representation
+	def generate_visual(self, filename, view=False):
+		# We need many subgraphs
+		for layer in range(self.number_of_layers):
+			subgraph = Digraph(name="cluster_" + str(layer), graph_attr={'color': "white", 'label': "Layer " + str(layer)}, node_attr={'style': "solid", 'color': "black", 'shape': "circle"})
+			
+			# Get the weight dimensions for generating the nodes
+			weight_dim = self.layer_vector[layer].get_weight_dim()
+			
+			for node_number in range(weight_dim[1]):
+				subgraph.node("layer_" + str(layer) + str(node_number+1))
+				
+			# Declare subgraphs
+			self.visual.subgraph(subgraph)
+			
+			
+		# The final layer needs to be done manually
+		subgraph = Digraph(name="cluster_" + str(self.number_of_layers), graph_attr={'color': "white", 'label': "Layer " + str(self.number_of_layers)}, node_attr={'style': "solid", 'color': "black", 'shape': "circle"})
+		
+		# Get the weight dimensions
+		weight_dim = self.layer_vector[self.number_of_layers - 1].get_weight_dim()
+		
+		for node_number in range(weight_dim[0]):
+			subgraph.node("layer_" + str(self.number_of_layers) + str(node_number+1))
+			
+		# Declare the subgraph
+		self.visual.subgraph(subgraph)
+		
+		
+		for layer in range(self.number_of_layers):
+			# Get the weight dimensions for generating the nodes
+			weight_dim = self.layer_vector[layer].get_weight_dim()
+		
+			# Put the edges in the graph
+			for input_node in range(weight_dim[1]):
+				for output_node in range(weight_dim[0]):
+					self.visual.edge("layer_" + str(layer) + str(input_node+1), 'layer_' + str(layer + 1) + str(output_node+1))
+		
+		# Render the graph		
+		self.visual.render('representations/' + filename + '.gv', view=view)	
 		
 		
 	
