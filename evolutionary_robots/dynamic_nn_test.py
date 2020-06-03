@@ -31,3 +31,13 @@ nn.load_weights_from_vector([1, 0.5, 0, 0.5, 0, 0.5, 0, 1, 0, 0, 1, 0.5, 0, 0, 1
 #			  delay, weights of layer one, bias,   delay, weights of layer two bias
 # Here the recurrence is skipped as it's weights are not required
 print(nn.forward_propagate([1, 1]))
+
+print("\n")
+print("Dynamic Test 1")
+nn = DynamicNeuralNetwork([[1, 2, [1, 2], activation_functions.linear_function], [2, 1, [0, 1], activation_functions.linear_function], [2, 1, [0], activation_functions.sigmoid_function], [1]])
+nn.load_weights_from_vector([2, 1, 0.1, 0.2, 0.3, 0.4, 0.5, 0.5, 0.1, 0.2, 1, 0, 1, 1, 1, 1, 1, 0.3, 0.4, 0.5, 0.6, 0, 1, 1, 0.7, 0.8, 0])
+print(nn.forward_propagate([0.5]))
+print(nn.forward_propagate([0.5]))
+
+
+

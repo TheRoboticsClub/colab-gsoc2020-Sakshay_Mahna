@@ -29,8 +29,8 @@ class TimeDelay:
 		input_vector = np.array([input_vector])
 		
 		# Insert the input_vector and remove the oldest one
-		self.input_matrix = np.append(self.input_matrix, input_vector, axis=0)
-		self.input_matrix = np.delete(self.input_matrix, 0, axis=0)
+		self.input_matrix = np.insert(self.input_matrix, 0, input_vector, axis=0)
+		self.input_matrix = np.delete(self.input_matrix, len(self.input_matrix) - 1, axis=0)
 		
 		# Generate the output
 		output = np.dot(self.weight_vector, self.input_matrix).flatten()
@@ -245,17 +245,22 @@ class DynamicNeuralNetwork:
 	# Function to process the connections that are input and output
 	def process_connections(self, layer_dimensions):
 		# Initialize the input and output connection list
-		self.input_connections = [[]] * (self.number_of_layers)
-		self.output_connections = [[]] * (self.number_of_layers)
+		self.input_connections = []
+		self.output_connections = []
 		
 		# If the current layer has a connection with a layer to it's right, then it is an input for that layer
 		# If the current layer has a connection with a layer to it's left, then it is an output for that layer
 		for i in range(self.number_of_layers):
+			in_connections = []
+			out_connections = []
 			for j in layer_dimensions[i][2]:
 				if j >= i:
-					self.input_connections[i].append(j)
+					in_connections.append(j)
 				else:
-					self.output_connections[i].append(j) 
+					out_connections.append(j)
+					
+			self.input_connections.append(in_connections)
+			self.output_connections.append(out_connections)
 	
 	# Function to save the layer weights
 	def save_weights_to_file(self, file_name):

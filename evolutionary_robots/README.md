@@ -25,6 +25,10 @@ Keeping the above things in mind the logic of the code is as follows. All the co
 	
 - `dynamic_nn.py`: This file contains Dynamic Neural Network implementations. Each Neural Network is a collection of Dynamic Layer. Each dynamic layer consists of the delay system, recurrent system and the static system. The static system is the same as the StaticLayer. The recurrent system needs to get the output from a different layer and integrate it with the layer under consideration. The delay system works by generating a weighted average of the input vector supplied currently and in the previous iteration. The input format for DynamicNeuralNetwork is `network = DynamicNeuralNetwork([[nodes_in_layer_one, delay_dim, [list_of_connections], activation_function], [nodes_in_layer_two, delay_dim, [list_of_connections], activation_function], ...[nodes_in_output]])`. The weight matrix follows the same convention as the *StaticNeuralNetwork*, additionaly the other weights are formatted as `network.load_weights_from_vector([weights_of_delay, weights_of_recurrence, static_weights, weights_of_bias])`. The calculation is performed by the function `network.forward_propagate(input_vector)`. Some sample test cases are provided in `dynamic_nn_test.py`.
 	
+	
+### Tests
+Some sample tests can be found in the `tests` directory.
+
 ### References
 [GeeksForGeeks](https://www.geeksforgeeks.org/activation-functions/)
 

@@ -1,0 +1,60 @@
+// Static Neural Network
+digraph {
+	graph [rankdir=LR splines=line]
+	node [fixedsize=true label=""]
+	subgraph cluster_0 {
+		graph [color=white label="Layer 0"]
+		node [color=black shape=circle style=solid]
+		layer_01
+	}
+	subgraph cluster_1 {
+		graph [color=white label="Layer 1"]
+		node [color=black shape=circle style=solid]
+		layer_11
+		layer_12
+		layer_13
+		layer_14
+		layer_15
+		layer_16
+		layer_17
+		layer_18
+		layer_19
+		layer_110
+	}
+	subgraph cluster_2 {
+		graph [color=white label="Layer 2"]
+		node [color=black shape=circle style=solid]
+		layer_21
+		layer_22
+	}
+	layer_01 -> layer_11
+	layer_01 -> layer_12
+	layer_01 -> layer_13
+	layer_01 -> layer_14
+	layer_01 -> layer_15
+	layer_01 -> layer_16
+	layer_01 -> layer_17
+	layer_01 -> layer_18
+	layer_01 -> layer_19
+	layer_01 -> layer_110
+	layer_11 -> layer_21
+	layer_11 -> layer_22
+	layer_12 -> layer_21
+	layer_12 -> layer_22
+	layer_13 -> layer_21
+	layer_13 -> layer_22
+	layer_14 -> layer_21
+	layer_14 -> layer_22
+	layer_15 -> layer_21
+	layer_15 -> layer_22
+	layer_16 -> layer_21
+	layer_16 -> layer_22
+	layer_17 -> layer_21
+	layer_17 -> layer_22
+	layer_18 -> layer_21
+	layer_18 -> layer_22
+	layer_19 -> layer_21
+	layer_19 -> layer_22
+	layer_110 -> layer_21
+	layer_110 -> layer_22
+}
