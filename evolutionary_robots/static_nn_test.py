@@ -35,7 +35,7 @@ input_vector = [1, 1]
 print("The input is: " + str(input_vector))
 output = nn.forward_propagate(input_vector)
 print("The output is: " + str(output))
-nn.generate_visual("StaticTest1")
+nn.generate_visual("StaticTest1", True)
 print("\n")
 
 print("Static Test 2")
@@ -45,4 +45,4 @@ input_vector = [1]
 print("The input is: " + str(input_vector))
 output = nn.forward_propagate(input_vector)
 print("The output is: " + str(output))
-nn.generate_visual("StaticTest2", True)
+nn.generate_visual("StaticTest2")

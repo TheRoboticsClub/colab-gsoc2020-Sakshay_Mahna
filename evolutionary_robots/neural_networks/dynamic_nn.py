@@ -9,6 +9,7 @@
 
 import numpy as np
 import pickle
+from graphviz import Digraph
 
 # Class for Time Delay system
 # The time delay network works by returning the weighted average of the input vectors
@@ -347,28 +348,10 @@ class DynamicNeuralNetwork:
 	def generate_visual(self, filename, view=False):
 		# We need many subgraphs
 		for layer in range(self.number_of_layers):
-			layer_subgraph = Digraph(name="layer_" + str(layer), graph_attr={'color': "white", 'label': "Layer " + str(layer)}, node_attr={'style': "solid", 'color': "black", 'shape': "circle"})
-			
-			# DELAY PART
-			# Delay subgraph
-			delay_subgraph = Digraph(name="delay_" + str(layer), graph_attr={'color': "white"}, node_attr={'style': "solid", 'color': "black", 'shape': "circle"})
-			
-			# Get the delay dimensions for generating the nodes
-			delay_dim = self.layer_vector[layer].get_delay_weight_dim()
-			
-			for node_number in range(delay_dim[1]):
-				delay_subgraph.node("layer_" + str(layer) + "_delay_" + str(node_number + 1))
-				
-			# Declare delay a subgraph of the layer subgraph
-			layer_subgraph.subgraph(delay_subgraph)
-			
-			# Connect those delay nodes
-			for node_number in range(delay_dim[1] - 1):
-				self.visual.edge("layer_" + str(layer) + "_delay_" + str(node_number + 1), "layer_" + str(layer) + "_delay_" + str(node_number + 2))
-				
+			subgraph = Digraph(name="cluster_" + str(layer), graph_attr={'color': "white", 'label': "Layer " + str(layer)}, node_attr={'style': "solid", 'color': "black", 'shape': "circle"})
 			
 			# Get the weight dimensions for generating the nodes
-			weight_dim = self.layer_vector[layer].get_weight_dim()
+			weight_dim = self.layer_vector[layer].get_weight_matrix_dim()
 			
 			for node_number in range(weight_dim[1]):
 				subgraph.node("layer_" + str(layer) + str(node_number+1))
@@ -378,10 +361,10 @@ class DynamicNeuralNetwork:
 			
 			
 		# The final layer needs to be done manually
-		subgraph = Digraph(name="cluster_" + str(self.number_of_layers), graph_attr={'color': "white", 'label': "Layer " + str(self.number_of_layers)}, node_attr={'style': "solid", 'color': "black", 'shape': "circle"})
+		subgraph = Digraph(name="cluster_" + str(self.number_of_layers), graph_attr={'color': "white", 'label': "Output"}, node_attr={'style': "solid", 'color': "black", 'shape': "circle"})
 		
 		# Get the weight dimensions
-		weight_dim = self.layer_vector[self.number_of_layers - 1].get_weight_dim()
+		weight_dim = self.layer_vector[self.number_of_layers - 1].get_weight_matrix_dim()
 		
 		for node_number in range(weight_dim[0]):
 			subgraph.node("layer_" + str(self.number_of_layers) + str(node_number+1))
@@ -392,12 +375,18 @@ class DynamicNeuralNetwork:
 		
 		for layer in range(self.number_of_layers):
 			# Get the weight dimensions for generating the nodes
-			weight_dim = self.layer_vector[layer].get_weight_dim()
+			weight_dim = self.layer_vector[layer].get_weight_matrix_dim()
 		
 			# Put the edges in the graph
 			for input_node in range(weight_dim[1]):
 				for output_node in range(weight_dim[0]):
 					self.visual.edge("layer_" + str(layer) + str(input_node+1), 'layer_' + str(layer + 1) + str(output_node+1))
+					
+		for recurrence_input in range(len(self.input_connections)):
+			for recurrence_output in self.input_connections[recurrence_input]:
+				input_weight_dim = self.layer_vector[recurrence_input].get_weight_matrix_dim()
+				output_weight_dim = self.layer_vector[recurrence_output].get_weight_matrix_dim()
+				self.visual.edge("layer_" + str(recurrence_output + 1) + str(output_weight_dim[0]), "layer_" + str(recurrence_input + 1) + str(input_weight_dim[0]), style = 'dashed')
 		
 		# Render the graph		
 		self.visual.render('representations/' + filename + '.gv', view=view)
