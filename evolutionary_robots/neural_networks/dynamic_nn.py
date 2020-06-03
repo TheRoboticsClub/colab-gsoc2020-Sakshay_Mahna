@@ -381,7 +381,8 @@ class DynamicNeuralNetwork:
 			for input_node in range(weight_dim[1]):
 				for output_node in range(weight_dim[0]):
 					self.visual.edge("layer_" + str(layer) + str(input_node+1), 'layer_' + str(layer + 1) + str(output_node+1))
-					
+		
+		# Add the recurrent edges
 		for recurrence_input in range(len(self.input_connections)):
 			for recurrence_output in self.input_connections[recurrence_input]:
 				input_weight_dim = self.layer_vector[recurrence_input].get_weight_matrix_dim()
