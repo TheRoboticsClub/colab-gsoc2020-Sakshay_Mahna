@@ -196,13 +196,13 @@ class StaticNeuralNetwork:
 		return intermediate_output
 		
 	# Function to save the layer weights
-	def save_weights(self, file_name):
+	def save_weights_to_file(self, file_name):
 		# Use pickle to save the layer_vector
 		with open(file_name, 'wb') as f:
 			pickle.dump(self.layer_vector, f)
 			
 	# Function to load the layer weights
-	def load_weights(self, file_name):
+	def load_weights_from_file(self, file_name):
 		# Use pickle to load the layer_vector
 		with open(file_name, 'rb') as f:
 			self.layer_vector = pickle.load(f)
