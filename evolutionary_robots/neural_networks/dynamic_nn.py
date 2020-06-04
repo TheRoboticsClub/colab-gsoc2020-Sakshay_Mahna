@@ -10,9 +10,11 @@
 import numpy as np
 import pickle
 from graphviz import Digraph
+from nn import Layer, NeuralNetwork
 
 # Class for Time Delay system
 # The time delay network works by returning the weighted average of the input vectors
+# No activation is given at the moment!################
 # delay_dim specifies the delay, a value of 1 gives the same Static behaviour
 class TimeDelay:
 	def __init__(self, input_dim, delay_dim):
@@ -90,7 +92,7 @@ class TimeRecurrence:
 		
 # Class for Dynamic Layer
 # Each dynamic layer has the provision to include the delay system, recurrent system and forward propagation system
-class DynamicLayer:
+class DynamicLayer(Layer):
 	# input_dim and output_dim are for the forward propagation part
 	# delay_dim is for the delay system
 	# recurrent_dim is a list for the recurrent system, the dimensions are given from left to right
@@ -189,8 +191,12 @@ class DynamicLayer:
 	def get_bias_vector_dim(self):
 		return self.bias_dim
 		
+	# Function to return the layer name
+	def get_name(self):
+		return self.layer_name
+		
 # The Dynamic Neural Network class
-class DynamicNeuralNetwork:
+class DynamicNeuralNetwork(NeuralNetwork):
 	# Layer dimensions follow the layout as:
 	# [[nodes_in_layer_one, delay_dim, [list_of_connections], activation_function], [nodes_in_layer_two, delay_dim, [list_of_connections], activation_function], ...[nodes_in_output]]
 	# The list_of_connections is provided in a left to right fashion
@@ -348,7 +354,9 @@ class DynamicNeuralNetwork:
 	def generate_visual(self, filename, view=False):
 		# We need many subgraphs
 		for layer in range(self.number_of_layers):
-			subgraph = Digraph(name="cluster_" + str(layer), graph_attr={'color': "white", 'label': "Layer " + str(layer)}, node_attr={'style': "solid", 'color': "black", 'shape': "circle"})
+			# Delay dimension
+			delay = self.layer_vector[layer].get_delay_weight_dim()
+			subgraph = Digraph(name="cluster_" + str(layer), graph_attr={'color': "white", 'label': "Layer " + str(layer) + "\nDelay " + str(delay[1])}, node_attr={'style': "solid", 'color': "black", 'shape': "circle"})
 			
 			# Get the weight dimensions for generating the nodes
 			weight_dim = self.layer_vector[layer].get_weight_matrix_dim()
@@ -387,7 +395,7 @@ class DynamicNeuralNetwork:
 			for recurrence_output in self.input_connections[recurrence_input]:
 				input_weight_dim = self.layer_vector[recurrence_input].get_weight_matrix_dim()
 				output_weight_dim = self.layer_vector[recurrence_output].get_weight_matrix_dim()
-				self.visual.edge("layer_" + str(recurrence_output + 1) + str(output_weight_dim[0]), "layer_" + str(recurrence_input + 1) + str(input_weight_dim[0]), style = 'dashed')
+				self.visual.edge("layer_" + str(recurrence_output + 1) + str(output_weight_dim[0]), "layer_" + str(recurrence_input + 1) + str(input_weight_dim[0]), style = 'dashed', color="red", constraint='false')
 		
 		# Render the graph		
 		self.visual.render('representations/' + filename + '.gv', view=view)

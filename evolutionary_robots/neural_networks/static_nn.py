@@ -5,14 +5,15 @@
 
 import numpy as np
 import pickle
-from graphviz import Digraph, Graph
+from graphviz import Digraph
+from nn import Layer, NeuralNetwork
 
 # Note: The weight matrix works as follows:
 # Each of the columns tune for the weights of a single input node
 # Each of the rows tune for the weights of a single output node
 
 # Static Layer, only forward connections are present in this layer
-class StaticLayer:
+class StaticLayer(Layer):
 	def __init__(self, input_dim, output_dim, activation_function, layer_name):
 		# Set the layer name
 		self.layer_name = layer_name
@@ -74,7 +75,7 @@ class StaticLayer:
 		return self.bias_dim
 		
 # Perceptron Class
-class Perceptron:
+class Perceptron(NeuralNetwork):
 	def __init__(self, input_dim, output_dim, activation_function):
 		# Initializations
 		self.input_dim = input_dim
@@ -167,7 +168,7 @@ class Perceptron:
 		
 
 # Static Neural Network Class
-class StaticNeuralNetwork:
+class StaticNeuralNetwork(NeuralNetwork):
 	# The layer_dimensions is an array with the following layout
 	# [[number_of_nodes_in_first_layer(input layer), activation_function], [number_of_nodes_in_second_layer, activation_function], ..., [number_of_output_nodes]]
 	def __init__(self, layer_dimensions):
