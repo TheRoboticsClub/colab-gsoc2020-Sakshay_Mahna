@@ -1,0 +1,41 @@
+// Dynamic Neural Network
+digraph {
+	graph [rankdir=LR splines=line]
+	node [fixedsize=true label=""]
+	subgraph cluster_0 {
+		graph [color=white label="Layer 0
+Delay 2"]
+		node [color=black shape=circle style=solid]
+		layer_01
+	}
+	subgraph cluster_1 {
+		graph [color=white label="Layer 1
+Delay 1"]
+		node [color=black shape=circle style=solid]
+		layer_11
+		layer_12
+	}
+	subgraph cluster_2 {
+		graph [color=white label="Layer 2
+Delay 1"]
+		node [color=black shape=circle style=solid]
+		layer_21
+		layer_22
+	}
+	subgraph cluster_3 {
+		graph [color=white label=Output]
+		node [color=black shape=circle style=solid]
+		layer_31
+	}
+	layer_01 -> layer_11
+	layer_01 -> layer_12
+	layer_11 -> layer_21
+	layer_11 -> layer_22
+	layer_12 -> layer_21
+	layer_12 -> layer_22
+	layer_21 -> layer_31
+	layer_22 -> layer_31
+	layer_22 -> layer_12 [color=red constraint=false style=dashed]
+	layer_31 -> layer_12 [color=red constraint=false style=dashed]
+	layer_22 -> layer_22 [color=red constraint=false style=dashed]
+}
