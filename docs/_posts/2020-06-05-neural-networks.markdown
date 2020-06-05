@@ -39,7 +39,7 @@ Overall, the first week of coding was really enjoyable. Here is a list of proble
 
 - **Debugging and Testing**: This was a difficult task. Even after testing the networks, I am still not completely sure that they are error free. Only time will tell!
 
-![Visual Representation of our DNN](/assets/img/DNN_repr.png)
+![Visual Representation of our DNN](./../assets/img/DNN_repr.png)
 
 *Visual Representation of our DNN*
 
