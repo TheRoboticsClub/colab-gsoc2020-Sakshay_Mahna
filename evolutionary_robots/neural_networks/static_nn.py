@@ -1,177 +1,68 @@
-# This module implements the Static Neural Networks
-# The fundamental idea behind neural networks is the concept of layers
-# A collection of layers make up a Neural Network
-# So, we implement a layer class and then a neural network class that makes use of it!
+"""Docstring for the static_nn.py module
+
+This module implements the Static Neural Networks
+The fundamental idea behind neural networks is the concept of layers
+A collection of layers make up a Neural Network
+So, we implement a layer class and then a neural network class that makes use of it!
+
+"""
 
 import numpy as np
 import pickle
 from graphviz import Digraph
-from nn import Layer, NeuralNetwork
+from layers import StaticLayer
+
+# Library used to generate warnings
+import warnings
 
 # Note: The weight matrix works as follows:
 # Each of the columns tune for the weights of a single input node
 # Each of the rows tune for the weights of a single output node
 
-# Static Layer, only forward connections are present in this layer
-class StaticLayer(Layer):
-	def __init__(self, input_dim, output_dim, activation_function, layer_name):
-		# Set the layer name
-		self.layer_name = layer_name
-	
-		# Initialize the weight and bias dimensions
-		self.weight_dim = (output_dim, input_dim)
-		self.bias_dim = (output_dim, 1)
-		
-		# Initialize the weight matrix
-		self.weight_matrix = np.random.rand(*self.weight_dim)
-		
-		# Initialize the bias vector
-		self.bias_vector = np.random.rand(output_dim)
-		
-		# Set the activation function
-		self.activation_function = activation_function
-		
-	# Function to calculate the output vector
-	# weight_matrix . input_vector + bias_vector
-	def forward_propagate(self, input_vector):
-		# Convert the input_vector to a numpy array
-		#input_vector = np.array(input_vector)
-		# The input is already converted to numpy array by the Neural Network
-		
-		# Output vector is obtained by dotting weight and input, then adding with bias
-		output_vector = np.add(np.dot(self.weight_matrix, input_vector), self.bias_vector)
-		
-		# Activate the output
-		output_vector = self.activation_function(output_vector)
-		
-		return output_vector
-	
-	# Function to set the weight matrix	
-	def set_weight_matrix(self, weight_matrix):
-		self.weight_matrix = weight_matrix
-		
-	# Function to return the weight matrix
-	def get_weight_matrix(self):
-		return self.weight_matrix
-	
-	# Function to set the bias vector	
-	def set_bias_vector(self, bias_vector):
-		self.bias_vector = bias_vector
-		
-	# Function to return the bias vector
-	def get_bias_vector(self):
-		return self.bias_vector
-		
-	# Function to return the layer name
-	def get_name(self):
-		return self.layer_name
-		
-	# Function to return the weight dimensions
-	def get_weight_dim(self):
-		return self.weight_dim
-		
-	# Function return the bias dimensions
-	def get_bias_dim(self):
-		return self.bias_dim
-		
-# Perceptron Class
-class Perceptron(NeuralNetwork):
-	def __init__(self, input_dim, output_dim, activation_function):
-		# Initializations
-		self.input_dim = input_dim
-		self.output_dim = output_dim
-		
-		# Contains a single static layer
-		# Initialize that Layer
-		self.layer = StaticLayer(input_dim, output_dim, activation_function, "Perceptron_Layer")
-		
-		# Construct a visual component
-		# The visual component is constructed using Graphviz
-		self.visual = Digraph(comment="Perceptron", graph_attr={'rankdir': "LR", 'splines': "line"}, node_attr={'fixedsize': "true", 'label': ""})
-		#self.generate_visual()
-		
-	# Function to calculate the output given an input vector
-	def forward_propagate(self, input_vector):
-		# Convert the input_vector to numpy array
-		input_vector = np.array(input_vector)
-		
-		# Get the output
-		output_vector = self.layer.forward_propagate(input_vector)
-		
-		return output_vector
-	
-	# Function to save the layer weights
-	def save_weights_to_file(self, file_name):
-		# Use pickle to save the layer_vector
-		with open(file_name, 'wb') as f:
-			pickle.dump(self.layer, f)
-			
-	# Function to load the layer weights
-	def load_weights_from_file(self, file_name):
-		# Use pickle to load the layer_vector
-		with open(file_name, 'rb') as f:
-			self.layer = pickle.load(f)
-			
-	# Function to return the weights and bias in the form of a vector
-	def return_weights_as_vector(self):
-		# The vector we get from flattening the weight matrix
-		# flatten() works in row major order
-		weight_vector = self.layer.get_weight_matrix().flatten()
-		
-		# The vector we get from flattening the bias vector
-		bias_vector = self.layer.get_bias_vector().flatten()
-		
-		# The output vector is concatenated form of weight_vector and bias_vector
-		output = np.concatenate([weight_vector, bias_vector])
-		
-		return output
-	
-	# Function to load the weights and bias from vector
-	def load_weights_from_vector(self, weight_vector):
-		# Convert to numpy array
-		weight_vector = np.array(weight_vector)
-	
-		# Get the dimensions of the weight matrix and bias vector
-		weight_dim = self.layer.get_weight_dim()
-		bias_dim = self.layer.get_bias_dim()
-		
-		# Get the interval at which weight and bias seperate
-		interval = weight_dim[0] * weight_dim[1]
-		
-		# Seperate the weights and bias and then reshape them
-		self.layer.set_weight_matrix(weight_vector[:interval].reshape(weight_dim))
-		self.layer.set_bias_vector(weight_vector[interval:].reshape(bias_dim[0],))
-	
-	# Function to generate the visual representation	
-	def generate_visual(self, filename, view=False):
-		# We need two subgraphs
-		subgraph_one = Digraph(name="cluster_0", graph_attr={'color': "white", 'label': "Layer 0"}, node_attr={'style': "solid", 'color': "blue4", 'shape': "circle"})
-		for node_number in range(self.input_dim):
-			subgraph_one.node("x" + str(node_number+1))
-			
-		subgraph_two = Digraph(name="cluster_1", graph_attr={'color': 'white', 'label': "Layer 1"}, node_attr={'style': "solid", 'color': "red2", 'shape': "circle"})
-		for node_number in range(self.output_dim):
-			subgraph_two.node("a" + str(node_number+1))
-			
-		# Declare subgraphs
-		self.visual.subgraph(subgraph_one)
-		self.visual.subgraph(subgraph_two)
-		
-		# Put the edges in the graph
-		for input_node in range(self.input_dim):
-			for output_node in range(self.output_dim):
-				self.visual.edge('x'+str(input_node+1), 'a'+str(output_node+1))
-		
-		# Render the graph		
-		self.visual.render('representations/' + filename + '.gv', view=view)
-		
-		
-
 # Static Neural Network Class
-class StaticNeuralNetwork(NeuralNetwork):
+class StaticNeuralNetwork:
+	"""
+	The Static Neural Network Class
+	The class has adjustable number of layers, number of neurons in a layer,
+	activation function and the parameters of those activation functions.
+	In essence a Neural Network is a collection of Layers
+	
+	...
+	
+	Attributes
+	----------
+	layer_dimensions: array_like
+		The layer_dimensions specifies the parameters of the layers of the Neural Network.
+		The layout followed is:
+		[[number_of_nodes_in_first_layer(input layer), activation_class], [number_of_nodes_in_second_layer, activation_class], ..., [number_of_output_nodes]]
+		
+	Methods
+	-------
+	forward_propagate(input_vector)
+		Generates the output of the Neural Network given the input_vector
+		
+	save_parameters_to_file(file_name)
+		Saves the parameters of the Neural Network to an external file named as file_name
+		
+	load_parameters_from_file(file_name)
+		Loads the parameters of the Neural Network from an external file named as file_name
+		
+	return_parameters_as_vectors()
+		Returns the parameters of the vector organized in the form of a vector
+		
+	load_parameters_from_vector(weight_vector)
+		Load the parameters of the Neural Network from a user input in the form of an array/vector
+		
+	generate_visual(filename, view=False)
+		Generate the visual representation of the Neural Network
+	"""
+
 	# The layer_dimensions is an array with the following layout
 	# [[number_of_nodes_in_first_layer(input layer), activation_function], [number_of_nodes_in_second_layer, activation_function], ..., [number_of_output_nodes]]
 	def __init__(self, layer_dimensions):
+		# Make some class variable declarations
+		self.input_dim = (layer_dimensions[0][0], )
+	
 		# Initialize a layer_vector, that is a list of Layer objects
 		self.layer_vector = []
 		
@@ -187,8 +78,38 @@ class StaticNeuralNetwork(NeuralNetwork):
 		
 	# Function to get output from input_vector
 	def forward_propagate(self, input_vector):
+		"""
+		Generate the output of the Neural Network when input_vector
+		is passed to the Neural Network
+		
+		Parameters
+		----------
+		input_vector: array_like
+			The input_vector to be passed to the Neural Network
+			
+		Returns
+		-------
+		intermediate_output: array_like
+			The output vector that is generated by the Neural Network
+			
+		Raises
+		------
+		ValueException
+			The input_vector should be of the dimensions of the input of the network
+			
+		Notes
+		-----
+		The Neural Network is a collection of layers. To generate the output of the
+		Neural Network the input_vector is fed into the first layer, whose output is
+		then fed into the next layer. Successively doing this for each layer, generates
+		the output of the network.
+		"""
 		# Convert the input_vector to numpy array
 		intermediate_output = np.array(input_vector)
+		
+		# Check for dimensions
+		if(intermediate_output.shape != self.input_dim):
+			raise ValueError("The dimensions of the input vector do not match to the specified ones!")
 		
 		# Forward propagate for each layer
 		for layer in self.layer_vector:
@@ -196,20 +117,51 @@ class StaticNeuralNetwork(NeuralNetwork):
 			
 		return intermediate_output
 		
-	# Function to save the layer weights
-	def save_weights_to_file(self, file_name):
+	# Function to save the layer parameters
+	def save_parameters_to_file(self, file_name):
+		"""
+		Save the parameters of the Neural Network
+		
+		Using pickle, the list of layers is stored
+		"""
 		# Use pickle to save the layer_vector
 		with open(file_name, 'wb') as f:
 			pickle.dump(self.layer_vector, f)
 			
-	# Function to load the layer weights
+	# Function to load the layer parameters
 	def load_weights_from_file(self, file_name):
+		""" Load the parameters of the Neural Network """
 		# Use pickle to load the layer_vector
 		with open(file_name, 'rb') as f:
 			self.layer_vector = pickle.load(f)
 			
-	# Function to return the weights and bias in the form of a vector
-	def return_weights_as_vector(self):
+	# Function to return the parameters in the form of a vector
+	def return_parameters_as_vector(self):
+		"""
+		Return the parameters of the Static Neural Network in the form of
+		a an array / vector.
+		
+		Parameters
+		----------
+		None
+		
+		Returns
+		-------
+		output: array_like
+			The vector representation of the parameters of the Neural Network
+			
+		Raises
+		------
+		None
+		
+		Notes
+		-----
+		The numpy flatten function works in row major order.
+		The parameter vector follows the layout as
+		[w_11, w_21, w_12, w_22, w_13, w_23, b_1, b_2, b_3, a_1g, a_1b, a_2g, a_2b, a_3g, a_3b, w_11, w_21, w_31, b_1, ...]
+		Here, w_ij implies the weight between ith input node and jth output node. b_i is the bias for the ith output node.
+		a_ib is the bias activation parameter of ith output node and a_ig is the gain activation parameter of ith output node. 
+		"""
 		# Initialize the output vector
 		# Determine an individual layer's weight matrix in row major form and then it's bias
 		# Then concatenate it with the previous output vector
@@ -223,15 +175,43 @@ class StaticNeuralNetwork(NeuralNetwork):
 			# The vector we get from flattening the bias vector
 			bias_vector = layer.get_bias_vector().flatten()
 			
-			# The output vector is concatenated form of weight_vector and bias_vector
-			output = np.concatenate([output, weight_vector, bias_vector])
+			# The vector of activation parameters
+			activation_vector = np.array(layer.get_activation_parameters())
+			
+			# The output vector is concatenated form of weight_vector, bias_vector and activation_vector
+			output = np.concatenate([output, weight_vector, bias_vector, activation_vector])
 		
 		return output
 	
-	# Function to load the weights and bias from vector
-	def load_weights_from_vector(self, weight_vector):
+	# Function to load the parameters from vector
+	def load_parameters_from_vector(self, parameter_vector):
+		"""
+		Load the parameters of the Static Neural Network in the form of
+		an array / vector
+		
+		Parameters
+		----------
+		parameter_vector: array_like
+			The parameter vector follows the layout as
+			[w_11, w_21, w_12, w_22, w_13, w_23, b_1, b_2, b_3, a_1g, a_1b, a_2g, a_2b, a_3g, a_3b, w_11, w_21, w_31, b_1, ...]
+			Here, w_ij implies the weight between ith input node and jth output node. b_i is the bias for the ith output node.
+			a_ib is the bias activation parameter of ith output node and a_ig is the gain activation parameter of ith output node. 
+			
+		Returns
+		-------
+		None
+		
+		Raises
+		------
+		ValueException
+			The parameter array is shorter than required
+			
+		Warning
+			The parameter array is greater than required
+			
+		"""
 		# Convert to numpy array
-		weight_vector = np.array(weight_vector)
+		parameter_vector = np.array(parameter_vector)
 	
 		# Interval counter maintains the current layer index
 		interval_counter = 0
@@ -245,17 +225,55 @@ class StaticNeuralNetwork(NeuralNetwork):
 			weight_interval = weight_dim[0] * weight_dim[1]
 			
 			# Get the interval at which the bias and next weight vector seperate
-			bias_interval = bias_dim[0] * bias_dim[1]
+			bias_interval = bias_dim[0]
 			
 			# Seperate the weights and bias and then reshape them
-			layer.set_weight_matrix(weight_vector[interval_counter:interval_counter + weight_interval].reshape(weight_dim))
-			interval_counter = interval_counter + weight_interval
-			layer.set_bias_vector(weight_vector[interval_counter:interval_counter + bias_interval].reshape(bias_dim[0],))
-			interval_counter = interval_counter + bias_interval
+			# Numpy raises a None Type Exception, as it cannot reshape a None object
+			# If such an excpetion occurs, raise a value error as our parameter_vector
+			# is shorter than required
+			try:
+				layer.set_weight_matrix(parameter_vector[interval_counter:interval_counter + weight_interval].reshape(weight_dim))
+				interval_counter = interval_counter + weight_interval
+				layer.set_bias_vector(parameter_vector[interval_counter:interval_counter + bias_interval].reshape(bias_dim[0],))
+				interval_counter = interval_counter + bias_interval
+				layer.set_activation_parameters(parameter_vector[interval_counter], parameter_vector[interval_counter + 1])
+				interval_counter = interval_counter + 2
+			except:
+				raise ValueError("The parameter_vector consists of elements less than required")
+			
+		# The interval counter should contain the number of elements in parameter_vector
+		# Otherwise the user has specified parameters more than required
+		# Just a warning is enough
+		if(len(parameter_vector) > interval_counter):
+			warnings.warn("The parameter vector consists of elements greater than required")
 			
 	
 	# Function to generate the visual representation
 	def generate_visual(self, filename, view=False):
+		"""
+		Generate the visual representation of the Neural Network and
+		store it as a pdf file in the representations directory
+		
+		Parameters
+		----------
+		filename
+			Specifies the name of the pdf file which is to be saved
+			
+		view=False
+			Whether to view the generated file(True) or not(False)
+			
+		Returns
+		-------
+		None
+		
+		Raises
+		------
+		None
+		
+		Note
+		----
+		Graphviz library is used to generate the representation
+		"""
 		# We need many subgraphs
 		for layer in range(self.number_of_layers):
 			subgraph = Digraph(name="cluster_" + str(layer), graph_attr={'color': "white", 'label': "Layer " + str(layer)}, node_attr={'style': "solid", 'color': "black", 'shape': "circle"})
