@@ -30,7 +30,7 @@ git clone https://github.com/TheRoboticsClub/colab-gsoc2020-Sakshay_Mahna
 
 ### How to create a Neural Network?
 
-- Import the Activation Function and Neural Networks along with Numpy(optional)
+- Import the Activation Function and Neural Networks along with Numpy(optional). The `neural_networks.activation_functions` consist of a library of activation functions. The `neural_networks.static_nn` contatins the StaticNeuralNetwork class.
 
 ```python
 from neural_networks.static_nn import StaticNeuralNetwork
@@ -38,23 +38,17 @@ from neural_networks.activation_functions import SigmoidActivation
 import numpy as np
 ```
 
-The `neural_networks.activation_functions` consist of a library of activation functions. The `neural_networks.static_nn` contatins the StaticNeuralNetwork class.
-
-- Initialize the Neural Network Object. For instance, we have a Perceptron with 2 input nodes and 1 output node along with a sigmoid activaiton function.
+- Initialize the Neural Network Object. For instance, we have a Perceptron with 2 input nodes and 1 output node along with a sigmoid activaiton function. Pass a **list of list** of Layer Parameters while initializing the Neural Network object.
 
 ```python
 percpetron = StaticNeuralNetwork([[2, SigmoidActivation(1, 0)], [1]])
 ```
 
-Pass a **list of list** of Layer Parameters while initializing the Neural Network object.
-
-- Load self-generated parameters into the Neural Network. Assume, in this case the weights of the input are 0.5 and 0.5, the bias is 1. And the gain of the Sigmoid Activation is 1 and the offset is 0.
+- Load self-generated parameters into the Neural Network. Assume, in this case the weights of the input are 0.5 and 0.5, the bias is 1. And the gain of the Sigmoid Activation is 1 and the offset is 0. Note that the parameters are to be given in a format specific to each Neural Network Class.
 
 ```python
 perceptron.load_parameters_from_vector([0.5, 0.5, 1, 1, 0])
 ```
-
-Note that the parameters are to be given in a format specific to each Neural Network Class.
 
 - Generate the output. In this case, the inputs to both the nodes is 1.
 
