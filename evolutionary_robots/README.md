@@ -148,7 +148,7 @@ nn.generate_visual(filename)
 ```
 
 
-#### Static Neural Network
+### Static Neural Network
 
 **Format for Initialization**
 
