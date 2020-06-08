@@ -1,206 +1,74 @@
-# This module contains the Dynamic Neural Network class
-# Two main constituents of the Dynamic Layer are Time Delay and Time Recurrence
-# Time Delay, provides the current input as well as the previous input to the network
-# Time Recurrence, provides the output of a layer to the input of a previous layer
+"""Docstring for dynamic_nn.py module
 
-# Note: The dynamic Neural Network implemented here only works for left-to-right case
-# For a network with right_to_left connections, the user is recommended to construct
-# a custom neural network without any abstractions!
+This module contains the Dynamic Neural Network class
+Two main constituents of the Dynamic Layer are Time Delay and Time Recurrence
+Time Delay provides the current output as well as the previous input to the network
+Time Recurrence, provides the output of a layer to the input of a previous layer
+
+The dynamic neural network implemented here only work for left-to-right case
+For a network with right_to_left connections, the user is recommended to construct
+a custom neural network without any abstractions!
+"""
 
 import numpy as np
 import pickle
 from graphviz import Digraph
-from nn import Layer, NeuralNetwork
+from layers import DynamicLayer
 
-# Class for Time Delay system
-# The time delay network works by returning the weighted average of the input vectors
-# No activation is given at the moment!################
-# delay_dim specifies the delay, a value of 1 gives the same Static behaviour
-class TimeDelay:
-	def __init__(self, input_dim, delay_dim):
-		# Weight dimensions and input dimensions
-		self.weight_dim = (1, delay_dim)
-		self.input_matrix_dim = (delay_dim, input_dim)
-		
-		# Generate the weight vector and input matrix
-		self.weight_vector = np.random.rand(*self.weight_dim)
-		self.input_matrix = np.zeros(self.input_matrix_dim)
-		
-	# Forward propagate
-	def forward_propagate(self, input_vector):
-		# Convert to numpy array
-		input_vector = np.array([input_vector])
-		
-		# Insert the input_vector and remove the oldest one
-		self.input_matrix = np.insert(self.input_matrix, 0, input_vector, axis=0)
-		self.input_matrix = np.delete(self.input_matrix, len(self.input_matrix) - 1, axis=0)
-		
-		# Generate the output
-		output = np.dot(self.weight_vector, self.input_matrix).flatten()
-		
-		return output
-		
-	# Function to return the weight vector
-	def get_weight_vector(self):
-		return self.weight_vector
-		
-	# Function to set the weight vector
-	def set_weight_vector(self, weight_vector):
-		self.weight_vector = weight_vector
-		
-	# Function to return the dimensions of weight vector
-	def get_weight_vector_dim(self):
-		return self.weight_dim
-		
-
-# Class for Time Recurrence system
-# The time recurrence works the same as static layer, but we have to set the input vector by ourselves
-# The input_dim are the dimensions of the later layer, which provides its output(right)
-# The output_dim are the dimensions of the layer that uses those values(left)
-class TimeRecurrence:
-	def __init__(self, input_dim, output_dim):
-		# Weight dimensions
-		self.weight_dim = (output_dim, input_dim)
-		
-		# Initialize the weight matrix
-		self.weight_matrix = np.random.rand(*self.weight_dim)
-		
-		# Initialize the input vector
-		self.input_vector = np.zeros((input_dim,))
-		
-	# Forward propagate
-	def forward_propagate(self):
-		# Generate the output and return it
-		output = np.dot(self.weight_matrix, self.input_vector)
-		return output
-		
-	# Function to get the weight matrix
-	def get_weight_matrix(self):
-		return self.weight_matrix
-		
-	# Function to set the weight matrix
-	def set_weight_matrix(self, weight_matrix):
-		self.weight_matrix = weight_matrix
-		
-	# Function to set the input_vector
-	def set_input_vector(self, input_vector):
-		self.input_vector = input_vector
-		
-	# Function to return the dimensions of weight matrix
-	def get_weight_matrix_dim(self):
-		return self.weight_dim
-		
-# Class for Dynamic Layer
-# Each dynamic layer has the provision to include the delay system, recurrent system and forward propagation system
-class DynamicLayer(Layer):
-	# input_dim and output_dim are for the forward propagation part
-	# delay_dim is for the delay system
-	# recurrent_dim is a list for the recurrent system, the dimensions are given from left to right
-	def __init__(self, input_dim, output_dim, delay_dim, recurrent_dim, activation_function, layer_name):
-		# Set the layer name
-		self.layer_name = layer_name
-		
-		# Initialize the weight and bias dimensions
-		self.weight_dim = (output_dim, input_dim)
-		self.bias_dim = (output_dim, 1)
-		
-		# Initialize the weight and bias
-		self.weight_matrix = np.random.rand(*self.weight_dim)
-		self.bias_vector = np.random.rand(output_dim)
-		
-		# Initialize the delay system
-		self.delay_system = TimeDelay(input_dim, delay_dim)
-		
-		# Initialize the recurrent system
-		self.recurrent_system = []
-		for dimension in recurrent_dim:
-			self.recurrent_system.append(TimeRecurrence(dimension, output_dim))
-			
-		# Set the activation function
-		self.activation_function = activation_function
-			
-	# Forward Propagate
-	def forward_propagate(self, input_vector):
-		# Convert to numpy array
-		input_vector = np.array(input_vector)
-		
-		# Get the input from delay system
-		input_vector = self.delay_system.forward_propagate(input_vector)
-		
-		# intermediate_output keeps storing the outputs and adding them
-		intermediate_output = np.add(np.dot(self.weight_matrix, input_vector), self.bias_vector)
-		
-		# Get the outputs from recurrent system
-		for recurrence in self.recurrent_system:
-			intermediate_output = np.add(intermediate_output, recurrence.forward_propagate())
-			
-		# Activate the output
-		intermediate_output = self.activation_function(intermediate_output)
-		
-		return intermediate_output
-		
-	# Function to set the input_vector of the recurrent layer
-	def set_recurrent_input(self, input_vector, index):
-		self.recurrent_system[index].set_input_vector(input_vector)
-		
-	# Function to set the weight matrix
-	def set_weight_matrix(self, weight_matrix):
-		self.weight_matrix = weight_matrix
-		
-	# Function to return the weight matrix
-	def get_weight_matrix(self):
-		return self.weight_matrix
-		
-	# Function to set the recurrent weight matrix
-	def set_recurrent_weight_matrix(self, weight_matrix, index):
-		self.recurrent_system[index].set_weight_matrix(weight_matrix)
-		
-	# Function to get the recurrent weight matrix
-	def get_recurrent_weight_matrix(self, index):
-		return self.recurrent_system[index].get_weight_matrix()
-		
-	# Function to set the delay weight
-	def set_delay_weight_vector(self, weight_vector):
-		self.delay_system.set_weight_vector(weight_vector)
-		
-	# Function to return the delay weight
-	def get_delay_weight_vector(self):
-		return self.delay_system.get_weight_vector()
-		
-	# Function to set the bias vector
-	def set_bias_vector(self, bias_vector):
-		self.bias_vector = bias_vector
-		
-	# Function to return the bias vector
-	def get_bias_vector(self):
-		return self.bias_vector
-		
-	# Function to return the delay weight dimensions
-	def get_delay_weight_dim(self):
-		return self.delay_system.get_weight_vector_dim()
-		
-	# Function to return the recurrent weight matrix dimensions
-	def get_recurrent_weight_dim(self, index):
-		return self.recurrent_system[index].get_weight_matrix_dim()
-		
-	# Function to return the static weight matrix dimensions
-	def get_weight_matrix_dim(self):
-		return self.weight_dim
-		
-	# Function to return the bias vector dimensions
-	def get_bias_vector_dim(self):
-		return self.bias_dim
-		
-	# Function to return the layer name
-	def get_name(self):
-		return self.layer_name
+# Library used to generate warnings
+import warnings
 		
 # The Dynamic Neural Network class
-class DynamicNeuralNetwork(NeuralNetwork):
-	# Layer dimensions follow the layout as:
-	# [[nodes_in_layer_one, delay_dim, [list_of_connections], activation_function], [nodes_in_layer_two, delay_dim, [list_of_connections], activation_function], ...[nodes_in_output]]
-	# The list_of_connections is provided in a left to right fashion
+class DynamicNeuralNetwork:
+	"""
+	The Dynamic Neural Network class
+	The class has adjustable number of layers, neurons in each layer,
+	the activation function and delay of each layer along with the
+	recurrent connections between layers
+	
+	...
+	
+	Attributes
+	----------
+	layer_dimensions: array_like
+		The layer dimensions specify the parameters of the layers of the Neural Network
+		The layout followed is:
+		[[nodes_in_layer_one, delay_dim, [list_of_connections], activation_function], [nodes_in_layer_two, delay_dim, [list_of_connections], activation_function], ...[nodes_in_output]]
+		The list_of_connections is provided in a left to right fashion
+		
+	
+	Methods
+	-------
+	forward_propagate(input_vector)
+		Generates the output of the Neural Network given the input_vector
+		
+	save_parameters_to_file(file_name)
+		Saves the parameters of the Neural Network to an external file named as file_name
+		
+	load_parameters_from_file(file_name)
+		Loads the parameters of the Neural Network from an external file named as file_name
+		
+	return_parameters_as_vectors()
+		Returns the parameters of the vector organized in the form of a vector
+		
+	load_parameters_from_vector(weight_vector)
+		Load the parameters of the Neural Network from a user input in the form of an array/vector
+		
+	generate_visual(filename, view=False)
+		Generate the visual representation of the Neural Network
+		
+	Additional Methods
+	------------------
+	update_inputs()
+		Internal method to update the inputs of the recurrent system
+		
+	process_connections()
+		Internal method to classify the input connections and output connections
+	"""
 	def __init__(self, layer_dimensions):
+		# Make some class variable declarations
+		self.input_dim = (layer_dimensions[0][0], )
+		
 		# Number of layers
 		self.number_of_layers = len(layer_dimensions) - 1
 		
@@ -225,6 +93,37 @@ class DynamicNeuralNetwork(NeuralNetwork):
 			
 	# Function to forward propagate the output
 	def forward_propagate(self, input_vector):
+		"""
+		Generate the output of the Neural Network when input_vector
+		is passed to the Neural Network
+		
+		Parameters
+		----------
+		input_vector: array_like
+			The input_vector to be passed to the Neural Network
+			
+		Returns
+		-------
+		intermediate_output: array_like
+			The output vector that is generated by the Neural Network
+			
+		Raises
+		------
+		ValueException
+			The input_vector should be of the dimensions of the input of the network
+			
+		Notes
+		-----
+		In Dynamic Neural Networks, all the layer outputs are stored. This makes it easy
+		to update the input vectors of the recurrent system.
+		"""
+		# Convert to numpy array
+		input_vector = np.array(input_vector)
+		
+		# CHeck shape
+		if(input_vector.shape != self.input_dim):
+			raise ValueError("The dimensions of the input vector do not match to the specified ones!")
+		
 		# A list of intermediate outputs will enable us to update the input_vector for each layer after calculation of the whole output
 		self.intermediate_output = [np.array([])] * self.number_of_layers
 		
@@ -243,6 +142,7 @@ class DynamicNeuralNetwork(NeuralNetwork):
 		
 	# Function to update the inputs
 	def update_inputs(self):
+		""" Internal function to update the recurrent weights. Works in left-to-right fashion """
 		# Loop through the input_connections
 		for i in range(len(self.input_connections)):
 			# Variable to help update the input from left to right
@@ -254,6 +154,7 @@ class DynamicNeuralNetwork(NeuralNetwork):
 	
 	# Function to process the connections that are input and output
 	def process_connections(self, layer_dimensions):
+		""" Internal function to seperate the output connections and the input connections """
 		# Initialize the input and output connection list
 		self.input_connections = []
 		self.output_connections = []
@@ -272,23 +173,50 @@ class DynamicNeuralNetwork(NeuralNetwork):
 			self.input_connections.append(in_connections)
 			self.output_connections.append(out_connections)
 	
-	# Function to save the layer weights
-	def save_weights_to_file(self, file_name):
+	# Function to save the layer parameters
+	def save_parameters_to_file(self, file_name):
+		"""
+		Save the parameters of the Neural Network
+		
+		Using pickle, the list of layers is stored
+		"""
 		# Use pickle to save the layer_vector
 		# This even saves all the previous input we were working on!
 		with open(filename, 'wb') as f:
 			pickle.dump(self.layer_vector, f)
 			
-	# Function to load the layer weights
-	def load_weights_from_file(self, file_name):
+	# Function to load the layer parameters
+	def load_parameters_from_file(self, file_name):
+		""" Load the parameters of the Neural Network """
 		# Use pickle to load the layer_vector
 		with open(file_name, 'rb') as f:
 			self.layer_vector = pickle.load(f)
 			
-	# Function to return all the weights and bias in the form of a vector
-	def return_weights_as_vector(self):
-		# The layout followed is the same that Static Network follows, with a few additions
-		# weights of delay system + weights of recurrent system(quite varying length) + weights of static system + weights of bias
+	# Function to return all the parameters in the form of a vector
+	def return_parameters_as_vector(self):
+		"""
+		Return the parameters of the Dynamic Neural Network in the form of
+		a an array / vector.
+		
+		Parameters
+		----------
+		None
+		
+		Returns
+		-------
+		output: array_like
+			The vector representation of the parameters of the Neural Network
+			
+		Raises
+		------
+		None
+		
+		Notes
+		-----
+		The numpy flatten function works in row major order.
+		The layout followed is the same as that of Static Neural Network, with a few additions
+		weights of delay system + weights of recurrent system + weights of static system + weights of bias + activation function parameters
+		"""
 		
 		# Initialize the output
 		output = np.array([])
@@ -309,49 +237,117 @@ class DynamicNeuralNetwork(NeuralNetwork):
 			# Get the bias vector
 			bias_vector = self.layer_vector[layer].get_bias_vector().flatten()
 			
+			# Get the activation parameters
+			activation_vector = np.array(self.layer_vector[layer].get_activation_parameters())
+			
 			# concatenate everything
-			output = np.concatenate([output, weight_vector_delay, weight_vector_recurrent, weight_vector_static, bias_vector])
+			output = np.concatenate([output, weight_vector_delay, weight_vector_recurrent, weight_vector_static, bias_vector, activation_vector])
 			
 		return output
 		
-	# Function to set all the weights and bias from a vector
-	def load_weights_from_vector(self, weight_vector):
+	# Function to set all the parameters from a vector
+	def load_parameters_from_vector(self, parameter_vector):
+		"""
+		Load the parameters of the Dynamic Neural Network in the form of
+		an array / vector
+		
+		Parameters
+		----------
+		parameter_vector: array_like
+			The layout followed is the same as that of Static Neural Network, with a few additions
+		weights of delay system + weights of recurrent system + weights of static system + weights of bias + activation function parameters
+			
+		Returns
+		-------
+		None
+		
+		Raises
+		------
+		ValueException
+			The parameter array is shorter than required
+			
+		Warning
+			The parameter array is greater than required
+		"""
 		# Same layout, therefore we need to extract and then load!
 		# Convert to numpy array
-		weight_vector = np.array(weight_vector)
+		parameter_vector = np.array(parameter_vector)
 		
 		# Interval counter maintains the current layer index
 		interval_counter = 0
 		
-		# Contrary to static neural network, in this case, we extract dimensions and then extract the weight simultaneously 
-		for layer in range(self.number_of_layers):
-			# Get the dimensions, interval and extract for delay
-			delay_dim = self.layer_vector[layer].get_delay_weight_dim()
-			delay_interval = delay_dim[0] * delay_dim[1]
-			self.layer_vector[layer].set_delay_weight_vector(weight_vector[interval_counter:interval_counter+delay_interval].reshape(delay_dim))
-			interval_counter = interval_counter + delay_interval
-			
-			# Get the dimensions, interval and extract for recurrent
-			for index in range(len(self.input_connections[layer])):
-				recurrent_dim = self.layer_vector[layer].get_recurrent_weight_dim(index)
-				recurrent_interval = recurrent_dim[0] * recurrent_dim[1]
-				self.layer_vector[layer].set_recurrent_weight_matrix(weight_vector[interval_counter:interval_counter+recurrent_interval].reshape(recurrent_dim), index)
-				interval_counter = interval_counter + recurrent_interval
+		# Numpy raises a None Type Exception, as it cannot reshape a None object
+		# If such an excpetion occurs, raise a value error as our parameter_vector
+		# is shorter than required
+		try:
+			# Contrary to static neural network, in this case, we extract dimensions and then extract the weight simultaneously 
+			for layer in range(self.number_of_layers):
+				# Get the dimensions, interval and extract for delay
+				delay_dim = self.layer_vector[layer].get_delay_weight_dim()
+				delay_interval = delay_dim[0] * delay_dim[1]
+				self.layer_vector[layer].set_delay_weight_vector(parameter_vector[interval_counter:interval_counter+delay_interval].reshape(delay_dim))
+				interval_counter = interval_counter + delay_interval
 				
-			# Get the dimensions, interval and extract for static weight
-			weight_dim = self.layer_vector[layer].get_weight_matrix_dim()
-			weight_interval = weight_dim[0] * weight_dim[1]
-			self.layer_vector[layer].set_weight_matrix(weight_vector[interval_counter:interval_counter+weight_interval].reshape(weight_dim))
-			interval_counter = interval_counter + weight_interval
+				# Get the dimensions, interval and extract for recurrent
+				for index in range(len(self.input_connections[layer])):
+					recurrent_dim = self.layer_vector[layer].get_recurrent_weight_dim(index)
+					recurrent_interval = recurrent_dim[0] * recurrent_dim[1]
+					self.layer_vector[layer].set_recurrent_weight_matrix(parameter_vector[interval_counter:interval_counter+recurrent_interval].reshape(recurrent_dim), index)
+					interval_counter = interval_counter + recurrent_interval
+					
+				# Get the dimensions, interval and extract for static weight
+				weight_dim = self.layer_vector[layer].get_weight_matrix_dim()
+				weight_interval = weight_dim[0] * weight_dim[1]
+				self.layer_vector[layer].set_weight_matrix(parameter_vector[interval_counter:interval_counter+weight_interval].reshape(weight_dim))
+				interval_counter = interval_counter + weight_interval
+				
+				# Get the dimensions, interval and extract for bias vector
+				bias_dim = self.layer_vector[layer].get_bias_vector_dim()
+				bias_interval = bias_dim[0]
+				self.layer_vector[layer].set_bias_vector(parameter_vector[interval_counter:interval_counter+bias_interval].reshape(bias_dim[0],))
+				interval_counter = interval_counter + bias_interval
+				
+				# Get the interval and extract for activation vector
+				activation_interval = 2
+				self.layer_vector[layer].set_activation_parameters(parameter_vector[interval_counter], parameter_vector[interval_counter+1])
+				interval_counter = interval_counter + activation_interval
+				
+		except:
+			raise ValueError("The parameter_vector consists of elements less than required")
 			
-			# Get the dimensions, interval and extract for bias vector
-			bias_dim = self.layer_vector[layer].get_bias_vector_dim()
-			bias_interval = bias_dim[0] * bias_dim[1]
-			self.layer_vector[layer].set_bias_vector(weight_vector[interval_counter:interval_counter+bias_interval].reshape(bias_dim[0],))
-			interval_counter = interval_counter + bias_interval
+		# The interval counter should contain the number of elements in parameter_vector
+		# Otherwise the user has specified parameters more than required
+		# Just a warning is enough
+		if(len(parameter_vector) > interval_counter):
+			warnings.warn("The parameter vector consists of elements greater than required")
 			
+	
 	# Function to generate the visual representation
 	def generate_visual(self, filename, view=False):
+		"""
+		Generate the visual representation of the Neural Network and
+		store it as a pdf file in the representations directory
+		
+		Parameters
+		----------
+		filename
+			Specifies the name of the pdf file which is to be saved
+			
+		view=False
+			Whether to view the generated file(True) or not(False)
+			
+		Returns
+		-------
+		None
+		
+		Raises
+		------
+		None
+		
+		Note
+		----
+		Graphviz library is used to generate the representation
+		"""
 		# We need many subgraphs
 		for layer in range(self.number_of_layers):
 			# Delay dimension

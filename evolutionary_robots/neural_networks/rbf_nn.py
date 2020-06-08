@@ -10,56 +10,6 @@ from graphviz import Digraph
 from static_nn import StaticLayer
 from activation_functions import linear_function
 from nn import Layer, NeuralNetwork
-
-# Radial Basis Function Layer
-class RBFLayer(Layer):
-	def __init__(self, input_dim, output_dim, distance_function, basis_function, parameter, layer_name):
-		# Set the name
-		self.layer_name = layer_name
-	
-		# Set the dimensions
-		self.center_dim = (output_dim, input_dim)
-		
-		# Set the center of neurons
-		self.center_matrix = np.random.rand(*self.center_dim)
-		
-		# Set the distance function
-		self.distance_function = distance_function
-		
-		# Set the basis function and it's parameter
-		self.basis_function = basis_function
-		self.parameter = parameter
-		
-	# Forward Propagate
-	def forward_propagate(self, input_vector):
-		# Conver to numpy array
-		input_vector = np.array(input_vector)
-		
-		# Compute the distance of the input and the centers
-		# The distance function has to calculate a distance vector
-		# based on the center matrix and input_vector
-		distance_vector = self.distance_function(input_vector, self.center_matrix)
-		
-		# Calculate the output of the basis function
-		output = self.basis_function(distance_vector, self.parameter)
-		
-		return output
-		
-	# Function to set the center matrix
-	def set_center_matrix(self, center_matrix):
-		self.center_matrix = center_matrix
-		
-	# Function to get the center matrix
-	def get_center_matrix(self):
-		return self.center_matrix
-		
-	# Function to return the dimensions of the center matrix
-	def get_center_dim(self):
-		return self.center_dim
-		
-	# Function to return the layer name
-	def get_name(self):
-		return self.layer_name
 		
 # Gaussian Radial Basis Network
 class GaussianRBFNetwork(NeuralNetwork):
