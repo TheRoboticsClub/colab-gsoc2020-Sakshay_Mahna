@@ -2,7 +2,7 @@
 
 ## How to create a Neural Network?
 
-Import the Activation Function and Neural Networks along with Numpy(optional). The `neural_networks.activation_functions` consist of a library of activation functions. The `neural_networks.static_nn` contatins the StaticNeuralNetwork class.
+**Import the Activation Function and Neural Networks** along with Numpy(optional). The `neural_networks.activation_functions` consist of a library of activation functions. The `neural_networks.static_nn` contatins the StaticNeuralNetwork class.
 
 ```python
 from neural_networks.static_nn import StaticNeuralNetwork
@@ -10,25 +10,25 @@ from neural_networks.activation_functions import SigmoidActivation
 import numpy as np
 ```
 
-Initialize the Neural Network Object. For instance, we have a Perceptron with 2 input nodes and 1 output node along with a sigmoid activaiton function. Pass a **list of list** of Layer Parameters while initializing the Neural Network object.
+**Initialize the Neural Network Object** For instance, we have a Perceptron with 2 input nodes and 1 output node along with a sigmoid activaiton function. Pass a **list of list** of Layer Parameters while initializing the Neural Network object.
 
 ```python
 percpetron = StaticNeuralNetwork([[2, SigmoidActivation(1, 0)], [1]])
 ```
 
-Load self-generated parameters into the Neural Network. Assume, in this case the weights of the input are 0.5 and 0.5, the bias is 1. And the gain of the Sigmoid Activation is 1 and the offset is 0. Note that the parameters are to be given in a format specific to each Neural Network Class.
+**Load self-generated parameters into the Neural Network** Assume, in this case the weights of the input are 0.5 and 0.5, the bias is 1. And the gain of the Sigmoid Activation is 1 and the offset is 0. Note that the parameters are to be given in a format specific to each Neural Network Class.
 
 ```python
 perceptron.load_parameters_from_vector([0.5, 0.5, 1, 1, 0])
 ```
 
-Generate the output. In this case, the inputs to both the nodes is 1.
+**Generate the output** In this case, the inputs to both the nodes is 1.
 
 ```python
 output = perceptron.forward_propagate([1, 1])
 ```
 
-For more examples, check the `examples` directory.
+For more examples, check the [examples directory](./../examples).
 
 The following covers the specifics of each of the Neural Network classes.
 
@@ -45,9 +45,9 @@ The following covers the specifics of each of the Neural Network classes.
 | ReLU Activation		| ReluActivation()	  | Beta and Theta		  |
 | Maximum Value			| MaximumActivation() | None				  |
 
-**Note**: In case of activation functions with parameters less than 2. The format of parameter input of Neural Networks remains the same. Therefore, they are to be given any arbitrary values(for correct syntax). These values do not affect the activation function.
+**Note**: In case of activation functions with parameters less than 2. The format of parameter input of Neural Networks remains the same. Therefore, they are to be given any arbitrary values(for correct syntax). These values do not affect the activation function parameters.
 
-There are two ways to set the parameters of the Activation Function. Either while initializing the object or while explicitly by a function call. The default values of beta and theta are taken to be as 1 and 0 respectively.
+**There are two ways to set the parameters of the Activation Function** Either while initializing the object or while explicitly by a function call. The default values of beta and theta are taken to be as 1 and 0 respectively.
 
 ```python
 # Default Initialization
@@ -60,7 +60,7 @@ activation = LinearActivation(2, 1)
 activation.set_parameters(1, 0)
 ```
 
-The input to the activation function should be a numpy array. Calculate the activation as follows. Building on from the example above.
+**Calculate the activation as follows** The input to the activation function should be a numpy array. Building on from the example above.
 
 ```python
 print(activation.calculate_activation(np.array([-1, 0, 1])))
@@ -80,19 +80,19 @@ The supported neural networks are:
 
 Methods supported by all the Neural Networks
 
-Generate a Neural Network with a given number of layers, number of neurons in each layer and the activation function. The format of the list to be passed is given in the next section for each neuron.
+**Generate a Neural Network** with a given number of layers, number of neurons in each layer and the activation function. The format of the list to be passed is given in the [next section](#static-neural-network) for each neural network.
 
 ```python
 nn = StaticNeuralNetwork(a_list_with_appropriate_format_for_initialization)
 ```
 
-Generate the output of a Neural Network. The input vector to be passed is a list, of dimensions as specified by the user during initialization.
+**Generate the output of Neural Network** The input vector to be passed is a list, of dimensions as specified by the user during initialization.
 
 ```python
 nn.forward_propagate(input_vector)
 ```
 
-Save and load the parameters of a Neural Network from a file.
+**Save and load the parameters from a file**
 
 ```python
 # Save the parameters to a file in some specific directory
@@ -102,7 +102,7 @@ nn.save_parameters_to_file(path_to_directory_with_file_name_in_quotes)
 nn.load_parameters_from_file(path_to_directory_with_file_name_in_quotes)
 ```
 
-Return and load the parameters of a Neural Network in the form of a list. The format of parameter list for each Neural Network is given in the next section
+**Return and load the parameters in the form of a list**. The format of parameter list for each Neural Network is given in the [next section](#static-neural-network) for each neural network.
 
 ```python
 # Return the parameters
@@ -112,7 +112,7 @@ nn.return_parameters_as_vectors()
 nn.load_parameters_from_vector(a_list_with_appropriate_format)
 ```
 
-Generate the visual representation of the Neural Network. The representation is generated in the form of pdf and saved in the directory `representations`
+**Generate the visual representation** The representation is generated in the form of pdf and saved in the directory `representations`
 
 ```python
 # See the representation right away
