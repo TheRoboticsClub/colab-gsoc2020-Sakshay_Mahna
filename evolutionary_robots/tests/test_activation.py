@@ -1,3 +1,7 @@
+# This part is specific to each user, not recommended to be copied
+import sys
+sys.path.append('./../')
+
 # Tests for activation functions
 
 from neural_networks import activation_functions

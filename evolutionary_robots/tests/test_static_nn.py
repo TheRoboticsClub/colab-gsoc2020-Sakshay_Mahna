@@ -1,3 +1,7 @@
+# This part is specific to each user, not recommended to be copied
+import sys
+sys.path.append('./../')
+
 # Tests for static neural networks
 
 from neural_networks.static_nn import StaticNeuralNetwork 
