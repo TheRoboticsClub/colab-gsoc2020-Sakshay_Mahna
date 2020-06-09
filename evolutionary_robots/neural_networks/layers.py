@@ -732,6 +732,12 @@ class CTRNNLayer:
 	get_time_constants()
 		Returns the time constants used by the layer
 		
+	set_activation_parameters(beta, theta)
+		Set the parameters of activation function
+		
+	get_activation_parameters()
+		Get the parameters of activation function
+		
 	"""
 	# time_interval is a scalar
 	# time_constant is a list, as it is different for each i-th neuron
@@ -860,6 +866,16 @@ class CTRNNLayer:
 	def get_time_constant(self):
 		""" Function to return the list of time constants """
 		return self.time_constant
+		
+	# Function to set the activation parameters
+	def set_activation_parameters(self, beta, theta):
+		""" Set the parameters of activation function """
+		self.activation_function.set_parameters(beta, theta)
+	
+	# Function to return the activation parameters(tuple)	
+	def get_activation_parameters(self):
+		""" Get the parameters of activation function """
+		return self.activation_function.get_parameters()
 
 		
 # Radial Basis Function Layer ################################################
