@@ -144,16 +144,20 @@ class CTRNN:
 		-----
 		The numpy flatten function works in row major order.
 		The parameter vector follows the layout as
-		[w_11, w_21, w_12, w_22, w_13, w_23, b_1, b_2, b_3, a_1g, a_1b, a_2g, a_2b, a_3g, a_3b, w_11, w_21, w_31, b_1, ...]
+		[tc_1, tc_2, tc_3, w_11, w_21, w_12, w_22, w_13, w_23, b_1, b_2, b_3, a_1g, a_1b, a_2g, a_2b, a_3g, a_3b, w_11, w_21, w_31, b_1, ...]
 		Here, w_ij implies the weight between ith input node and jth output node. b_i is the bias for the ith output node.
 		a_ib is the bias activation parameter of ith output node and a_ig is the gain activation parameter of ith output node.
+		tc_i is the time constant of ith neuron of the current layer
 		"""
 		# Initialize the output vector
 		# Determine an individual layer's weight matrix in row major form, it's bias and then activation function parameters
 		# Then concatenate it with the previous output vector
 		output = np.array([])
 	
-		for layer in self.layer_vector:
+		for layer in self.layer_vector: 
+			# The vector we get from flattening time constants
+			time_vector = layer.get_time_constant.flatten()
+		
 			# The vector we get from flattening the weight matrix
 			# flatten() works in row major order
 			weight_vector = layer.get_weight_matrix().flatten()
@@ -164,8 +168,8 @@ class CTRNN:
 			# The vector of activation parameters
 			activation_vector = np.array(layer.get_activation_parameters())
 			
-			# The output vector is concatenated form of weight_vector, bias_vector and activation_vector
-			output = np.concatenate([output, weight_vector, bias_vector, activation_vector])
+			# The output vector is concatenated form of time_vector, weight_vector, bias_vector and activation_vector
+			output = np.concatenate([output, time_vector, weight_vector, bias_vector, activation_vector])
 		
 		return output
 	
@@ -179,9 +183,10 @@ class CTRNN:
 		----------
 		parameter_vector: array_like
 			The parameter vector follows the layout as
-			[w_11, w_21, w_12, w_22, w_13, w_23, b_1, b_2, b_3, a_1g, a_1b, a_2g, a_2b, a_3g, a_3b, w_11, w_21, w_31, b_1, ...]
+			[tc_1, tc_2, tc_3, w_11, w_21, w_12, w_22, w_13, w_23, b_1, b_2, b_3, a_1g, a_1b, a_2g, a_2b, a_3g, a_3b, w_11, w_21, w_31, b_1, ...]
 			Here, w_ij implies the weight between ith input node and jth output node. b_i is the bias for the ith output node.
-			a_ib is the bias activation parameter of ith output node and a_ig is the gain activation parameter of ith output node. 
+			a_ib is the bias activation parameter of ith output node and a_ig is the gain activation parameter of ith output node.
+			tc_i is the time constant of ith neuron of the current layer 
 			
 		Returns
 		-------
@@ -202,9 +207,13 @@ class CTRNN:
 		interval_counter = 0
 		
 		for layer in self.layer_vector:
-			# Get the dimensions of the weight matrix and bias vector
+			# Get the dimensions of the time constant vector, weight matrix and bias vector
+			time_dim = layer.get_time_dim()
 			weight_dim = layer.get_weight_dim()
 			bias_dim = layer.get_bias_dim()
+			
+			# Get the interval at which time constants seperate
+			time_interval = time_dim[0]
 			
 			# Get the interval at which weight and bias seperate
 			weight_interval = weight_dim[0] * weight_dim[1]
@@ -217,10 +226,15 @@ class CTRNN:
 			# If such an excpetion occurs, raise a value error as our parameter_vector
 			# is shorter than required
 			try:
+				layer.set_time_constant(parameter_vector[interval_counter:interval_counter + time_interval].reshape(time_dim[0], ))
+				interval_counter = interval_counter + time_interval
+				
 				layer.set_weight_matrix(parameter_vector[interval_counter:interval_counter + weight_interval].reshape(weight_dim))
 				interval_counter = interval_counter + weight_interval
+				
 				layer.set_bias_vector(parameter_vector[interval_counter:interval_counter + bias_interval].reshape(bias_dim[0],))
 				interval_counter = interval_counter + bias_interval
+				
 				layer.set_activation_parameters(parameter_vector[interval_counter], parameter_vector[interval_counter + 1])
 				interval_counter = interval_counter + 2
 			except:

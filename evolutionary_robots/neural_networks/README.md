@@ -159,7 +159,7 @@ nn.generate_visual(filename)
 
 **Format for Initialization**
 
-There is no such format for initialization because the Network consists of only 3 layers, whose input, hidden and output dimensions are stated explicitly while initialization of the Network object
+There is no format for initialization because the Network consists of only 3 layers, whose input, hidden and output dimensions are stated explicitly while initialization of the Network object
 
 **Format for parameter vector**
 
@@ -167,6 +167,23 @@ There is no such format for initialization because the Network consists of only 
 [c_11, c_21, c_31, c_12, c_22, c_32, c_13, c_23, c_33, w_11, w_21, w_12, w_22, w_13, w_23 ...]
 # Here, w_ij implies the weight between ith input node and jth output node.
 # c_ij implies the ith parameter of center of jth neuron.
+```
+
+### Continuous Time Recurrent Neural Network
+
+**Format for Initialization**
+
+```
+[[number_of_nodes_in_first_layer(input_layer), list_of_time_constants, activation_function], [number_of_nodes_in_second_layer, list_of_time_constants, activation_function], ..., [number_of_nodes_in_output]]
+```
+
+**Format for parameter vector**
+
+```
+[tc_1, tc_2, tc_3, w_11, w_21, w_12, w_22, w_13, w_23, b_1, b_2, b_3, a_1g, a_1b, a_2g, a_2b, a_3g, a_3b, w_11, w_21, w_31, b_1, ...]
+# Here, w_ij implies the weight between ith input node and jth output node. b_i is the bias for the ith output node.
+# a_ib is the bias activation parameter of ith output node and a_ig is the gain activation parameter of ith output node.
+# tc_i is the time constant of ith neuron of the current layer
 ```
 
 

@@ -22,7 +22,7 @@ class TestCTRNN(unittest.TestCase):
 		nn = CTRNN([[2, [2, 3, 5], self.activation_function], [3, [2], self.activation_function], [1]], 0.6)
 
 		# Weights given in the same format as Static Weights
-		nn.load_parameters_from_vector(np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0, 0, 1, 1, 0, 0.7, 0.8, 0.9, 0, 1, 0]))
+		nn.load_parameters_from_vector(np.array([2, 3, 5, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0, 0, 1, 1, 0, 2, 0.7, 0.8, 0.9, 0, 1, 0]))
 		output = nn.forward_propagate([1, 1])
 		np.testing.assert_almost_equal(output, np.array([0.1740721]))
 		
@@ -31,14 +31,14 @@ class TestCTRNN(unittest.TestCase):
 		
 	def test_wrong_input(self):
 		nn = CTRNN([[2, [2, 3, 5], self.activation_function], [3, [2], self.activation_function], [1]], 0.6)
-		nn.load_parameters_from_vector(np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0, 0, 1, 1, 0, 0.7, 0.8, 0.9, 0, 1, 0]))
+		nn.load_parameters_from_vector(np.array([2, 3, 5, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0, 0, 1, 1, 0, 2, 0.7, 0.8, 0.9, 0, 1, 0]))
 		with self.assertRaises(ValueError):
 			output = nn.forward_propagate([1, 1, 1])
 		
 	def test_wrong_parameters(self):
 		nn = CTRNN([[2, [2, 3, 5], self.activation_function], [3, [2], self.activation_function], [1]], 0.6)
 		with self.assertRaises(ValueError):
-			nn.load_parameters_from_vector(np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0, 0, 1, 0.7, 0.8, 0.9, 0, 1, 0]))
+			nn.load_parameters_from_vector(np.array([2, 3, 5, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0, 0, 1, 1, 0, 2, 0.7, 0.8, 0.9, 0, 1]))
 
 
 if __name__ == "__main__":

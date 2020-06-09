@@ -729,6 +729,9 @@ class CTRNNLayer:
 	get_bias_dim()
 		Returns the dimension of the bias vector
 		
+	set_time_constant(time_constant)
+		Set the time constant parameters
+		
 	get_time_constants()
 		Returns the time constants used by the layer
 		
@@ -740,7 +743,7 @@ class CTRNNLayer:
 		
 	"""
 	# time_interval is a scalar
-	# time_constant is a list, as it is different for each i-th neuron
+	# time_constant is a list, as it is different for each of the i-th neuron
 	def __init__(self, input_dim, output_dim, time_interval, time_constant, activation_function, layer_name):
 		# Name of the layer
 		self.layer_name = layer_name
@@ -748,14 +751,20 @@ class CTRNNLayer:
 		# Weight and bias dimensions
 		self.weight_dim = (output_dim, input_dim)
 		self.bias_dim = (output_dim, )
+		self.time_dim = (output_dim, )
 		
 		# Initialize the weight and bias
 		self.weight_matrix = np.random.rand(*self.weight_dim)
 		self.bias_vector = np.random.rand(output_dim)
 		
 		# Generate the weights for the weighted average
+		self.time_interval = time_interval
 		self.time_constant = time_constant
 		self.time_weight = np.asarray(float(time_interval) / np.array(time_constant))
+		
+		# A check for the dimension of time constant list
+		if(self.time_weight.shape != self.time_dim):
+			raise ValueError("The dimension of time constant list is incorrect")
 		
 		# Set the activation function
 		self.activation_function = activation_function
@@ -861,6 +870,25 @@ class CTRNNLayer:
 	def get_bias_dim(self):
 		""" Function to return the dimensions of the bias vector """
 		return self.bias_dim
+		
+	# Function to return the time constant dimension
+	def get_time_dim(self):
+		""" Function to return the dimensions of the time constant vector """
+		return self.time_dim
+		
+	# Function to set the time constant list
+	def set_time_constant(self, time_constant):
+		"""
+		Function to set the time constant list of neurons
+		Raises an excpetion if the dimensions do not match!
+		"""
+		self.time_constant = np.array(time_constant)
+		
+		if(self.time_constant.shape != self.time_dim):
+			raise ValueError("The dimension of time constant list is not correct!")
+			
+		# Calculate the weights based on the time constants and the time interval!
+		self.time_weight = np.asarray(float(self.time_interval) / self.time_constant)
 	
 	# Function to return the time constant list
 	def get_time_constant(self):
