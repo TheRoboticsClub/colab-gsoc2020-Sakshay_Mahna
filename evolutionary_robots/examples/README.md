@@ -24,4 +24,4 @@
 
 **Example**
 
-![Image for Example](assets/rbf.jpg)
+![Image for Example](assets/RBF.jpg)
