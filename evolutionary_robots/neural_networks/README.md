@@ -70,12 +70,12 @@ print(activation.calculate_activation(np.array([-1, 0, 1])))
 ## Neural Network
 The supported neural networks are:
 
-| Neural Networks   	    | Class to import     	 |
-|---------------------------|------------------------|
-| Static 			        | StaticNeuralNetwork()  |
-| Dynamic				    | DynamicNeuralNetwork() |
-| Gaussian RBF              | GaussianRBF()			 |
-| Continuous Time Recurrent	| CTRNN()				 |
+| Neural Networks   	    | Class to import     	 | Module     |
+|---------------------------|------------------------|----------|
+| Static 			        | StaticNeuralNetwork()  | `static_nn.py` |
+| Dynamic				    | DynamicNeuralNetwork() | `dynamic_nn.py`  |
+| Gaussian RBF              | GaussianRBF()			 | `rbf_nn.py`  |
+| Continuous Time Recurrent	| CTRNN()				 | `ctrnn.py`       |
 
 
 Methods supported by all the Neural Networks
@@ -159,7 +159,12 @@ nn.generate_visual(filename)
 
 **Format for Initialization**
 
-There is no format for initialization because the Network consists of only 3 layers, whose input, hidden and output dimensions are stated explicitly while initialization of the Network object
+There is no format for initialization because the Network consists of only 3 layers, whose input, hidden and output dimensions are stated explicitly while initialization of the Network object. The format is
+
+```python
+network = GaussianRBF(input_dimension, hidden_dimension, output_dimension, beta)
+# beta is the value of the parameter of the Gaussian RBF function
+```
 
 **Format for parameter vector**
 
