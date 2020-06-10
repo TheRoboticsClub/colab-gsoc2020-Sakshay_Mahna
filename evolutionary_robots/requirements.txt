@@ -1,0 +1,3 @@
+numpy==1.16.5
+graphviz==0.14
+
