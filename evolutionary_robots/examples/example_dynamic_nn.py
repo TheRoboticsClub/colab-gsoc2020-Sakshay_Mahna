@@ -37,6 +37,7 @@ nn = DynamicNeuralNetwork([[2, 1, [], LinearActivation()], [3, 1, [], LinearActi
 
 # Load the parameters
 # The weights are as specified in the format
+# Note: Since we do not have any recurrent relations, therefore the recurrent weights are not specified
 nn.load_parameters_from_vector([1, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0, 0, 1, 1, 0, 1, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 1, 1, 1, 0])
 
 # Generate output to [1, 1]
