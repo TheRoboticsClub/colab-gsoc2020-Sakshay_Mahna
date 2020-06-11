@@ -9,6 +9,7 @@ more Neural Networks can be generated.
 # Import numpy
 import numpy as np
 from activation_functions import ActivationFunction
+import warnings
 
 # Static Layer, only forward connections are present in this layer #################################
 class StaticLayer:
@@ -38,6 +39,12 @@ class StaticLayer:
 	-------
 	forward_propagate(input_vector)
 		Calculate the output of the Layer when input_vector is passed
+		
+	update_parameters(parameter_vector)
+		Update the parameters based on a vector passed as argument
+		
+	return_parameters()
+		Return the parameters in the form of a vector
 		
 	Additional Methods
 	------------------
@@ -135,6 +142,114 @@ class StaticLayer:
 		output_vector = self.activation_function.calculate_activation(output_vector)
 		
 		return output_vector
+		
+	# Function to update the parameters
+	def update_parameters(self, parameter_vector):
+		"""
+		Load the parameters of the Static Layer in the form of
+		an array / vector
+		
+		Parameters
+		----------
+		parameter_vector: array_like
+			The parameter vector follows the layout as
+			[w_11, w_21, w_12, w_22, w_13, w_23, b_1, b_2, b_3, a_1g, a_1b, a_2g, a_2b, a_3g, a_3b, w_11, w_21, w_31, b_1, ...]
+			Here, w_ij implies the weight between ith input node and jth output node. b_i is the bias for the ith output node.
+			a_ib is the bias activation parameter of ith output node and a_ig is the gain activation parameter of ith output node. 
+			
+		Returns
+		-------
+		None
+		
+		Raises
+		------
+		ValueException
+			The parameter array is shorter than required
+			
+		Warning
+			The parameter array is greater than required
+		"""
+		# Convert to numpy array
+		parameter_vector = np.array(parameter_vector)
+	
+		# Interval counter maintains the current layer index
+		interval_counter = 0
+		
+		# Get the interval at which the weight and bias seperate
+		weight_interval = self.weight_dim[0] * self.weight_dim[1]
+		
+		# Get the interval at which the bias and next weight vector seperate
+		bias_interval = bias_dim[0]
+		
+		# Seperate the weights and bias and then reshape them
+		# Numpy raises a None Type Exception, as it cannot reshape a None object
+		# If such an excpetion occurs, raise a value error as our parameter_vector
+		# is shorter than required
+		try:
+			self.set_weight_matrix(parameter_vector[interval_counter:interval_counter + weight_interval].reshape(self.weight_dim))
+			interval_counter = interval_counter + weight_interval
+			
+			self.set_bias_vector(parameter_vector[interval_counter:interval_counter + bias_interval].reshape(self.bias_dim[0],))
+			interval_counter = interval_counter + bias_interval
+			
+			self.set_activation_parameters(parameter_vector[interval_counter], parameter_vector[interval_counter + 1])
+			interval_counter = interval_counter + 2
+			
+		except:
+			raise ValueError("The parameter_vector consists of elements less than required")
+			
+		# The interval counter should contain the number of elements in parameter_vector
+		# Otherwise the user has specified parameters more than required
+		# Just a warning is enough
+		if(len(parameter_vector) > interval_counter):
+			warnings.warn("The parameter vector consists of elements greater than required")
+			
+	# Function to return the parameters
+	def return_parameters(self):
+		"""
+		Return the parameters of the Static Layer in the form of
+		a an array / vector.
+		
+		Parameters
+		----------
+		None
+		
+		Returns
+		-------
+		output: array_like
+			The vector representation of the parameters of the Neural Network
+			
+		Raises
+		------
+		None
+		
+		Notes
+		-----
+		The numpy flatten function works in row major order.
+		The parameter vector follows the layout as
+		[w_11, w_21, w_12, w_22, w_13, w_23, b_1, b_2, b_3, a_1g, a_1b, a_2g, a_2b, a_3g, a_3b, w_11, w_21, w_31, b_1, ...]
+		Here, w_ij implies the weight between ith input node and jth output node. b_i is the bias for the ith output node.
+		a_ib is the bias activation parameter of ith output node and a_ig is the gain activation parameter of ith output node.
+		"""
+		# Initialize the output vector
+		# Determine an individual layer's weight matrix in row major form and then it's bias
+		# Then concatenate it with the previous output vector
+		output = np.array([])
+		
+		# The vector we get from flattening the weight matrix
+		# flatten() works in row major order
+		weight_vector = self.get_weight_matrix().flatten()
+		
+		# The vector we get from flattening the bias vector
+		bias_vector = self.get_bias_vector().flatten()
+		
+		# The vector of activation parameters
+		activation_vector = np.array(self.get_activation_parameters())
+		
+		# The output vector is concatenated form of weight_vector, bias_vector and activation_vector
+		output = np.concatenate([output, weight_vector, bias_vector, activation_vector])
+		
+		return output
 	
 	# Function to set the weight matrix	
 	def set_weight_matrix(self, weight_matrix):
@@ -424,6 +539,12 @@ class DynamicLayer:
 	forward_propagate(input_vector)
 		Generate the output of the layer given the input vector
 		
+	update_parameters(parameter_vector)
+		Update the parameters based on the parameter_vector argument
+		
+	return_parameters()
+		Return the parameters of the layer
+		
 	Additional Methods
 	------------------
 	set_recurrent_input(input_vector, index)
@@ -548,6 +669,127 @@ class DynamicLayer:
 		intermediate_output = self.activation_function.calculate_activation(intermediate_output)
 		
 		return intermediate_output
+		
+	# Function to update the parameters
+	def update_parameters(self, parameter_vector):
+		"""
+		Load the parameters of the Dynamic Layer in the form of
+		an array / vector
+		
+		Parameters
+		----------
+		parameter_vector: array_like
+			The layout followed is the same as that of Static Neural Network, with a few additions
+		weights of delay system + weights of recurrent system + weights of static system + weights of bias + activation function parameters
+			
+		Returns
+		-------
+		None
+		
+		Raises
+		------
+		ValueException
+			The parameter array is shorter than required
+			
+		Warning
+			The parameter array is greater than required
+		"""
+		# Same layout, therefore we need to extract and then load!
+		# Convert to numpy array
+		parameter_vector = np.array(parameter_vector)
+		
+		# Interval counter maintains the current layer index
+		interval_counter = 0
+		
+		# Numpy raises a None Type Exception, as it cannot reshape a None object
+		# If such an excpetion occurs, raise a value error as our parameter_vector
+		# is shorter than required
+		try:
+			delay_dim = self.get_delay_weight_dim()
+			delay_interval = delay_dim[0] * delay_dim[1]
+			self.set_delay_weight_vector(parameter_vector[interval_counter:interval_counter+delay_interval].reshape(delay_dim))
+			interval_counter = interval_counter + delay_interval
+			
+			# Update the recurrent weights
+			for index in range(len(self.recurrent_system)):
+				recurrent_dim = self.get_recurrent_weight_dim()
+				recurrent_interval = recurrent_dim[0] * recurrent_dim[1]
+				self.set_recurrent_weight_matrix(parameter_vector[interval_counter:interval_counter+recurrent_interval].reshape(recurrent_dim), index)
+				interval_counter = interval_counter + recurrent_interval
+				
+			# Get the dimensions, interval and extract for static weight
+			weight_interval = self.weight_dim[0] * self.weight_dim[1]
+			self.set_weight_matrix(parameter_vector[interval_counter:interval_counter+weight_interval].reshape(self.weight_dim))
+			interval_counter = interval_counter + weight_interval
+			
+			# Get the dimensions, interval and extract for bias vector
+			bias_interval = self.bias_dim[0]
+			self.set_bias_vector(parameter_vector[interval_counter:interval_counter+bias_interval].reshape(self.bias_dim[0],))
+			interval_counter = interval_counter + bias_interval
+			
+			# Get the interval and extract for activation vector
+			activation_interval = 2
+			self.set_activation_parameters(parameter_vector[interval_counter], parameter_vector[interval_counter+1])
+			interval_counter = interval_counter + activation_interval
+			
+		except:
+			raise ValueError("The parameter_vector consists of elements less than required")
+			
+		
+		# The interval counter should contain the number of elements in parameter_vector
+		# Otherwise the user has specified parameters more than required
+		# Just a warning is enough
+		if(len(parameter_vector) > interval_counter):
+			warnings.warn("The parameter vector consists of elements greater than required")
+			
+	# Function to return the parameters of the layer
+	def return_parameters(self):
+		"""
+		Return the parameters of the Dynamic Layer in the form of
+		a an array / vector.
+		
+		Parameters
+		----------
+		None
+		
+		Returns
+		-------
+		output: array_like
+			The vector representation of the parameters of the Neural Network
+			
+		Raises
+		------
+		None
+		
+		Notes
+		-----
+		The numpy flatten function works in row major order.
+		The layout followed is the same as that of Static Neural Network, with a few additions
+		weights of delay system + weights of recurrent system + weights of static system + weights of bias + activation function parameters
+		"""
+		# Initialize the output
+		output = np.array([])
+	
+		# The delay system uses a weight vector
+		weight_vector_delay = self.get_delay_weight_vector().flatten()
+		
+		# The recurrent weights need to be flattened and collected as well
+		# They are taken from input side
+		weight_vector_recurrent = np.array([])
+		for index in range(len(self.recurrent_system)):
+			weight_vector_recurrent = np.concatenate([weight_vector_recurrent, self.get_recurrent_weight_matrix(index).flatten()])
+			
+		# Get the static weight matrix
+		weight_vector_static = self.get_weight_matrix().flatten()
+		
+		# Get the bias vector
+		bias_vector = self.get_bias_vector().flatten()
+		
+		# Get the activation parameters
+		activation_vector = np.array(self.get_activation_parameters())
+		
+		# Concatenate everything
+		output = np.concatenate([output, weight_vector_delay, weight_vector_recurrent, weight_vector_static, bias_vector, activation_vector])
 		
 	# Function to set the input_vector of the recurrent layer
 	def set_recurrent_input(self, input_vector, index):
@@ -706,6 +948,12 @@ class CTRNNLayer:
 	euler_step(input_vector):
 		Calculates the next step of the Layer based on first degree Euler Approximation
 		
+	update_parameters(parameter_vector)
+		Updates the parameters of the layer according to the parameter_vector argument
+		
+	return_parameters()
+		Return the parameters of the layer
+		
 	Additional Methods
 	------------------
 	set_weight_matrix(weight_matrix)
@@ -826,6 +1074,125 @@ class CTRNNLayer:
 		
 		return current_output
 		
+	# Function to update the parameters of the layer
+	def update_parameters(self, parameter_vector):
+		"""
+		Load the parameters of the CTRNN Layer in the form of
+		an array / vector
+		
+		Parameters
+		----------
+		parameter_vector: array_like
+			The parameter vector follows the layout as
+			[tc_1, tc_2, tc_3, w_11, w_21, w_12, w_22, w_13, w_23, b_1, b_2, b_3, a_1g, a_1b, a_2g, a_2b, a_3g, a_3b, w_11, w_21, w_31, b_1, ...]
+			Here, w_ij implies the weight between ith input node and jth output node. b_i is the bias for the ith output node.
+			a_ib is the bias activation parameter of ith output node and a_ig is the gain activation parameter of ith output node.
+			tc_i is the time constant of ith neuron of the current layer 
+			
+		Returns
+		-------
+		None
+		
+		Raises
+		------
+		ValueException
+			The parameter array is shorter than required
+			
+		Warning
+			The parameter array is greater than required
+		"""
+		# Convert to numpy array
+		parameter_vector = np.array(parameter_vector)
+	
+		# Interval counter maintains the current layer index
+		interval_counter = 0
+		
+		# Get the interval at which time constants seperate
+		time_interval = self.time_dim[0]
+		
+		# Get the interval at which weight and bias seperate
+		weight_interval = self.weight_dim[0] * self.weight_dim[1]
+		
+		# Get the interval at which the bias and next weight vector seperate
+		bias_interval = bias_dim[0]
+		
+		# Seperate the weights and bias and then reshape them
+		# Numpy raises a None Type Exception, as it cannot reshape a None object
+		# If such an excpetion occurs, raise a value error as our parameter_vector
+		# is shorter than required
+		try:
+			self.set_time_constant(parameter_vector[interval_counter:interval_counter + time_interval].reshape(self.time_dim[0], ))
+			interval_counter = interval_counter + time_interval
+			
+			self.set_weight_matrix(parameter_vector[interval_counter:interval_counter + weight_interval].reshape(self.weight_dim))
+			interval_counter = interval_counter + weight_interval
+			
+			self.set_bias_vector(parameter_vector[interval_counter:interval_counter + bias_interval].reshape(self.bias_dim[0],))
+			interval_counter = interval_counter + bias_interval
+			
+			self.set_activation_parameters(parameter_vector[interval_counter], parameter_vector[interval_counter + 1])
+			interval_counter = interval_counter + 2
+			
+		except:
+			raise ValueError("The parameter_vector consists of elements less than required")
+			
+		# The interval counter should contain the number of elements in parameter_vector
+		# Otherwise the user has specified parameters more than required
+		# Just a warning is enough
+		if(len(parameter_vector) > interval_counter):
+			warnings.warn("The parameter vector consists of elements greater than required")
+		
+	# Function to return the parameters of a layer
+	def return_parameters(self):
+		"""
+		Return the parameters of the CTRNN Neural Network in the form of
+		a an array / vector.
+		
+		Parameters
+		----------
+		None
+		
+		Returns
+		-------
+		output: array_like
+			The vector representation of the parameters of the Neural Network
+			
+		Raises
+		------
+		None
+		
+		Notes
+		-----
+		The numpy flatten function works in row major order.
+		The parameter vector follows the layout as
+		[tc_1, tc_2, tc_3, w_11, w_21, w_12, w_22, w_13, w_23, b_1, b_2, b_3, a_1g, a_1b, a_2g, a_2b, a_3g, a_3b, w_11, w_21, w_31, b_1, ...]
+		Here, w_ij implies the weight between ith input node and jth output node. b_i is the bias for the ith output node.
+		a_ib is the bias activation parameter of ith output node and a_ig is the gain activation parameter of ith output node.
+		tc_i is the time constant of ith neuron of the current layer
+		"""
+		# Initialize the output vector
+		# Determine an individual layer's weight matrix in row major form, it's bias and then activation function parameters
+		# Then concatenate it with the previous output vector
+		output = np.array([])
+		
+		# The vector we get from flattening time constants
+		time_vector = self.get_time_constant.flatten()
+	
+		# The vector we get from flattening the weight matrix
+		# flatten() works in row major order
+		weight_vector = self.get_weight_matrix().flatten()
+		
+		# The vector we get from flattening the bias vector
+		bias_vector = self.get_bias_vector().flatten()
+		
+		# The vector of activation parameters
+		activation_vector = np.array(self.get_activation_parameters())
+		
+		# The output vector is concatenated form of time_vector, weight_vector, bias_vector and activation_vector
+		output = np.concatenate([output, time_vector, weight_vector, bias_vector, activation_vector])
+		
+		return output
+	
 	# Function to set the weight matrix	
 	def set_weight_matrix(self, weight_matrix):
 		"""
@@ -949,6 +1316,12 @@ class RBFLayer:
 	forward_propagate(input_vector)
 		Calculates the output of the layer given an input vector
 		
+	update_parameters(parameter_vector)
+		Update the parameters of the layer according to the parameter_vector argument
+		
+	return_parameters()
+		Return the parameters of the layer
+		
 	Additional Methods
 	----------------
 	set_center_matrix(center_matrix)
@@ -1022,6 +1395,77 @@ class RBFLayer:
 		output = self.basis_function(distance_vector, self.parameter)
 		
 		return output
+		
+	# Function to update the parameters
+	def update_parameters(self, parameter_vector):
+		"""
+		Load the parameters of the RBF Layer in the form of
+		an array / vector
+		
+		Parameters
+		----------
+		parameter_vector: array_like
+			The parameter vector follows the layout as
+			[c_11, c_21, c_31, c_12, c_22, c_32, c_13, c_23, c_33]
+			Here, c_ij implies the ith parameter of center of jth neuron.
+			
+		Returns
+		-------
+		None
+		
+		Raises
+		------
+		ValueException
+			The parameter array is shorter than required
+			
+		Warning
+			The parameter array is greater than required
+		"""
+		# Convert to numpy array
+		parameter_vector = np.array(parameter_vector)
+		
+		# Seperate the weights and bias and then reshape them
+		# Numpy raises a None Type Exception, as it cannot reshape a None object
+		# If such an excpetion occurs, raise a value error as our parameter_vector
+		# is shorter than required
+		try:
+			# Seperate the center matrix
+			self.set_center_matrix(parameter_vector[:interval].reshape(self.center_dim))
+			
+		except:
+			raise ValueError("The parameter vector consists of elements less than required")
+			
+		# The interval counter should contain the number of elements in parameter_vector
+		# Otherwise the user has specified parameters more than required
+		# Just a warning is enough
+		if(len(parameter_vector) > self.center_dim[0] * self.center_dim[1]):
+			warnings.warn("The parameter vector consists of elements greater than required")
+			
+	# Function to return the parameters of the layer
+	def return_parameters(self):
+		"""
+		Return the parameters of the Layer in the form of
+		a an array / vector.
+		
+		Parameters
+		----------
+		None
+		
+		Returns
+		-------
+		output: array_like
+			The vector representation of the parameters of the Neural Network
+			
+		Raises
+		------
+		None
+		"""
+		# The vector we get from flattening the center matrix
+		# flatten() works in row major order
+		center_vector = self.rbf_layer.get_center_matrix().flatten()
+		
+		return center_vector
+			
 		
 	# Function to set the center matrix
 	def set_center_matrix(self, center_matrix):
