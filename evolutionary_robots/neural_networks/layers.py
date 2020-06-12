@@ -11,6 +11,74 @@ import numpy as np
 from activation_functions import ActivationFunction
 import warnings
 
+# Input Layer, only for taking inputs from the user
+class InputLayer:
+	"""
+	Input Layer takes input from the user and sends
+	it to the other layers ahead!
+	
+	...
+	
+	Attributes
+	----------
+	input_dim: integer
+		Specifies the number of input nodes
+	
+	layer_name: string
+		Specifies the name of the layer 
+		
+	Methods
+	-------
+	set_input(input_vector)
+		Save the input from the user
+		
+	get_input()
+		Give the input to the user
+		
+	Additional Methods
+	------------------
+	get_input_dim()
+		Get the dimensions of input
+		
+	get_layer_name()
+		Get the name of the layer
+		
+	"""
+	def __init__(self, input_dim, layer_name):
+		# Class declarations
+		self.input_dim = (input_dim, )
+		self.layer_name = layer_name
+		
+	# Function to take input from user
+	def set_input(self, input_vector):
+		""" 
+		Take input from user
+		Raise exception if dimensions do not match!
+		"""
+		
+		input_vector = np.array(input_vector)
+		
+		if(input_vector.shape != self.input_dim):
+			raise ValueError("The dimensions of input do not match!")
+		
+		# Store in a class variable
+		self.vector = input_vector
+		
+	# Function to get the input_vector that we stored
+	def get_input(self):
+		""" Return the input vector provided """
+		return self.vector
+		
+	# Function to get the dimensions of input vector
+	def get_input_dim(self):
+		""" Returns the dimensions of input vector """
+		return self.input_dim
+		
+	# Function to get the layer name
+	def get_layer_name(self):
+		""" Returns the name of the layer """
+		return self.layer_name
+
 # Static Layer, only forward connections are present in this layer #################################
 class StaticLayer:
 	"""
@@ -179,7 +247,7 @@ class StaticLayer:
 		weight_interval = self.weight_dim[0] * self.weight_dim[1]
 		
 		# Get the interval at which the bias and next weight vector seperate
-		bias_interval = bias_dim[0]
+		bias_interval = self.bias_dim[0]
 		
 		# Seperate the weights and bias and then reshape them
 		# Numpy raises a None Type Exception, as it cannot reshape a None object
@@ -948,6 +1016,9 @@ class CTRNNLayer:
 	euler_step(input_vector):
 		Calculates the next step of the Layer based on first degree Euler Approximation
 		
+	forward_propagate(input_vector)
+		Calculates the output based on the input_vector
+		
 	update_parameters(parameter_vector)
 		Updates the parameters of the layer according to the parameter_vector argument
 		
@@ -1073,6 +1144,14 @@ class CTRNNLayer:
 		self.previous_output = current_output
 		
 		return current_output
+		
+	# Just a wrapper function for euler_step to maintain uniformity
+	def forward_propagate(input_vector):
+		"""
+		Function to generate output of the input vector
+		Just a wrapper function for euler_step()
+		"""
+		return euler_step(input_vector)
 		
 	# Function to update the parameters of the layer
 	def update_parameters(self, parameter_vector):
