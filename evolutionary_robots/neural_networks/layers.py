@@ -27,6 +27,9 @@ class InputLayer:
 	layer_name: string
 		Specifies the name of the layer 
 		
+	delay(optional): integer
+		Specifies the delay of the connection
+		
 	Methods
 	-------
 	set_input(input_vector)
@@ -35,57 +38,84 @@ class InputLayer:
 	get_input()
 		Give the input to the user
 		
-	Additional Methods
-	------------------
-	get_input_dim()
-		Get the dimensions of input
-		
-	get_layer_name()
-		Get the name of the layer
-		
 	"""
-	def __init__(self, input_dim, layer_name):
-		# Class declarations
-		self.input_dim = (input_dim, )
-		self.layer_name = layer_name
+	def __init__(self, input_dim, layer_name, delay = 1):
+		# Private Class declarations
+		self.__input_dim = (input_dim, )
+		self.__layer_name = layer_name
+		self.__gain = np.ones((input_dim, ))
+
+		# Output matrix is used to work with delays
+		self.__output_matrix = np.zeros((delay, input_dim))
+		
+	# Getters and Setters
+	@property
+	def input_dim(self):
+		""" Getter for input_dim """
+		return self.__input_dim
+		
+	@property
+	def layer_name(self):
+		""" Getter for layer name """
+		return self.__layer_name
+		
+	@property
+	def gain(self):
+		""" Getter for gain """
+		return self.__gain
+		
+	@gain.setter
+	def gain(self, gain):
+		self.__gain = gain
 		
 	# Function to take input from user
-	def set_input(self, input_vector):
+	def forward_propagate(self, input_vector, delay = 0):
 		""" 
-		Take input from user
-		Raise exception if dimensions do not match!
+		Generate the output of the Layer when input_vector
+		is passed to the Layer
+		
+		Parameters
+		----------
+		input_vector: array_like
+			The input_vector to be passed to the Layer
+			
+		delay(optional): integer
+			Specify which output to return according to delay
+			
+		Returns
+		-------
+		output_matrix[delay]: array_like
+			The output_vector generated from the input_vector
+			
+		Raises
+		------
+		ValueException
+			The input_vector should be of the dimension as specified by the user earlier
+			
+		Notes
+		-----
+		The input_matrix stores the various values input in the various time frames
+		The output vector is returned according to the specified delay
 		"""
-		
-		input_vector = np.array(input_vector)
-		
-		if(input_vector.shape != self.input_dim):
-			raise ValueError("The dimensions of input do not match!")
-		
-		# Store in a class variable
-		self.vector = input_vector
-		
-	# Function to get the input_vector that we stored
-	def get_input(self):
-		""" Return the input vector provided """
-		return self.vector
-		
-	# Function to get the dimensions of input vector
-	def get_input_dim(self):
-		""" Returns the dimensions of input vector """
-		return self.input_dim
-		
-	# Function to get the layer name
-	def get_layer_name(self):
-		""" Returns the name of the layer """
-		return self.layer_name
+		try:
+			# Multiply with the gain
+			input_vector = np.multiply(np.array(input_vector), self.gain)
+			# Insert the input_vector and remove the oldest one
+			self.output_matrix = np.insert(self.output_matrix, 0, input_vector, axis=0)
+			self.output_matrix = np.delete(self.output_matrix, self.input_dim[0] - 1, axis=0)
+			
+		except:
+			raise ValueError("Please check dimensions of " + self.layer_name)
+			
+		# Return according to the delay
+		return self.output_matrix[delay]
 
-# Static Layer, only forward connections are present in this layer #################################
-class StaticLayer:
+# Simple Layer, simple feed forward connection with a specified delay #################################
+class SimpleLayer:
 	"""
-	Static Layer is the simplest of all layers
-	Only forward connections are present in this layer
-	The layer stores the weights and calculates the output
-	based on matrix multiplication
+	Simple Layer works by calculating the activation of each neuron
+	using the feed forward algorithm and supplies the output according
+	to the delay of the layer
 	
 	...
 	
@@ -103,6 +133,9 @@ class StaticLayer:
 	layer_name: string
 		Specifies the name of the layer 
 		
+	delay(optional): integer
+		Specifies the delay of the connection
+		
 	Methods
 	-------
 	forward_propagate(input_vector)
@@ -116,54 +149,36 @@ class StaticLayer:
 		
 	Additional Methods
 	------------------
-	set_weight_matrix(weight_matrix)
-		Set the weight matrix
-	
-	get_weight_matrix()
-		Get the current weight matrix
-	
-	set_bias_vector(bias_vector)
-		Set the bias vector
-		
-	get_bias_vector()
-		Get the	current bias vector
-		
-	get_layer_name()
-		Get the name of the layer
-		
-	get_weight_dim()
-		Get the dimensions of the weight matrix
-		
-	get_bias_dim()
-		Get the dimensions of the bias vector
-		
 	set_activation_parameters(beta, theta)
 		Set the parameters of activation function
 		
 	get_activation_parameters()
 		Get the parameters of activation function
 	"""
-	def __init__(self, input_dim, output_dim, activation_function, layer_name):
+	def __init__(self, input_dim, output_dim, activation_function, layer_name, delay = 1):
 		# Set the layer name
-		self.layer_name = layer_name
+		self.__layer_name = layer_name
 	
 		# Initialize the weight and bias dimensions
-		self.weight_dim = (output_dim, input_dim)
-		self.bias_dim = (output_dim, )
+		self.__weight_dim = (output_dim, input_dim)
+		self.__bias_dim = (output_dim, )
 		
 		# Initialize the weight matrix
-		self.weight_matrix = np.random.rand(*self.weight_dim)
+		self.__weight_matrix = np.random.rand(*self.weight_dim)
 		
 		# Initialize the bias vector
-		self.bias_vector = np.random.rand(output_dim)
+		self.__bias_vector = np.random.rand(output_dim)
+		
+		# Initialize the output matrix
+		self.__output_matrix = np.zeros((delay, output_dim))
 		
 		# Set the activation function
-		self.activation_function = activation_function
+		self.__activation_function = activation_function
 		# Also check if the activation function is an instance of the ActivationFunction
-		if(not isinstance(self.activation_function, ActivationFunction)):
-			raise TypeError("The activation function has to be an instance of ActivationFunction class")
+		if(not hasattr(self.activation_function, 'calculate_activation')):
+			raise TypeError("The activation class needs to contain a method calculate_activation")
 		
-	def forward_propagate(self, input_vector):
+	def forward_propagate(self, input_vector, delay = 0):
 		"""
 		Generate the output of the Layer when input_vector
 		is passed to the Layer
@@ -172,6 +187,9 @@ class StaticLayer:
 		----------
 		input_vector: array_like
 			The input_vector to be passed to the Layer
+			
+		delay(optional): integer
+			Specifies which output to return according to the delay
 			
 		Returns
 		-------
@@ -196,20 +214,26 @@ class StaticLayer:
 		output_vector = weight_matrix . input_vector + bias_vector
 		"""
 		
-		# Convert the input vector to numpy array
-		input_vector = np.array(input_vector)
-		
-		# Check for the proper dimensions of the input vector
-		if(input_vector.shape != (self.weight_dim[1], )):
-			raise ValueError("The dimensions of input vector do not match!")
-		
-		# Output vector is obtained by dotting weight and input, then adding with bias
-		output_vector = np.add(np.dot(self.weight_matrix, input_vector), self.bias_vector)
-		
-		# Activate the output
-		output_vector = self.activation_function.calculate_activation(output_vector)
-		
-		return output_vector
+		try:
+			# Convert the input vector to numpy array
+			input_vector = np.array(input_vector)
+			
+			# Output vector is obtained by dotting weight and input, then adding with bias
+			output_vector = np.add(np.dot(self.__weight_matrix, input_vector), self.__bias_vector)
+			
+			# Activate the output
+			output_vector = self.activation_function.calculate_activation(output_vector)
+			
+			# Insert the input_vector and remove the oldest one
+			self.__output_matrix = np.insert(self.__output_matrix, 0, output_vector, axis=0)
+			self.__output_matrix = np.delete(self.__output_matrix, self.weight_dim[0] - 1, axis=0)
+			
+			# Output according to the delay
+			return self.__output_matrix[delay]
+			
+		except:
+			raise ValueError("Please check dimensions of " + self.layer_name)
+
 		
 	# Function to update the parameters
 	def update_parameters(self, parameter_vector):
@@ -254,10 +278,10 @@ class StaticLayer:
 		# If such an excpetion occurs, raise a value error as our parameter_vector
 		# is shorter than required
 		try:
-			self.set_weight_matrix(parameter_vector[interval_counter:interval_counter + weight_interval].reshape(self.weight_dim))
+			self.weight_matrix = parameter_vector[interval_counter:interval_counter + weight_interval].reshape(self.weight_dim)
 			interval_counter = interval_counter + weight_interval
 			
-			self.set_bias_vector(parameter_vector[interval_counter:interval_counter + bias_interval].reshape(self.bias_dim[0],))
+			self.bias_vector = parameter_vector[interval_counter:interval_counter + bias_interval].reshape(self.bias_dim[0],)
 			interval_counter = interval_counter + bias_interval
 			
 			self.set_activation_parameters(parameter_vector[interval_counter], parameter_vector[interval_counter + 1])
@@ -306,10 +330,10 @@ class StaticLayer:
 		
 		# The vector we get from flattening the weight matrix
 		# flatten() works in row major order
-		weight_vector = self.get_weight_matrix().flatten()
+		weight_vector = self.weight_matrix().flatten()
 		
 		# The vector we get from flattening the bias vector
-		bias_vector = self.get_bias_vector().flatten()
+		bias_vector = self.bias_vector().flatten()
 		
 		# The vector of activation parameters
 		activation_vector = np.array(self.get_activation_parameters())
@@ -319,8 +343,9 @@ class StaticLayer:
 		
 		return output
 	
-	# Function to set the weight matrix	
-	def set_weight_matrix(self, weight_matrix):
+	# Setters and Getters	
+	@weight_matrix.setter
+	def weight_matrix(self, weight_matrix):
 		"""
 		Set a user defined weight matrix
 		
@@ -329,15 +354,11 @@ class StaticLayer:
 		if(weight_matrix.shape != self.weight_dim):
 			raise ValueError("The dimensions of weight matrix do not match!")
 		
-		self.weight_matrix = weight_matrix
-		
-	# Function to return the weight matrix
-	def get_weight_matrix(self):
-		""" Get the weight matrix that the Layer is using """
-		return self.weight_matrix
+		self.__weight_matrix = weight_matrix
 	
-	# Function to set the bias vector	
-	def set_bias_vector(self, bias_vector):
+	# Function to set the bias vector
+	@bias_vector.setter	
+	def bias_vector(self, bias_vector):
 		"""
 		Set a user defined bias vector
 		
@@ -346,37 +367,36 @@ class StaticLayer:
 		if(bias_vector.shape != self.bias_dim):
 			raise ValueError("The dimensions of bias vector do not match!")
 			
-		self.bias_vector = bias_vector
-		
-	# Function to return the bias vector
-	def get_bias_vector(self):
-		""" Get the bias vector that the Layer is using """
-		return self.bias_vector
+		self.__bias_vector = bias_vector
 		
 	# Function to return the layer name
-	def get_layer_name(self):
+	@property
+	def layer_name(self):
 		""" Get the name of the Layer """
-		return self.layer_name
+		return self.__layer_name
 		
 	# Function to return the weight dimensions
-	def get_weight_dim(self):
+	@property
+	def weight_dim(self):
 		""" Get the dimensions of the weight matrix """
-		return self.weight_dim
+		return self.__weight_dim
 		
 	# Function return the bias dimensions
-	def get_bias_dim(self):
+	@property
+	def bias_dim(self):
 		""" Get the dimensions of the bias vector """
-		return self.bias_dim
+		return self.__bias_dim
 		
 	# Function to set the activation parameters
 	def set_activation_parameters(self, beta, theta):
 		""" Set the parameters of activation function """
-		self.activation_function.set_parameters(beta, theta)
+		self.__activation_function.beta = beta
+		self.__activation_function.theta = theta
 	
 	# Function to return the activation parameters(tuple)	
 	def get_activation_parameters(self):
 		""" Get the parameters of activation function """
-		return self.activation_function.get_parameters()
+		return self.__activation_function.beta, self.__activation_function.theta
 		
 # Dynamic Layer ##############################################################
 # The time delay network works by returning the weighted average of the input vectors
