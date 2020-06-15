@@ -14,3 +14,8 @@ Link to the [Blog Post](https://theroboticsclub.github.io/colab-gsoc2020-Sakshay
 **Expected Outcome**: Make some changes to the code, add proper documentation, tests and examples.
 
 **Expected Problems**: Never worked on documentation before. So, something new to work on!
+
+### Week #3
+**Expected Outcome**: Properly generate the Neural Network Morphology
+
+**Expected Problems**: The higher level functions of the construction, simplified for the user
