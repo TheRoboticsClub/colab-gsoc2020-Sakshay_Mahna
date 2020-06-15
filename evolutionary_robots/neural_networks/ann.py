@@ -8,9 +8,10 @@ activation function and variable type of layer(Simple or Continuous)
 """
 
 import numpy as np
+import tensorflow as tf
 import pickle
 from graphviz import Digraph
-from layers import InputLayer, StaticLayer, CTRNNLayer, RBFLayer
+from layers import InputLayer, SimpleLayer, CTRLayer
 
 # Library used to genrate warnings
 import warnings
@@ -23,156 +24,167 @@ class ArtificialNeuralNetwork:
 	
 	Attributes
 	----------
-	number_of_layers: integer
-		The number of layers in the Neural Network
+	layer_vector: array_like
+		Specifies the configuration of each layer in an array format
+		[[number_of_neurons, type_of_layer, activation_function, input_connections, output_connections], ...]	*for each layer
 		
-	type_of_layer: array_like
-		An array specifying the type of layer, Input, Static, CTR or RBF
-		0 => Input, 1 => Static, 2 => CTR and 3 => RBF
-		
-	number_of_neurons: array_like
-		An array of neurons in each layer
-		
-	activation_function: array_like
-		An array of activation function objects
-		For the input layers, it is ignored
-		
-	adjacency_matrix: array_like
-		Adjacency Matrix to specify the connections between layers
-		1 for [i, j] implies that ith layer gives output to jth layer
+		number_of_neurons: number of neurons(input dimensions)
+		type_of_layer: 0 for input, 1 for simple and 2 for ctr
 		
 	Methods
 	-------
 	
 	"""
 	
-	def __init__(self, number_of_layers, type_of_layer, number_of_neurons, activation_function, adjacency_matrix):
+	def __init__(self, layer_vector):
 		# Class declarations
-		self.number_of_layers = number_of_layers
+		self.number_of_layers = len(layer_vector)
 		
-		# Convert to Adjacency List
-		self.matrix_to_list(adjacency_matrix)
+		# Private declarations
+		self.__input_layers = []
+		self.__output_layers = []
+		self.__graph = tf.Graph()
 		
-		# Construct the layers
-		self.construct_layers(type_of_layer, number_of_neurons, activation_function)
-	
-	# Function to generate an adjacency list from
-	# an adjacency matrix
-	def matrix_to_list(self, adjacency_matrix):
-		"""
-		Internal function to convert from adjacency matrix to input output lists
-		"""
-		adjacency_matrix = np.array(adjacency_matrix)
+		# Construct the layers and the graph
+		self._construct_layers(layer_vector)
+		#self._construct_graph()
 		
-		# Output connections: For index i which layers take input from i
-		# Input connections: For index i which layer give input to i
-		self.input_connections = []
-		self.output_connections = []
-		
-		# Append to output connections when a 1 occurs
-		for node in range(len(adjacency_matrix)):
-			# Generate a list wherever 1 occurs and then append to list for that layer
-			list_of_indices = [i for i, x in enumerate(adjacency_matrix[node]) if x == 1]
-			self.output_connections.append(list_of_indices)
-				
-		# Append to input connections when a 1 occurs in the transpose
-		adjacency_matrix = np.transpose(adjacency_matrix)
-		for node in range(len(adjacency_matrix)):
-			# Generate a list wherever 1 occurs and then append to list for that layer
-			list_of_indices = [i for i, x in enumerate(adjacency_matrix[node]) if x == 1]
-			self.input_connections.append(list_of_indices)
+		tf.compat.v1.enable_eager_execution()
 			
 	
 	# Function to construct the layers given the inputs
 	# in essence, a Neural Network
-	def construct_layers(self, type_of_layer, number_of_neurons, activation_function):
-		# Initialize 3 layer dictionaries (Currently 3, we can move to 4 in the near future)
-		self.input_layers = {}
-		self.hidden_layers = {}
-		self.output_layers = {}
+	def _construct_layers(self, layer_vector):
+		# A dictionary for storing each layer
+		self.layer_map = {}
 		
-		# A dictionary for storing which layer is Input, Hidden or Output
-		self.layer_category = {}
+		# List for input output connections
+		self.input_connections = []
+		self.output_connections = []
 		
 		# Append the Layer classes
-		# Breadth First Search based Algorithm
 		for index in range(self.number_of_layers):
-			# All the calculation is based on the adjacency list and type of layer
-			# 0 implies Input Layer
-			if(type_of_layer[index] == 0):
-				self.input_layers[index] = InputLayer(number_of_neurons[index], "Input Layer")
-				self.layer_category[index] = "Input"
+			# 0 => input layer
+			if(layer_vector[index][1] == 0):
+				# Input Layer
+				self.__input_layers.append("layer_" + str(index))
+			
+				# No need to collect the input dimensions as input layer doesn't take input from other layers
+				input_dimension = layer_vector[index][0]
+				self.input_connections.append([])
 				
-			# 1 implies a Static Layer
-			elif(type_of_layer[index] == 1):
-				# Combined input dimension of a layer
-				# Dimensions of the layers that are giving input to the current layer
-				input_dimensions = [number_of_neurons[i] for i in self.input_connections[index]]
-				combined_input_dim = sum(input_dimensions)
-				
-				# Output or hidden, output layer does not have any elements in it's output_connections
-				if(len(self.output_connections[index]) == 0):
-					self.output_layers[index] = StaticLayer(combined_input_dim, number_of_neurons[index], activation_function[index], "Output Layer")
-					self.layer_category[index] = "Output"
+				# Collect the output dimensions
+				connect = []
+				for connection in layer_vector[index][4]:
+					connect.append("layer_" + str(connection))
 					
-				else:
-					self.hidden_layers[index] = StaticLayer(combined_input_dim, number_of_neurons[index], activation_function[index], "Hidden Layer")
-					self.layer_category[index] = "Hidden"
+				self.output_connections.append(connect)
 				
-			# 2 implies a CTR Layer
-			elif(type_of_layer[index] == 2):
-				# Combined input dimension of a layer
-				# Dimensions of the layers that are giving input to the current layer
-				input_dimensions = [number_of_neurons[i] for i in self.input_connections[index]]
-				combined_input_dim = sum(input_dimensions)
+				# Generate the layer
+				self.layer_map["layer_" + str(index)] = InputLayer(input_dimension, "layer_"+str(index))
 				
-				# Output or hidden, output layer does not have any elements in it's output_connections
-				if(len(self.output_connections[index]) == 0):
-					self.output_layers[index] = CTRNNLayer(combined_input_dim, number_of_neurons[index], 0.001, np.fill((number_of_layers[index], ), 0.001),activation_function[index], "Output Layer")
-					self.layer_category[index] = "Output"
+			# 1 => Simple Layer
+			elif(layer_vector[index][1] == 1):
+				# Collect the input dimensions
+				input_dimension = 0
+				connect = []
+				for connection in layer_vector[index][3]:
+					# Taking account the delay as well
+					 connect.append(("layer_" + str(connection[0]), connection[1]))
+					 input_dimension = input_dimension + layer_vector[connection[0]][0]
+					 
+				self.input_connections.append(connect)
+				
+				# Collect the output dimensions
+				output_dimension = layer_vector[index][0]
+				connect = []
+				for connection in layer_vector[index][4]:
+					connect.append("layer_" + str(connection))
 					
-				else:
-					self.hidden_layers[index] = CTRNNLayer(combined_input_dim, number_of_neurons[index], 0.001, np.fill((number_of_layers[index], ), 0.001),activation_function[index], "Hidden Layer")
-					self.layer_category[index] = "Hidden"
+				# Determine the output layer
+				if(len(connect) == 0):
+					self.__output_layers.append("layer_" + str(index))
+						
+				self.output_connections.append(connect)	
 				
+				# Collect the activation function
+				activation_function = layer_vector[index][2]
 				
-			# 2 implies an RBF Layer, but not now!
-	
-	# Function to get output from input_vector
-	# Input vector is a map that tells which indices are given the inputs	
-	def forward_propagate(self, input_vector):
-		# Output Dictionary to store the outputs of the layer
-		# They can then be used criss-cross
-		output_dict = {}
-		
-		# Input Layers
-		for index, layer in self.input_layers.items():
-			output_dict[index] = np.array(input_vector[index])
-			
-		# Hidden Layers
-		for index, layer in self.hidden_layers.items():
-			# Combine the inputs
-			combined_input = np.array([])
-			for input_index in self.input_connections[index]:
-				combined_input = np.concatenate([combined_input, output_dict[input_index]])
-			
-			output_dict[index] = layer.forward_propagate(np.array(combined_input))
-		
-		
-		# Return Dictionary for storing the final output of neural network
-		return_dict = {}
-			
-		# Output Layers
-		for index, layer in self.output_layers.items():
-			# Combine the inputs
-			combined_input = np.array([])
-			for input_index in self.input_connections[index]:
-				combined_input = np.concatenate([combined_input, output_dict[input_index]])
+				# Generate the layer
+				self.layer_map["layer_" + str(index)] = SimpleLayer(input_dimension, output_dimension, activation_function, "layer_"+str(index))
 				
-			return_dict[index] = layer.forward_propagate(np.array(combined_input))
+			# 2 => CTR Layer
+			elif(layer_vector[index][1] == 2):
+				# Collect the input dimensions
+				input_dimension = 0
+				connect = []
+				for connection in layer_vector[index][3]:
+					# Taking account the delay as well
+					connect.append(("layer_" + str(connection[0]), connection[1]))
+					
+				self.input_connections.append(connect)
+				
+				# Collect the output dimensions
+				output_dimension = layer_vector[index][0]
+				connect = []
+				for connection in layer_vector[index][4]:
+					connect.append("layer_" + str(connection))
+					
+				# Determine the output layer
+				if(len(connect) == 0):
+					self.__output_layers.append("layer_" + str(index))
+					
+				self.output_connections.append(connect)
+					
+				# Collect the activaiton function
+				activation_function = layer_vector[index][2]
+				
+				# Generate the layer
+				self.layer_map["layer_" + str(index)] = CTRLayer(input_dimension, output_dimension, activation_function, "layer_"+str(index))
+
+
+	# The function to calculate the output
+	def forward_propagate(self, input_dict):
+		# Output matrix for computing through the computation graph
+		self.input_matrix = [tf.Variable(np.array([0.0]))] * self.number_of_layers
+		self.sensor_matrix = [tf.Variable(np.array([0.0]))] * self.number_of_layers
+		self.output_matrix = [tf.Variable(np.array([0.0]))] * self.number_of_layers
 		
-		return return_dict
-		
+		# Generate the computation graph
+		for index in range(self.number_of_layers):
+			# If the layer is part of input
+			if "layer_" + str(index) in self.__input_layers:
+				self.input_matrix[index].assign(input_dict[index], validate_shape=False)
+				self.output_matrix[index].assign(tf.numpy_function(self.layer_map["layer_" + str(index)].forward_propagate, [self.input_matrix[index]], tf.float64))
+				
+			# If the layer is not part of the input
+			else:
+				# Sensor input for associative layer
+				# In general it will be zero, but can take other value if specified
+				self.sensor_matrix[index].assign(input_dict[index])
+				
+				input_vector = []
+				# Collect the input vector
+				for layer in self.input_connections:
+					for connection in layer:
+						# determine connection index
+						connection_index = int(connection[0][6:])
+						# No delay
+						if(connection[1] == False):
+							input_vector.append(self.output_matrix[connection_index][0])
+						# Delay
+						else:
+							input_vector.append(self.output_matrix[connection_index][1])
+						
+				# Concatenate all the vectors
+				self.input_matrix[index].assign(tf.concat(input_vector, axis = 0))
+				
+				# Calculate the activation corresponding to the concatenated input vector and sensor input
+				self.output_matrix[index].assign(tf.numpy_function(self.layer_map["layer_" + str(index)].forward_propagate, [self.input_matrix[index], self.sensor_matrix[index]], tf.float64))
+
+				
+
+
 	# Function to save the layer parameters
 	def save_parameters_to_file(self, file_name):
 		"""
