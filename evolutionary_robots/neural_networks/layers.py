@@ -46,26 +46,6 @@ class InputLayer:
 		# Output matrix is used to work with delays
 		self.__output_matrix = np.zeros((delay, input_dim))
 		
-	# Getters and Setters
-	@property
-	def input_dim(self):
-		""" Getter for input_dim """
-		return self.__input_dim
-		
-	@property
-	def layer_name(self):
-		""" Getter for layer name """
-		return self.__layer_name
-		
-	@property
-	def gain(self):
-		""" Getter for gain """
-		return self.__gain
-		
-	@gain.setter
-	def gain(self, gain):
-		self.__gain = gain
-		
 	# Function to take input from user
 	def forward_propagate(self, input_vector):
 		""" 
@@ -100,10 +80,30 @@ class InputLayer:
 			self.__output_matrix = np.delete(self.__output_matrix, self.__delay, axis=0)
 			
 		except:
-			raise ValueError("Please check dimensions of " + self.layer_name)
+			raise ValueError("Please check dimensions of " + self.__layer_name)
 			
 		# Return according to the delay
 		return self.__output_matrix
+		
+	# Getters and Setters
+	@property
+	def input_dim(self):
+		""" Getter for input_dim """
+		return self.__input_dim
+		
+	@property
+	def layer_name(self):
+		""" Getter for layer name """
+		return self.__layer_name
+		
+	@property
+	def gain(self):
+		""" Getter for gain """
+		return self.__gain
+		
+	@gain.setter
+	def gain(self, gain):
+		self.__gain = gain
 
 # Simple Layer, simple feed forward connection with a specified delay #################################
 class SimpleLayer:
@@ -176,7 +176,7 @@ class SimpleLayer:
 		self.__activation_function = activation_function
 		# Also check if the activation function is an instance of the ActivationFunction
 		if(not hasattr(self.__activation_function, 'calculate_activation')):
-			raise TypeError("The activation class needs to contain a method calculate_activation")
+			raise TypeError("The activation class needs to contain a method calculate_activation for " + self.__layer_name)
 		
 	def forward_propagate(self, input_vector, sensor_input):
 		"""
@@ -236,7 +236,7 @@ class SimpleLayer:
 			return self.__output_matrix
 			
 		except:
-			raise ValueError("Please check dimensions of " + self.layer_name)
+			raise ValueError("Please check dimensions of " + self.__layer_name)
 
 		
 	# Function to update the parameters
@@ -292,13 +292,13 @@ class SimpleLayer:
 			interval_counter = interval_counter + 2
 			
 		except:
-			raise ValueError("The parameter_vector consists of elements less than required")
+			raise ValueError("The parameter_vector of " + self.__layer_name + " consists of elements less than required")
 			
 		# The interval counter should contain the number of elements in parameter_vector
 		# Otherwise the user has specified parameters more than required
 		# Just a warning is enough
 		if(len(parameter_vector) > interval_counter):
-			warnings.warn("The parameter vector consists of elements greater than required")
+			warnings.warn("The parameter vector of " + self.__layer_name + " consists of elements greater than required")
 			
 	# Function to return the parameters
 	def return_parameters(self):
@@ -334,10 +334,10 @@ class SimpleLayer:
 		
 		# The vector we get from flattening the weight matrix
 		# flatten() works in row major order
-		weight_vector = self.weight_matrix().flatten()
+		weight_vector = self.weight_matrix.flatten()
 		
 		# The vector we get from flattening the bias vector
-		bias_vector = self.bias_vector().flatten()
+		bias_vector = self.bias_vector.flatten()
 		
 		# The vector of activation parameters
 		activation_vector = np.array(self.get_activation_parameters())
@@ -360,7 +360,7 @@ class SimpleLayer:
 		Raises a Value Exception if the dimensions do not match
 		"""
 		if(weight_matrix.shape != self.weight_dim):
-			raise ValueError("The dimensions of weight matrix do not match!")
+			raise ValueError("The dimensions of weight matrix do not match for " + self.__layer_name)
 		
 		self.__weight_matrix = weight_matrix
 		
@@ -377,7 +377,7 @@ class SimpleLayer:
 		Raises a Value Exception if the dimensions do not match
 		"""
 		if(bias_vector.shape != self.bias_dim):
-			raise ValueError("The dimensions of bias vector do not match!")
+			raise ValueError("The dimensions of bias vector do not match for " + self.__layer_name)
 			
 		self.__bias_vector = bias_vector
 		
@@ -468,7 +468,7 @@ class CTRLayer:
 		Get the parameters of activation function
 		
 	"""
-	def __init__(self, input_dim, output_dim, activation_function, layer_name, delay = 2):
+	def __init__(self, input_dim, output_dim, activation_function, time_interval, time_constant, layer_name, delay = 2):
 		# Name of the layer
 		self.__layer_name = layer_name
 		
@@ -489,19 +489,19 @@ class CTRLayer:
 		self.__gain = np.ones((output_dim, ))
 		
 		# Generate the weights for the weighted average
-		self.__time_interval = 1
-		self.__time_constant = np.ones((output_dim, ))
-		self.__time_weight = np.asarray(float(time_interval) / np.array(time_constant))
+		self.__time_interval = time_interval
+		self.__time_constant = time_constant
+		self.__time_weight = np.asarray(float(self.__time_interval) / np.array(self.__time_constant))
 		
 		# A check for the dimension of time constant list
 		if(self.__time_weight.shape != self.__time_dim):
-			raise ValueError("The dimension of time constant list is incorrect")
+			raise ValueError("The dimension of time constant list is incorrect for " + self.__layer_name)
 		
 		# Set the activation function
 		self.__activation_function = activation_function
 		# Also check if the activation function is an instance of the ActivationFunction
 		if(not hasattr(self.__activation_function, 'calculate_activation')):
-			raise TypeError("The activation function needs to has an attribute calculate_activation")
+			raise TypeError("The activation function needs to has an attribute calculate_activation for " + self.__layer_name)
 		
 		# Set the previous state output, zero for initial
 		self.__previous_output = np.zeros(output_dim)
@@ -547,14 +547,13 @@ class CTRLayer:
 			input_vector = np.array(input_vector)
 			
 			# Get the current activation
-			current_activation = np.add(np.dot(self.weight_matrix, input_vector), self.bias_vector)
+			current_activation = np.add(np.dot(self.__weight_matrix, input_vector), self.__bias_vector)
 			current_activation = self.__activation_function.calculate_activation(current_activation)
 			current_activation = current_activation + np.multiply(self.gain, sensor_input)
 			
 			# Generate the current output
 			# This equation is the first order euler solution
 			current_output = self.__previous_output * (1 - self.__time_weight) + current_activation * self.__time_weight
-			
 			# Insert the input_vector and remove the oldest one
 			self.__output_matrix = np.insert(self.__output_matrix, 0, current_output, axis=0)
 			self.__output_matrix = np.delete(self.__output_matrix, self.__delay, axis=0)
@@ -565,15 +564,15 @@ class CTRLayer:
 			return self.__output_matrix
 			
 		except:
-			raise ValueError("Please check dimensions of " + self.layer_name)
+			raise ValueError("Please check dimensions of " + self.__layer_name)
 		
 	# Just a wrapper function for euler_step to maintain uniformity
-	def forward_propagate(input_vector, sensor_input):
+	def forward_propagate(self, input_vector, sensor_input):
 		"""
 		Function to generate output of the input vector
 		Just a wrapper function for euler_step()
 		"""
-		return euler_step(input_vector, sensor_input)
+		return self._euler_step(input_vector, sensor_input)
 		
 	# Function to update the parameters of the layer
 	def update_parameters(self, parameter_vector):
@@ -609,39 +608,39 @@ class CTRLayer:
 		interval_counter = 0
 		
 		# Get the interval at which time constants seperate
-		time_interval = self.time_dim[0]
+		time_interval = self.__time_dim[0]
 		
 		# Get the interval at which weight and bias seperate
-		weight_interval = self.weight_dim[0] * self.weight_dim[1]
+		weight_interval = self.__weight_dim[0] * self.__weight_dim[1]
 		
 		# Get the interval at which the bias and next weight vector seperate
-		bias_interval = self.bias_dim[0]
+		bias_interval = self.__bias_dim[0]
 		
 		# Seperate the weights and bias and then reshape them
 		# Numpy raises a None Type Exception, as it cannot reshape a None object
 		# If such an excpetion occurs, raise a value error as our parameter_vector
 		# is shorter than required
 		try:
-			self.time_constant(parameter_vector[interval_counter:interval_counter + time_interval].reshape(self.time_dim[0], ))
+			self.__time_constant = parameter_vector[interval_counter:interval_counter + time_interval].reshape(self.__time_dim[0], )
 			interval_counter = interval_counter + time_interval
 			
-			self.weight_matrix(parameter_vector[interval_counter:interval_counter + weight_interval].reshape(self.weight_dim))
+			self.__weight_matrix = parameter_vector[interval_counter:interval_counter + weight_interval].reshape(self.__weight_dim)
 			interval_counter = interval_counter + weight_interval
 			
-			self.bias_vector(parameter_vector[interval_counter:interval_counter + bias_interval].reshape(self.bias_dim[0],))
+			self.__bias_vector = parameter_vector[interval_counter:interval_counter + bias_interval].reshape(self.__bias_dim[0],)
 			interval_counter = interval_counter + bias_interval
 			
 			self.set_activation_parameters(parameter_vector[interval_counter], parameter_vector[interval_counter + 1])
 			interval_counter = interval_counter + 2
 			
 		except:
-			raise ValueError("The parameter_vector consists of elements less than required")
+			raise ValueError("The parameter_vector for " + self.__layer_name + " consists of elements less than required")
 			
 		# The interval counter should contain the number of elements in parameter_vector
 		# Otherwise the user has specified parameters more than required
 		# Just a warning is enough
 		if(len(parameter_vector) > interval_counter):
-			warnings.warn("The parameter vector consists of elements greater than required")
+			warnings.warn("The parameter vector for " + self.__layer_name + " consists of elements greater than required")
 		
 	# Function to return the parameters of a layer
 	def return_parameters(self):
@@ -677,14 +676,14 @@ class CTRLayer:
 		output = np.array([])
 		
 		# The vector we get from flattening time constants
-		time_vector = self.time_constant.flatten()
+		time_vector = self.__time_constant.flatten()
 	
 		# The vector we get from flattening the weight matrix
 		# flatten() works in row major order
-		weight_vector = self.weight_matrix().flatten()
+		weight_vector = self.__weight_matrix.flatten()
 		
 		# The vector we get from flattening the bias vector
-		bias_vector = self.bias_vector().flatten()
+		bias_vector = self.__bias_vector.flatten()
 		
 		# The vector of activation parameters
 		activation_vector = np.array(self.get_activation_parameters())
@@ -708,7 +707,7 @@ class CTRLayer:
 		Raise a value exception if dimensions do not match
 		"""
 		if(weight_matrix.shape != self.weight_dim):
-			raise ValueError("The dimensions of the weight matrix do not match")
+			raise ValueError("The dimensions of the weight matrix do not match for " + self.__layer_name)
 		self.__weight_matrix = weight_matrix
 		
 	# Function to return the bias vector
@@ -725,7 +724,7 @@ class CTRLayer:
 		Raise a value exception if dimensions do not match
 		"""
 		if(bias_vector.shape != self.bias_dim):
-			raise ValueError("The dimensions of the bias vector do not match!")
+			raise ValueError("The dimensions of the bias vector do not match for " + self.__layer_name)
 		self.__bias_vector = bias_vector
 		
 	# Function to return the layer name
@@ -751,17 +750,6 @@ class CTRLayer:
 	def time_dim(self):
 		""" Function to return the dimensions of the time constant vector """
 		return self.__time_dim
-		
-	@property
-	def time_interval(self):
-		return self.__time_interval
-		
-	@time_interval.setter
-	def time_interval(self, time_interval):
-		self.__time_interval = time_interval
-		
-		# Change the time weight as well
-		self.__time_weight = np.asarray(float(self.time_interval) / self.time_constant)
 	
 	# Function to return the time constant list
 	@property
@@ -779,7 +767,7 @@ class CTRLayer:
 		self.time_constant = np.array(time_constant)
 		
 		if(self.time_constant.shape != self.time_dim):
-			raise ValueError("The dimension of time constant list is not correct!")
+			raise ValueError("The dimension of time constant list is not correct for " + self.__layer_name)
 			
 		# Calculate the weights based on the time constants and the time interval!
 		self.__time_weight = np.asarray(float(self.time_interval) / self.time_constant)

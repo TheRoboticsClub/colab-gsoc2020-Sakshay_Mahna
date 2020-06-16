@@ -1,27 +1,17 @@
 # Examples
 
-## Static Neural Network
+### Example 1
 
-**Example 1 and Example 2**
+`perceptron.py` Contains an example of 2 layers(Input and Output) with Linear Activation. The output layer is Simple or Continuous Time Recurrent
 
-![Image for Example 1](assets/Static1.jpg)
-![Image for Example 2](assets/Static2.jpg)
+### Example 2
 
-## Dynamic Neural Network
+`recurrent.py` Contains an example of recurrent relation between 2 hidden layers and how to make such networks
 
-**Example 1 and Example 2**
+### Example 3
 
-![Image for Example 1](assets/Dynamic1.jpg)
-![Image for Example 2](assets/Dynamic2.jpg)
+`order.py` Contains an example of **order of execution** and how to take care of that!
 
-## CTRNN
+### Example 4
 
-**Example**
-
-![Image for Example](assets/ctrnn.jpg)
-
-## RBF Network
-
-**Example**
-
-![Image for Example](assets/RBF.jpg)
+`complex.py` Contains an example showing how to design a complex, hypothetical Neural Network
