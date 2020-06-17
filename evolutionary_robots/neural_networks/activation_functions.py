@@ -27,7 +27,7 @@ the calculate_activation() method
 import numpy as np
 
 
-class ActivationFunction:
+class ActivationFunction(object):
 	"""
     Class of Activation Function
 
@@ -45,31 +45,33 @@ class ActivationFunction:
 	calculate_activation(input_vector)
 	    Calculate the activation of an input vector
 	    
-	Additional Methods
-	------------------
-	set_parameters(beta, theta)
-	    Sets the gain and bias of the activation function respectively
-	
-	get_parameters()
-		Returns the gain and bias of the activation function as tuple
 	"""  
 	def __init__(self, beta = 1, theta = 0):
-		# Set the class variables
-		self.beta = beta
-		self.theta = theta
+		# Set the protected class variables
+		self._beta = beta
+		self._theta = theta
+		
+	@property
+	def beta(self):
+		""" Get the beta parameter """
+		return self._beta
+		
+	@beta.setter
+	def beta(self, beta):
+		self._beta = beta
+		
+	@property
+	def theta(self):
+		""" Get the theta parameter """
+		return self._theta
+		
+	@theta.setter
+	def theta(self, theta):
+		self._theta = theta
 		
 	def calculate_activation(self, x):
 		# Different implementation of different functions
 		pass
-		
-	def set_parameters(self, beta, theta):
-		""" Set the parameters beta(gain) and theta(bias) respectively """
-		self.beta = beta
-		self.theta = theta
-		
-	def get_parameters(self):
-		""" Return the parameters beta(gain) and theta(bias) as tuple """
-		return self.beta, self.theta
 
 
 # The linear activation class

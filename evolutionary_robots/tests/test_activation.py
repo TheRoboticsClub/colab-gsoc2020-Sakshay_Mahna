@@ -13,6 +13,12 @@ class TestActivationFunctions(unittest.TestCase):
 	def setUp(self):
 		self.input_vector = np.array([1, 0, -0.1])
 	
+	def test_setter_getter(self):
+		Sigmoid = activation_functions.SigmoidActivation()
+		Sigmoid.beta = 2
+		Sigmoid.theta = 1
+		np.testing.assert_almost_equal(Sigmoid.calculate_activation(self.input_vector), np.array([0.5, 0.11920292, 0.09975049]))
+	
 	def test_linear(self):
 		Linear = activation_functions.LinearActivation(2, 1)
 		np.testing.assert_almost_equal(Linear.calculate_activation(self.input_vector), np.array([0, -2, -2.2]))

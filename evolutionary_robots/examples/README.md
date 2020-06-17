@@ -1,27 +1,17 @@
 # Examples
 
-## Static Neural Network
+### Example 1
 
-**Example 1 and Example 2**
+`perceptron.py` Contains an example of 2 layers(Input and Output) with Linear Activation. The input layer consists of 2 neurons and the output layer consists of 3 neurons. The output layer is Simple or Continuous Time Recurrent.
 
-![Image for Example 1](assets/Static1.jpg)
-![Image for Example 2](assets/Static2.jpg)
+### Example 2
 
-## Dynamic Neural Network
+`recurrent.py` Contains an example of recurrent relation between 2 hidden layers. The input consists of 1 neuron. There are 2 hidden layers with 1 neuron each and an output layer with 1 neuron. The hidden layers are assumed to be at the same level. In order to make these 2 layers communicate with each other, a delay has to be specified for one of the connection according to the order of execution. The example shows the correct and the wrong method.
 
-**Example 1 and Example 2**
+### Example 3
 
-![Image for Example 1](assets/Dynamic1.jpg)
-![Image for Example 2](assets/Dynamic2.jpg)
+`order.py` Contains an example of **order of execution** and how to adjust it. There are 3 layers in the network, input, hidden and output. All of them consist of 2 neurons each. The output layer of the network is expected to take input from the input and hidden layer and the hidden layer is supposed to take input from the input layer. Therefore, the correct order of execution is input -> hidden -> output. The example shows the correct and the wrong order of execution.
 
-## CTRNN
+### Example 4
 
-**Example**
-
-![Image for Example](assets/ctrnn.jpg)
-
-## RBF Network
-
-**Example**
-
-![Image for Example](assets/RBF.jpg)
+`complex.py` Contains an example showing how to design a complex hypothetical Neural Network, which takes associative inputs as well in accordance with a gain. There are 6 layers in total, of which 4 are hidden and 1 input and 1 output layer. The 5th layer is connected as a recurrence to the 2nd layer. However, the weights are adjusted such that the recurrence is not able to show it's effect.
