@@ -109,6 +109,8 @@ nn.set_gain(0, np.array([1, 1, 1...]))
 nn.get_gain(0)
 ```
 
+By default, the gains are equal to 1.
+
 **Save and load the parameters from a file**
 
 ```python
