@@ -170,9 +170,13 @@ The *continuous time recurrent layer* is a feed forward layer that calculates th
 
 The parameter vector for setting the weights is a list of list. Each layer follows a particular pattern of how the weights are set from the vector.
 
-**Input Layer** Input Layer takes no parameters. Therefore, the parameter list for input layers is kept as empty
+#### Input Layer
 
-**Simple Layer** The format followed is:
+Input Layer takes no parameters. Therefore, the parameter list for input layers is kept as empty
+
+#### Simple Layer 
+
+The format followed is:
 
 ```python
 [w_11, w_21, w_12, w_22, w_13, w_23, b_1, b_2, b_3, a_1g, a_1b, a_2g, a_2b, a_3g, a_3b, w_11, w_21, w_31, b_1, ...]
@@ -183,7 +187,9 @@ The parameter vector for setting the weights is a list of list. Each layer follo
 The jth output node corresponds to the index of the neuron of the layer under consideration.
 The ith input node corresponds to the index of the neuron of the layer specified in the order of `input_connections` above.
 
-**Continuous Time Recurrent Layer** The format followed is:
+#### Continuous Time Recurrent Layer
+
+The format followed is:
 
 ```python
 [tc_1, tc_2, tc_3, w_11, w_21, w_12, w_22, w_13, w_23, b_1, b_2, b_3, a_1g, a_1b, a_2g, a_2b, a_3g, a_3b, w_11, w_21, w_31, b_1, ...]
