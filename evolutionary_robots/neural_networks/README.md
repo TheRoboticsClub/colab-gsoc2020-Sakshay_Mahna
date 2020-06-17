@@ -86,7 +86,7 @@ The `time_interval` is an optional parameter that specifies the time interval of
 
 **Generate the output of Neural Network** An input dictionary specifying the input specific to each layer is passed to the `forward_propagate` function of the ArtificialNeuralNetwork class. The input for both the input and associative layers is passed through this input dictionary. Input for any layer not passed is assumed to be zero.
 
-The order of indices of the layers specified during initialization of the network is taken as the order of execution. A seperate user defined order of execution can also be followed while calculating the output of the network.
+The order of indices of the layers specified during initialization of the network is taken as the **order of execution**. A seperate user defined order of execution can also be followed while calculating the output of the network. The Neural Network in another sense is a computational graph. The order in which the computations are done is specified by numbering the layers in ascending order starting from 0. In this way, the order of indices of layers during initialization would be the same as the order of execution.
 
 The output is in the form of a dictionary. The dictionary is keyed according to the index of the layer as specified during initialization.
 
@@ -153,11 +153,11 @@ The *continuous time recurrent layer* is a feed forward layer that calculates th
 
 **activation_function** specifies the activation function class. This is usually taken from the activation functions library. In order to allow an outside class, it should possess a method called `calculate_activation` that takes in a single numpy array and outputs the activation result.
 
-**input_connections** is a list of tuples. The first element specifies the index of the layers from which the current layer takes input. The second element is a boolean that tells whether to delay the input by next iteration or not. In order to construct **specific networks**, the delay element is set True. The delay element delays the input of a layer with respect to it's activation that is present at the time of execution. For an example check the [examples directory](./../examples). An input layer can have no input connections. They are simply ignored if passed.
+**input_connections** is a list of tuples. The first element specifies the index of the layers from which the current layer takes input. The second element is a boolean that tells whether to delay the input by next iteration or not. In order to construct **specific networks**, the delay element is set True. The delay element delays the input of a layer with respect to it's activation that is present at the time of execution. For an example check the [examples directory](./../examples).
 
-Additionally, the order of specification of the input connections determines the format for the parameter vector that sets the weights of the network. 
+**An input layer can have no input connections**. They are simply ignored if passed. Additionally, the order of specification of the input connections determines the format of the parameter vector that sets the weights of the network. 
 
-**output_connections** is a list of integers specifying the index of the layers which the current layer provides output to. An output layer is determined by it's output connections. A layer having no output connections is considered as the output layer, and the output dictionary returned by `forward_propagate()` returns the output of such layers.
+**output_connections** is a list of integers specifying the index of the layers which the current layer provides output to. An output layer is determined by it's output connections. **A layer having no output connections is considered as the output layer**, and the output dictionary returned by `forward_propagate()` returns the output of such layers.
 
 
 ### Format for parameter vector
