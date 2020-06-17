@@ -5,7 +5,7 @@ from neural_networks.ann import ArtificialNeuralNetwork
 import numpy as np
 from neural_networks.activation_functions import LinearActivation
 
-print("Static Recurrent ANN: First Way")
+print("Static Recurrent ANN: First Way (Correct Way)")
 nn = ArtificialNeuralNetwork([[2, 0, None, [], [1, 2]], [1, 1, LinearActivation(), [(0, False), (2, False)], [2, 3]], [1, 1, LinearActivation(), [(0, False), (1, True)], [1, 3]], [1, 1, LinearActivation(), [(1, False), (2, False)], []]])
 
 parameter_vector = [[], [1, 1, 1, 0, 1, 0], [1, 1, 1, 0, 1, 0], [1, 1, 0, 1, 0]]

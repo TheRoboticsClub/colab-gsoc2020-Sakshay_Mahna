@@ -12,7 +12,7 @@ from activation_functions import ActivationFunction
 import warnings
 
 # Input Layer, only for taking inputs from the user
-class InputLayer:
+class InputLayer(object):
 	"""
 	Input Layer takes input from the user and sends
 	it to the other layers ahead!
@@ -40,8 +40,10 @@ class InputLayer:
 		# Private Class declarations
 		self.__input_dim = (input_dim, )
 		self.__layer_name = layer_name
-		self.__gain = np.ones((input_dim, ))
 		self.__delay = delay
+		
+		# Protected Class Variables
+		self._gain = np.ones((input_dim, ))
 
 		# Output matrix is used to work with delays
 		self.__output_matrix = np.zeros((delay, input_dim))
@@ -74,7 +76,7 @@ class InputLayer:
 		"""
 		try:
 			# Multiply with the gain
-			input_vector = np.multiply(np.array(input_vector), self.gain)
+			input_vector = np.multiply(np.array(input_vector), self._gain)
 			# Insert the input_vector and remove the oldest one
 			self.__output_matrix = np.insert(self.__output_matrix, 0, input_vector, axis=0)
 			self.__output_matrix = np.delete(self.__output_matrix, self.__delay, axis=0)
@@ -99,14 +101,17 @@ class InputLayer:
 	@property
 	def gain(self):
 		""" Getter for gain """
-		return self.__gain
+		return self._gain
 		
 	@gain.setter
 	def gain(self, gain):
-		self.__gain = gain
+		if(self.gain.shape != self.__input_dim):
+			raise ValueError("The dimensions of gain are not correct for " + self.__layer_name)
+		
+		self._gain = gain
 
 # Simple Layer, simple feed forward connection with a specified delay #################################
-class SimpleLayer:
+class SimpleLayer(object):
 	"""
 	Simple Layer works by calculating the activation of each neuron
 	using the feed forward algorithm and supplies the output according
@@ -170,7 +175,7 @@ class SimpleLayer:
 		
 		# Set the gain of the sensors values that are going to be input
 		# as an associative layer
-		self.__gain = np.ones((output_dim, ))
+		self._gain = np.ones((output_dim, ))
 		
 		# Set the activation function
 		self.__activation_function = activation_function
@@ -218,6 +223,7 @@ class SimpleLayer:
 		try:
 			# Convert the input vector to numpy array
 			input_vector = np.array(input_vector)
+			sensor_input = np.array(sensor_input)
 			
 			# Output vector is obtained by dotting weight and input, then adding with bias
 			output_vector = np.add(np.dot(self.weight_matrix, input_vector), self.bias_vector)
@@ -226,7 +232,7 @@ class SimpleLayer:
 			output_vector = self.__activation_function.calculate_activation(output_vector)
 			
 			# Add the sensor input
-			output_vector = output_vector + np.multiply(self.gain, sensor_input)
+			output_vector = output_vector + np.multiply(self._gain, sensor_input)
 			
 			# Insert the input_vector and remove the oldest one
 			self.__output_matrix = np.insert(self.__output_matrix, 0, output_vector, axis=0)
@@ -403,11 +409,15 @@ class SimpleLayer:
 	@property
 	def gain(self):
 		""" Getter for gain """
-		return self.__gain
+		
+		return self._gain
 		
 	@gain.setter
 	def gain(self, gain):
-		self.__gain = gain
+		if(self.gain.shape != self.__bias_dim):
+			raise ValueError("The dimensions of gain are not correct for " + self.__layer_name)
+		
+		self._gain = gain
 		
 	# Function to set the activation parameters
 	def set_activation_parameters(self, beta, theta):
@@ -422,7 +432,7 @@ class SimpleLayer:
 		
 
 # CTR Layer ################################################################
-class CTRLayer:
+class CTRLayer(object):
 	"""
 	CTR Layer is used in the Continuous Time Recurrent Neural Network.
 	CTR has to save the state of the previous output and then calculate
@@ -486,7 +496,7 @@ class CTRLayer:
 		self.__output_matrix = np.zeros((delay, output_dim))
 		
 		# Initialize the gain vector
-		self.__gain = np.ones((output_dim, ))
+		self._gain = np.ones((output_dim, ))
 		
 		# Generate the weights for the weighted average
 		self.__time_interval = time_interval
@@ -549,7 +559,7 @@ class CTRLayer:
 			# Get the current activation
 			current_activation = np.add(np.dot(self.__weight_matrix, input_vector), self.__bias_vector)
 			current_activation = self.__activation_function.calculate_activation(current_activation)
-			current_activation = current_activation + np.multiply(self.gain, sensor_input)
+			current_activation = current_activation + np.multiply(self._gain, sensor_input)
 			
 			# Generate the current output
 			# This equation is the first order euler solution
@@ -776,11 +786,14 @@ class CTRLayer:
 	@property
 	def gain(self):
 		""" Getter for gain """
-		return self.__gain
+		return self._gain
 		
 	@gain.setter
 	def gain(self, gain):
-		self.__gain = gain
+		if(self.gain.shape != self.__bias_dim):
+			raise ValueError("The dimensions of gain are not correct for " + self.__layer_name)
+		
+		self._gain = gain
 		
 	# Function to set the activation parameters
 	def set_activation_parameters(self, beta, theta):

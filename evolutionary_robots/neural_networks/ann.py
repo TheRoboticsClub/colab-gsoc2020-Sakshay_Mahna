@@ -15,7 +15,7 @@ from layers import InputLayer, SimpleLayer, CTRLayer
 # Library used to genrate warnings
 import warnings
 
-class ArtificialNeuralNetwork:
+class ArtificialNeuralNetwork(object):
 	"""
 	The Artificial Neural Network Class
 	
@@ -232,7 +232,7 @@ class ArtificialNeuralNetwork:
 		** Perfect Example of EAFP
 		"""
 		# Iterate according to order of execution
-		for index in self.__order_of_execution:
+		for index in self.order_of_execution:
 			# Used in various places throughout
 			layer_key = "layer_" + str(index)
 			
@@ -248,7 +248,7 @@ class ArtificialNeuralNetwork:
 			else:
 				# If the layer is not a part of the input
 				# Does the user give a sensor input?
-				if layer_key not in input_dict:
+				if index not in input_dict:
 					# If it is not, we define the input for the sensor
 					input_dict[index] = np.zeros(self.__layer_map[layer_key].bias_dim)
 					
@@ -396,6 +396,14 @@ class ArtificialNeuralNetwork:
 		
 		return self.__output_matrix
 		
+	def set_gain(self, index, gain):
+		""" Setter function for setting the gain of a layer """
+		gain = np.array(gain)
+		self.__layer_map["layer_" + str(index)].gain = gain
+		
+	def get_gain(self, index):
+		""" Getter function for the gain of a layer """
+		return self.__layer_map["layer_" + str(index)].gain
 		
 	
 			
