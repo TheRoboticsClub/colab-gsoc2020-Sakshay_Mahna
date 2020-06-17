@@ -63,6 +63,7 @@ class ArtificialNeuralNetwork:
 	def __init__(self, layer_vector, time_constants={}, time_interval=0.01):
 		# Class declarations
 		self.__number_of_layers = len(layer_vector)
+		self.__order_of_execution = range(self.__number_of_layers)
 		self.__time_interval = time_interval
 		
 		# Private declarations
@@ -222,7 +223,7 @@ class ArtificialNeuralNetwork:
 		Notes
 		-----
 		Dynamic Programming is used for the calculation of the output
-		Based on the order of execution specified according to the user,
+		Based on the order of execution specified according to the user(by default taken as order of indices of layers),
 		the output is calculated and stored in the output matrix.
 		
 		The layer outputs the activation for both the current and previous
@@ -231,7 +232,7 @@ class ArtificialNeuralNetwork:
 		** Perfect Example of EAFP
 		"""
 		# Iterate according to order of execution
-		for index in range(self.__number_of_layers):
+		for index in self.__order_of_execution:
 			# Used in various places throughout
 			layer_key = "layer_" + str(index)
 			
@@ -372,6 +373,16 @@ class ArtificialNeuralNetwork:
 	def number_of_layers(self):
 		""" Getter for number of layers """
 		return self.__number_of_layers
+		
+	@property
+	def order_of_execution(self):
+		""" Getter for the order of execution """
+		return self.__order_of_execution
+		
+	@order_of_execution.setter
+	def order_of_execution(self, order_list):
+		""" Setter for order of exeuction """
+		self.__order_of_execution = order_list
 		
 	@property
 	def time_interval(self):
