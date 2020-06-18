@@ -15,3 +15,7 @@
 ### Example 4
 
 `complex.py` Contains an example showing how to design a complex hypothetical Neural Network, which takes associative inputs as well in accordance with a gain. There are 6 layers in total, of which 4 are hidden and 1 input and 1 output layer. The 5th layer is connected as a recurrence to the 2nd layer. However, the weights are adjusted such that the recurrence is not able to show it's effect.
+
+### Example 5
+
+`large.py` Contains an example showing how to design a Large Static Neural Network, which has a large number of layers. There are 30 Layers in total, 2 of which are input and output and the other 28 are hidden. In order to pass the parameters of the network a loop structure is used.
