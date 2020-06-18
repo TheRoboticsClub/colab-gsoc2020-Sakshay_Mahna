@@ -32,6 +32,8 @@ print(output)
 output = nn.forward_propagate(input_dict)
 print(output)
 
+
+##########################################################
 print("Changed order of execution")
 # Same initialization, but changing the order of execution before calculating the output
 nn = ArtificialNeuralNetwork([
@@ -62,6 +64,8 @@ output = nn.forward_propagate(input_dict)
 print(output)
 
 
+
+###################################################################
 print("Static ANN example of order: Correct Way")
 # Different initialization, which results in a different order of initialization
 nn = ArtificialNeuralNetwork([
