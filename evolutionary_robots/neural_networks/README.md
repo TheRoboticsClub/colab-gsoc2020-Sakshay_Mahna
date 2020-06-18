@@ -163,7 +163,7 @@ The *continuous time recurrent layer* is a feed forward layer that calculates th
 
 **activation_function** specifies the activation function class. This is usually taken from the activation functions library. In order to allow an outside class, it should possess a method called `calculate_activation` that takes in a single numpy array and outputs the activation result.
 
-**input_connections** is a list of tuples. The first element specifies the index of the layers from which the current layer takes input. The second element is a boolean that tells whether to delay the input by next iteration or not. In order to construct **specific networks**, the delay element is set True. The delay element delays the input of a layer with respect to it's activation that is present at the time of execution. For an example check the [examples directory](./../examples).
+**input_connections** is a **list of tuples**. The first element specifies the index of the layers from which the current layer takes input. The second element is a boolean that tells whether to delay the input by next iteration or not. In order to construct **specific networks**, the delay element is set True. The delay element delays the input of a layer with respect to it's activation that is present at the time of execution. For an example check the *Example 2* of [examples directory](./../examples).
 
 **An input layer can have no input connections**. They are simply ignored if passed. Additionally, the order of specification of the input connections determines the format of the parameter vector that sets the weights of the network. 
 

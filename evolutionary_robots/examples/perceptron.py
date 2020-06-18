@@ -2,14 +2,18 @@ import sys
 sys.path.append('./../')
 
 from neural_networks.ann import ArtificialNeuralNetwork
+from neural_networks.interface import Layer
 import numpy as np
 from neural_networks.activation_functions import LinearActivation
 
 print("Static ANN")
 # Simple ANN with 2 input 3 output and Linear Activation
+inputLayer = Layer(2, 0, None, [], [1])			# Input Layer
+outputLayer = Layer(3, 1, LinearActivation(), [0], [])	# Output Layer
+
 nn = ArtificialNeuralNetwork([
-				[2, 0, None, [], [1]],					# Layer 0
-				[3, 1, LinearActivation(), [(0, False)], []]		# Layer 1
+				inputLayer,					# Layer 0
+				outputLayer		# Layer 1
 			     ])
 
 # Loading the parameters from a list
@@ -33,9 +37,12 @@ print(output)
 print("CTRNN")
 # CTRNN with 2 input 3 output and Linear Activation
 # And time constants are 1, 1, 1
+# The input Layer is same, therefore no changes
+# The output layer type is changed, 
+outputLayer.type_of_layer = 2
 nn = ArtificialNeuralNetwork([
-				[2, 0, None, [], [1]],					# Layer 0
-				[3, 2, LinearActivation(), [(0, False)], []]		# Layer 1
+				inputLayer,					# Layer 0
+				outputLayer		# Layer 1
 			     ])
 
 # Loading the parameters from a list

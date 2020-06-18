@@ -2,6 +2,7 @@ import sys
 sys.path.append('./../')
 
 from neural_networks.ann import ArtificialNeuralNetwork
+from neural_networks.interface import Layer
 import numpy as np
 from neural_networks.activation_functions import LinearActivation
 
@@ -10,12 +11,20 @@ from neural_networks.activation_functions import LinearActivation
 # The hidden layers are connected with each other
 # The output of one hidden layer is dependent on the previous output of the other hidden layer and vice versa
 
+inputLayer = Layer(2, 0, None, [], [1, 2])		# Input Layer
+hiddenLayer1 = Layer(1, 1, LinearActivation(), [0, 2], [2, 3])	# Hidden Layer 1
+hiddenLayer2 = Layer(1, 1, LinearActivation(), [0, 1], [1, 3])	# Hidden Layer 2
+outputLayer = Layer(1, 1, LinearActivation(), [1, 2], [])		# Output Layer
+
+# Delay the input connection of Hidden Layer 2 that is received from Hidden Layer 1
+hiddenLayer2.delayed_connections = [1]
+
 print("Static Recurrent ANN: First Way (Correct Way)")
 nn = ArtificialNeuralNetwork([
-				[2, 0, None, [], [1, 2]], 						# Layer 0 (Input Layer)
-				[1, 1, LinearActivation(), [(0, False), (2, False)], [2, 3]], 		# Layer 1 (Hidden Layer)
-				[1, 1, LinearActivation(), [(0, False), (1, True)], [1, 3]], 		# Layer 2 (Hidden Layer)
-				[1, 1, LinearActivation(), [(1, False), (2, False)], []]		# Layer 3 (Output Layer)
+				inputLayer, 						# Layer 0 (Input Layer)
+				hiddenLayer1, 		# Layer 1 (Hidden Layer)
+				hiddenLayer2, 		# Layer 2 (Hidden Layer)
+				outputLayer		# Layer 3 (Output Layer)
 			     ])
 
 # Loading the parameters from a list
@@ -38,12 +47,16 @@ print(output)
 
 ####################################################
 # The difference lies where we have put the delay between Layer 1 and Layer 2
+# Remove the delay from Hidden Layer 2 and put it in Hidden Layer 1
+hiddenLayer2.delayed_connections = []
+hiddenLayer1.delayed_connections = [2]
+
 print("Static Recurrent ANN: Second Way (Wrong Way)")
 nn = ArtificialNeuralNetwork([
-				[2, 0, None, [], [1, 2]], 						# Layer 0
-				[1, 1, LinearActivation(), [(0, False), (2, True)], [2, 3]], 		# Layer 1 (The connection input from Layer 2 is delayed)
-				[1, 1, LinearActivation(), [(0, False), (1, False)], [1, 3]], 		# Layer 2 (The connection input from Layer 1 is not delayed)
-				[1, 1, LinearActivation(), [(1, False), (2, False)], []]		# Layer 3
+				inputLayer, 						# Layer 0
+				hiddenLayer1, 		# Layer 1 (The connection input from Layer 2 is delayed)
+				hiddenLayer2, 		# Layer 2 (The connection input from Layer 1 is not delayed)
+				outputLayer		# Layer 3
 			     ])
 
 # Loading the parameters from a list

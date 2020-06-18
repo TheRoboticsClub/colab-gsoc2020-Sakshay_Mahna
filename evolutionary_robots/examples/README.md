@@ -6,7 +6,7 @@
 
 ### Example 2
 
-`recurrent.py` Contains an example of recurrent relation between 2 hidden layers. The input consists of 1 neuron. There are 2 hidden layers with 1 neuron each and an output layer with 1 neuron. The hidden layers are assumed to be at the same level. In order to make these 2 layers communicate with each other, a delay has to be specified for one of the connection according to the order of execution. The example shows the correct and the wrong method.
+`recurrent.py` Contains an example of recurrent relation between 2 hidden layers. The input consists of 1 neuron. There are 2 hidden layers with 1 neuron each and an output layer with 1 neuron. The hidden layers are assumed to be at the same level. These layers are connected to each other such that both of them depend on the input layer and the other layer's previous activation to determine it's output. One of the layers will be evaluated first, according to the order of execution. Hence, in order to make these 2 layers communicate with each other, a delay has to be specified for one of the connection so the sequential execution does not create a problem. The example shows the correct and the wrong method.
 
 ### Example 3
 
