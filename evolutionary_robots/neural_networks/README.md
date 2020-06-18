@@ -13,19 +13,27 @@ import numpy as np
 **Initialize the Artificial Neural Network Object** For instance, we have a Perceptron with 2 input nodes and 1 output node along with a sigmoid activation function. Pass a **list of list** of Layer Parameters while initializing the Neural Network object.
 
 ```python
-percpetron = ArtificialNeuralNetwork([[2, 0, None, [], [1]], [1, 1, SigmoidActivation(), [(0, False)], []]])
+percpetron = ArtificialNeuralNetwork([
+                                      [2, 0, None, [], [1]],                                  # Input Layer
+                                      [1, 1, SigmoidActivation(), [(0, False)], []]           # Output Layer
+                                      ])
 ```
 
 **Load self-generated parameters into the Neural Network** Assume, in this case the weights corresponding to second layer are 0.5 and 0.5, the bias is 1. And the gain of the Sigmoid Activation is 1 and the offset is 0. Note that the parameters are to be given in a format specific to each layer of the network.
 
 ```python
-perceptron.load_parameters_from_vector([[], [0.5, 0.5, 1, 1, 0]])
+perceptron.load_parameters_from_vector([
+                                        [],                         # Input Layer
+                                        [0.5, 0.5, 1, 1, 0]         # Output Layer
+                                       ])
 ```
 
 **Generate the output** In this case, the inputs to both the nodes of input layer is 1.
 
 ```python
-output = perceptron.forward_propagate({0: [1, 1]})
+output = perceptron.forward_propagate({
+                                       0: [1, 1]        # Input Layer
+                                      })
 ```
 
 For more examples, check the [examples directory](./../examples).
