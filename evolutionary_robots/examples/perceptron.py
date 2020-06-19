@@ -12,7 +12,7 @@ inputLayer = Layer(2, 0, None, [], [1])			# Input Layer
 outputLayer = Layer(3, 1, LinearActivation(), [0], [])	# Output Layer
 
 nn = ArtificialNeuralNetwork([
-				inputLayer,					# Layer 0
+				inputLayer,		# Layer 0
 				outputLayer		# Layer 1
 			     ])
 
@@ -41,7 +41,7 @@ print("CTRNN")
 # The output layer type is changed, 
 outputLayer.type_of_layer = 2
 nn = ArtificialNeuralNetwork([
-				inputLayer,					# Layer 0
+				inputLayer,		# Layer 0
 				outputLayer		# Layer 1
 			     ])
 
