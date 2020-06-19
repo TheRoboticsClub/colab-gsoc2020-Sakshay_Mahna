@@ -9,8 +9,8 @@ from neural_networks.activation_functions import LinearActivation
 # An ANN with 3 Layers, which are input, hidden and output
 # The output layer depends on the output of input and hidden layers
 inputLayer = Layer(2, 0, None, [], [1, 2])
-hiddenLayer = Layer(2, 1, LinearActivation(), [0], [2])
-outputLayer = Layer(2, 1, LinearActivation(), [0, 1], [])
+hiddenLayer = Layer(2, 1, LinearActivation(), [0], [1])			# Connections are made according to the initialization of Neural Network object
+outputLayer = Layer(2, 1, LinearActivation(), [0, 2], [])
 
 print("Static ANN example of order: Wrong Way")
 nn = ArtificialNeuralNetwork([
@@ -72,6 +72,8 @@ print(output)
 ###################################################################
 print("Static ANN example of order: Correct Way")
 # Different initialization, which results in a different order of initialization
+hiddenLayer.output_connections = [2]
+outputLayer.input_connections = [0, 1]
 nn = ArtificialNeuralNetwork([
 				inputLayer, 					# Layer 0 (Input Layer)
 				hiddenLayer, 			# Layer 1 (Hidden Layer)
