@@ -9,14 +9,14 @@ from neural_networks.activation_functions import LinearActivation
 # An ANN with 3 Layers, which are input, hidden and output
 # The output layer depends on the output of input and hidden layers
 inputLayer = Layer(2, 0, None, [], [1, 2])
-hiddenLayer = Layer(2, 1, LinearActivation(), [0], [1])			# Connections are made according to the initialization of Neural Network object
+hiddenLayer = Layer(2, 1, LinearActivation(), [0], [1])		# Connections are made according to the initialization of Neural Network object
 outputLayer = Layer(2, 1, LinearActivation(), [0, 2], [])
 
 print("Static ANN example of order: Wrong Way")
 nn = ArtificialNeuralNetwork([
-				inputLayer, 					# Layer 0 (Input Layer)
-				outputLayer, 	# Layer 1 (Output Layer)
-				hiddenLayer			# Layer 2 (Hidden Layer)
+				inputLayer, 		# Layer 0 (Input Layer)
+				outputLayer, 		# Layer 1 (Output Layer)
+				hiddenLayer		# Layer 2 (Hidden Layer)
 			     ])
 
 # Loading the parameters from a list			
@@ -41,9 +41,9 @@ print(output)
 print("Changed order of execution")
 # Same initialization, but changing the order of execution before calculating the output
 nn = ArtificialNeuralNetwork([
-				inputLayer, 						# Layer 0 (Input Layer)
+				inputLayer, 		# Layer 0 (Input Layer)
 				outputLayer, 		# Layer 1 (Output Layer)
-				hiddenLayer				# Layer 2 (Hidden Layer)
+				hiddenLayer		# Layer 2 (Hidden Layer)
 			      ])
 
 # Loading the parameters from a list							
@@ -75,9 +75,9 @@ print("Static ANN example of order: Correct Way")
 hiddenLayer.output_connections = [2]
 outputLayer.input_connections = [0, 1]
 nn = ArtificialNeuralNetwork([
-				inputLayer, 					# Layer 0 (Input Layer)
-				hiddenLayer, 			# Layer 1 (Hidden Layer)
-				outputLayer	# Layer 2 (Output Layer)
+				inputLayer, 		# Layer 0 (Input Layer)
+				hiddenLayer, 		# Layer 1 (Hidden Layer)
+				outputLayer		# Layer 2 (Output Layer)
 			     ])
 							
 # Loading the parameters from a list
