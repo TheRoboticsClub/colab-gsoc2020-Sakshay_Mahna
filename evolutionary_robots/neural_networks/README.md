@@ -18,7 +18,7 @@ import numpy as np
 inputLayer = Layer(2, 0, None, [], [1])
 outputLayer = Layer(1, 1, SigmoidActivation(), [0], [])
 percpetron = ArtificialNeuralNetwork([
-                                      inputLayer,                                  # Input Layer
+                                      inputLayer,           # Input Layer
                                       outputLayer           # Output Layer
                                       ])
 ```
@@ -159,18 +159,6 @@ nn.forward_propagate(input_dictionary)
 nn.order_of_execution = [2, 3, 1, 0]
 nn.forward_propagate(input_dictionary)
 ```
-
-In order to set the gains of a particular layer, the following function calls are requried:
-
-```python
-# Set the gain of layer_0
-nn.set_gain(0, np.array([1, 1, 1...]))
-
-# Return the gains that were set
-nn.get_gain(0)
-```
-
-By default, the gains are equal to 1.
 
 **Save and load the parameters from a file**
 
