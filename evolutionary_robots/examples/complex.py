@@ -21,12 +21,12 @@ hiddenLayer4 = Layer(1, 1, LinearActivation(), [2, 1, 3], [1, 5])
 outputLayer = Layer(1, 1, LinearActivation(), [4], [])
 
 nn = ArtificialNeuralNetwork([
-				inputLayer, 								# Layer 0 (Input Layer)
+				inputLayer, 		# Layer 0 (Input Layer)
 				hiddenLayer1, 		# Layer 1 (Hidden Layer 1)
-				hiddenLayer2, 					# Layer 2 (Hidden Layer 2)
-				hiddenLayer3, 					# Layer 3 (Hidden Layer 3)
-				hiddenLayer4, 	# Layer 4 (Hidden Layer 4)
-				outputLayer					# Layer 5 (Output Layer)
+				hiddenLayer2, 		# Layer 2 (Hidden Layer 2)
+				hiddenLayer3, 		# Layer 3 (Hidden Layer 3)
+				hiddenLayer4, 		# Layer 4 (Hidden Layer 4)
+				outputLayer		# Layer 5 (Output Layer)
 			     ])
 
 # Weights are such that the recurrence is not able to show itself!
