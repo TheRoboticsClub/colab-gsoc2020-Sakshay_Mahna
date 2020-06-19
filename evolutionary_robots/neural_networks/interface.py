@@ -42,6 +42,7 @@ class Layer(object):
 		Specifies the list of input connections whose input should be delayed before using in the layer
 	"""
 	def __init__(self, number_of_neurons = 1, type_of_layer = 1, activation_function = LinearActivation(), input_connections = [], output_connections = []):
+		# Attributes
 		self.number_of_neurons = number_of_neurons
 		self.type_of_layer = type_of_layer
 		self.activation_function = activation_function
@@ -67,6 +68,7 @@ class Layer(object):
 	@property
 	def type_of_layer(self):
 		""" Getter for Type of Layer """
+		# Type of Layer in words based on index
 		if(self._type_of_layer == 0):
 			return "Input"
 		elif(self._type_of_layer == 1):
@@ -83,6 +85,7 @@ class Layer(object):
 	@property
 	def activation_function(self):
 		""" Getter for Activation Function """
+		# Better readability
 		return type(self._activation_function)
 		
 	@activation_function.setter
