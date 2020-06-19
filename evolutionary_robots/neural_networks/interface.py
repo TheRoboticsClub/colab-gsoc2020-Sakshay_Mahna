@@ -10,7 +10,36 @@ import numpy as np
 
 class Layer(object):
 	"""
+	Layer Class provides an easier abstraction for developing an Artificial Neural Network
+	Layer objects can be initialized and updated according to the user and passed as initialization parameter to the network
 	
+	Attributes
+	----------
+	number_of_neurons: integer
+		Specifies the number of neurons in the layer
+		
+	type_of_layer: integer
+		Specifies the type of layer, be it Input, Simple or Continuous
+		
+	activation_function: ActvationFunction object
+		Specifies the activation function of the Layer, ignored if type of layer is Input
+		
+	input_connections: array like
+		Specifies the layer indices that provide input to the current layer
+		
+	output_connections: array_like
+		Specifies the layer indices that the current layer provides output to
+		
+	Additional Attributes
+	---------------------
+	gains: array like
+		Specifies the gain of input values for a layer
+		
+	time_constants: array like
+		Specifies the time constants of the layer(useful for continuous layer)
+		
+	delay_connections: array_like
+		Specifies the list of input connections whose input should be delayed before using in the layer
 	"""
 	def __init__(self, number_of_neurons = 1, type_of_layer = 1, activation_function = LinearActivation(), input_connections = [], output_connections = []):
 		self.number_of_neurons = number_of_neurons
