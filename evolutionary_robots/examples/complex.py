@@ -51,8 +51,9 @@ output = nn.forward_propagate(input_dict)
 print(output)
 
 # Set the gain of Layer 3 according to the number of neurons in that layer
-nn.set_gain(3, [2, 2])
-
+hiddenLayer2.gains = [2, 2]
+nn = ArtificialNeuralNetwork([inputLayer, hiddenLayer1, hiddenLayer2, hiddenLayer3, hiddenLayer4, outputLayer])
+nn.load_parameters_from_vector(parameter_vector)
 # Input the Neural Network through a dictionary
 input_dict = {
 		0: np.array([1.0, 1.0]), 	# Input to Layer 0

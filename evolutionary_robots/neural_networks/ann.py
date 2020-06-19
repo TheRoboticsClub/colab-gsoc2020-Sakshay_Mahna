@@ -60,7 +60,7 @@ class ArtificialNeuralNetwork(object):
 		Load the parameters of the Neural Network from a vector
 	"""
 	
-	def __init__(self, layer_vector, time_constants={}, time_interval=0.01):
+	def __init__(self, layer_vector, time_interval=0.01):
 		# Class declarations
 		self.__number_of_layers = len(layer_vector)
 		self.__order_of_execution = range(self.__number_of_layers)
@@ -71,7 +71,7 @@ class ArtificialNeuralNetwork(object):
 		self.__output_layers = []
 		
 		# Construct the layers and the graph
-		self._construct_layers(layer_vector, time_constants)
+		self._construct_layers(layer_vector)
 		
 		# Output matrix dictionary for Dynamic Programming Solution
 		self.__output_matrix = {}
@@ -79,7 +79,7 @@ class ArtificialNeuralNetwork(object):
 	
 	# Function to construct the layers given the inputs
 	# in essence, a Neural Network
-	def _construct_layers(self, layer_vector, time_constants):
+	def _construct_layers(self, layer_vector):
 		"""
 		Private function for the construction of the layers for the Neural Network
 		
@@ -131,6 +131,7 @@ class ArtificialNeuralNetwork(object):
 					
 					# Generate the layer
 					self.__layer_map["layer_" + str(index)] = InputLayer(input_dimension, "layer_"+str(index))
+					self.__layer_map["layer_" + str(index)].gain = layer_vector[index][5]
 					
 				# 1 => Simple Layer
 				elif(layer_vector[index][1] == 1):
@@ -161,6 +162,7 @@ class ArtificialNeuralNetwork(object):
 					
 					# Generate the layer
 					self.__layer_map["layer_" + str(index)] = SimpleLayer(input_dimension, output_dimension, activation_function, "layer_"+str(index))
+					self.__layer_map["layer_" + str(index)].gain = layer_vector[index][5]
 					
 				# 2 => CTR Layer
 				elif(layer_vector[index][1] == 2):
@@ -190,11 +192,8 @@ class ArtificialNeuralNetwork(object):
 					activation_function = layer_vector[index][2]
 					
 					# Generate the layer
-					try:
-						self.__layer_map["layer_" + str(index)] = CTRLayer(input_dimension, output_dimension, activation_function, self.__time_interval, time_constants[index], "layer_"+str(index))
-					except:
-						time_dimension = (output_dimension, )
-						self.__layer_map["layer_" + str(index)] = CTRLayer(input_dimension, output_dimension, activation_function, self.__time_interval, np.ones(time_dimension), "layer_" + str(index))
+					self.__layer_map["layer_" + str(index)] = CTRLayer(input_dimension, output_dimension, activation_function, self.__time_interval, layer_vector[index][6], "layer_"+str(index))
+					self.__layer_map["layer_" + str(index)].gain = layer_vector[index][5]
 						
 		except:
 			raise Exception("There is something wrong with the configuration dictionary of the network!")
@@ -395,15 +394,6 @@ class ArtificialNeuralNetwork(object):
 			Shows the outputs of every layer """
 		
 		return self.__output_matrix
-		
-	def set_gain(self, index, gain):
-		""" Setter function for setting the gain of a layer """
-		gain = np.array(gain)
-		self.__layer_map["layer_" + str(index)].gain = gain
-		
-	def get_gain(self, index):
-		""" Getter function for the gain of a layer """
-		return self.__layer_map["layer_" + str(index)].gain
 		
 	
 			

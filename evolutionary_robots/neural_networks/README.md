@@ -2,20 +2,24 @@
 
 ## How to create a Neural Network?
 
-**Import the Activation Function and Neural Network** along with Numpy(optional). The `neural_networks.activation_functions` consist of a library of activation functions. The `neural_networks.ann` contains the ArtificialNeuralNetwork class.
+**Import the Activation Function and Neural Network** along with Numpy(optional). The `neural_networks.activation_functions` consist of a library of activation functions. The `neural_networks.ann` contains the ArtificialNeuralNetwork class. The `neural_networks.interface` contain user interface classes.
 
 ```python
 from neural_networks.ann import ArtificialNeuralNetwork
 from neural_networks.activation_functions import SigmoidActivation
+from neural_networks.interface import Layer
 import numpy as np
 ```
 
-**Initialize the Artificial Neural Network Object** For instance, we have a Perceptron with 2 input nodes and 1 output node along with a sigmoid activation function. Pass a **list of list** of Layer Parameters while initializing the Neural Network object.
+**Initialize the Artificial Neural Network Object** For instance, we have a Perceptron with 2 input nodes and 1 output node along with a sigmoid activation function. Generate two layer objects, which are going to serve as the input and output layers.
 
 ```python
+# The format is number of neurons, type of layer, activation function, input connections and output connections
+inputLayer = Layer(2, 0, None, [], [1])
+outputLayer = Layer(1, 1, SigmoidActivation(), [0], [])
 percpetron = ArtificialNeuralNetwork([
-                                      [2, 0, None, [], [1]],                                  # Input Layer
-                                      [1, 1, SigmoidActivation(), [(0, False)], []]           # Output Layer
+                                      inputLayer,                                  # Input Layer
+                                      outputLayer           # Output Layer
                                       ])
 ```
 
@@ -76,19 +80,68 @@ print(activation.calculate_activation(np.array([-1, 0, 1])))
 # The output is a numpy array [-1, 0, 1]
 ```
 
+## Layer
+
+`interface.py` consists classes that define easier user interface. Layer class is present in this module.
+
+Layer class allows easier initialization and management of layers of the Neural Network. The parameters of the layers can be passed during initialization or by changing the attributes of the object.
+
+```python
+# Initializing Layer Object
+layer = Layer(number_of_neurons, type_of_layer, activation_function, list_of_input_connections, list_of_output_connections)
+
+# Initializing with attributes or changing the attributes
+layer = Layer()
+layer.number_of_neurons = 1
+layer.type_of_layer = 2
+layer.activation_function = SigmoidActivation()
+layer.input_connections = [1, 2]
+layer.output_connections = [0]
+```
+
+**number_of_neurons** specifies the number of neurons in a particular layer.
+
+**type_of_layer** specifies the type of layer. There are 3 types of layer for the Neural Network. *0 implies input layer, 1 implies simple layer and 2 implies a continuous time recurrent layer*.
+
+- The *input layer* simply takes input of a sensor and returns them with an optional gain.
+
+- The *simple layer* is a simple feed forward layer that calculates the output through forward propagation. Using specific input connections, this layer can behave as a recurrent layer as well. In addition to it, optional sensor values can also be passed to the layer(from input_dict) to make it behave as associative layer as well.
+
+- The *continuous time recurrent layer* is a feed forward layer that calculates the output using first order euler approximation. Similar to the *simple layer*, this layer can be made to behave accordingly.
+
+**activation_function** specifies the activation function class. This is usually taken from the activation functions library. In order to allow an outside class, it should possess a method called `calculate_activation` that takes in a single numpy array and outputs the activation result.
+
+**input_connections** is a list of integers specifying the index of the layers which the current layer takes input from. An input layer is determined by it's input connections. A layer having type of layer equal to 1 is an input layer, any **input connections specified for this layer are simply ignored**. Additionally, the order of specification of the input connections **determines the format of the parameter vector** that sets the weights of the network. 
+
+**output_connections** is a list of integers specifying the index of the layers which the current layer provides output to. An output layer is determined by it's output connections. **A layer having no output connections is considered as the output layer**, and the output dictionary returned by `forward_propagate()` returns the output of such layers.
+
+**delay_connections** is an optional attribute that has to be set explicitly apart from initialization. It is a list of integers specifying the layer indices from which the input to current layer is to be delayed by one iteration of the network. By default, delay_connections is an empty list.
+
+**time_constants** is an optional attribute that has to be set explicitly apart from initialization. It is a list of integers specifying the time constants of the neurons of the layer. By default, time constants are taken to be one.
+
+**gains** is an optional attribute that has to be set explicitly apart from initialization. It is a list of integers specifying the gain provided to each input of the neuron. By default, the gains are taken as 1.
+
+```python
+layer = Layer()
+layer.input_connections([1, 2])		# Layer takes input from layer indexed as 1 and 2
+layer.delay_connections([2])		# Layer delays the input taken from 2 by one iteration
+
+layer.time_constants = [2, 2]
+layer.gains = [1, 1]
+```
+
+
 ## Neural Network
 
 `ann.py` consists of an ArtificialNeuralNetwork class which allows the creation of Static and Dynamic Neural Networks.
 
 Methods supported by the ArtificialNeuralNetwork class are:
 
-**Generate a Neural Network** with a given number of layers, number of neurons in each layer, the input and output connections and the activation function. The format of the list to be passed is given in the [next section](#format-for-initialization).
+**Generate a Neural Network** with a given number of layers, number of neurons in each layer, the input and output connections and the activation function.
 
 ```python
-nn = ArtificialNeuralNetwork(a_list_with_appropriate_format_for_initialization, time_constant_dictionary, time_interval)
+nn = ArtificialNeuralNetwork(a_list_of_layer_object, time_interval)
 ```
-
-The `time_constant_dictionary` is an optional parameter that specifies a list of time constants for the continuous layer. By default, the time constants are assigned a value of 1.
 
 The `time_interval` is an optional parameter that specifies the time interval of the network. This is useful in the case when a continuous layer is used, otherwise this is ignored. By default, the time interval is 0.01.
 
@@ -144,30 +197,6 @@ nn.load_parameters_from_vector(a_list_with_appropriate_format)
 ```python
 nn.output_matrix
 ```
-
-### Format for Initialization
-
-```
-[[number_of_neurons, type_of_layer, activation_function, input_connections, output_connections], ...]	*for each layer
-```
-
-**number_of_neurons** specifies the number of neurons in a particular layer.
-
-**type_of_layer** specifies the type of layer. There are 3 types of layer for the Neural Network. *0 implies input layer, 1 implies simple layer and 2 implies a continuous time recurrent layer*.
-
-The *input layer* simply takes input of a sensor and returns them with an optional gain.
-
-The *simple layer* is a simple feed forward layer that calculates the output through forward propagation. Using specific input connections, this layer can behave as a recurrent layer as well. In addition to it, optional sensor values can also be passed to the layer(from input_dict) to make it behave as a hidden as well as associative layer.
-
-The *continuous time recurrent layer* is a feed forward layer that calculates the output using first order euler approximation. Similar to the *simple layer*, this layer can be made to behave accordingly.
-
-**activation_function** specifies the activation function class. This is usually taken from the activation functions library. In order to allow an outside class, it should possess a method called `calculate_activation` that takes in a single numpy array and outputs the activation result.
-
-**input_connections** is a **list of tuples**. The first element specifies the index of the layers from which the current layer takes input. The second element is a boolean that tells whether to delay the input by next iteration or not. In order to construct **specific networks**, the delay element is set True. The delay element delays the input of a layer with respect to it's activation that is present at the time of execution. For an example check the *Example 2* of [examples directory](./../examples).
-
-**An input layer can have no input connections**. They are simply ignored if passed. Additionally, the order of specification of the input connections determines the format of the parameter vector that sets the weights of the network. 
-
-**output_connections** is a list of integers specifying the index of the layers which the current layer provides output to. An output layer is determined by it's output connections. **A layer having no output connections is considered as the output layer**, and the output dictionary returned by `forward_propagate()` returns the output of such layers.
 
 
 ### Format for parameter vector

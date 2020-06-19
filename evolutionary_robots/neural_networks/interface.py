@@ -6,6 +6,7 @@ user interface to define various attributes of a layer
 """
 
 from activation_functions import LinearActivation
+import numpy as np
 
 class Layer(object):
 	"""
@@ -18,6 +19,10 @@ class Layer(object):
 		self.input_connections = input_connections
 		self.output_connections = output_connections
 		
+		# Some defaults
+		self.gains = np.ones((number_of_neurons, ))
+		self.time_constants = np.ones((number_of_neurons, ))
+		
 	# Getters and Setters
 	@property
 	def number_of_neurons(self):
@@ -27,6 +32,8 @@ class Layer(object):
 	@number_of_neurons.setter
 	def number_of_neurons(self, neuron):
 		self._number_of_neurons = neuron
+		self._gains = np.ones((neuron, ))
+		self._time_constants = np.ones((neuron, ))
 		
 	@property
 	def type_of_layer(self):
@@ -104,6 +111,24 @@ class Layer(object):
 	def output_connections(self, connections):
 		self._output_connections = connections
 		
+	@property
+	def gains(self):
+		""" Getter for a list of gains """
+		return self._gains
+		
+	@gains.setter
+	def gains(self, gains):
+		self._gains = np.array(gains)
+		
+	@property
+	def time_constants(self):
+		""" Getter for a list of time constants """
+		return self._time_constants
+		
+	@time_constants.setter
+	def time_constants(self, time_constants):
+		self._time_constants = np.array(time_constants)
+		
 	# Get Item to make the Layer behave as a list
 	def __getitem__(self, index):
 		"""
@@ -126,6 +151,12 @@ class Layer(object):
 			
 		elif(index == 4):
 			return self._output_connections
+		
+		elif(index == 5):
+			return self._gains
+			
+		elif(index == 6):
+			return self._time_constants
 			
 		else:
 			raise IndexError("List Index out of Range")

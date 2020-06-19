@@ -28,6 +28,15 @@ class TestANN(unittest.TestCase):
 		output = nn.forward_propagate(input_dict)
 		
 		np.testing.assert_almost_equal(output[1], np.array([1.3, 1.7, 2.1]))
+		
+		outputLayer.type_of_layer = 2
+		nn = ArtificialNeuralNetwork([inputLayer, outputLayer])
+		
+		parameter_vector = [[], [1, 1, 1, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 1, 1, 1, 1, 0]]
+		nn.load_parameters_from_vector(parameter_vector)
+		
+		output = nn.forward_propagate(input_dict)
+		np.testing.assert_almost_equal(output[1], np.array([0.013, 0.017, 0.021]))
 	
 	def test_parameters(self):
 		inputLayer = Layer(2, 0, None, [], [1])
@@ -43,11 +52,19 @@ class TestANN(unittest.TestCase):
 		outputLayer = Layer(3, 1, self.activation_function, [0], [])
 		nn = ArtificialNeuralNetwork([inputLayer, outputLayer])
 		
+		parameter_vector = [[], [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 1, 1, 1, 1, 0]]
+		nn.load_parameters_from_vector(parameter_vector)
+		
 		input_dict = {0: np.array([1.0, 1.0]), 1: np.array([1.0, 1.0, 1.0])}
 		output1 = nn.forward_propagate(input_dict)
 		output2 = nn.forward_propagate(input_dict)
 		
-		nn.set_gain(1, [2.0, 2.0, 2.0])
+		outputLayer.gains = [2.0, 2.0, 2.0]
+		nn = ArtificialNeuralNetwork([inputLayer, outputLayer])
+		
+		parameter_vector = [[], [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 1, 1, 1, 1, 0]]
+		nn.load_parameters_from_vector(parameter_vector)
+		
 		output3 = nn.forward_propagate(input_dict)
 		
 		np.testing.assert_array_equal(output1[1], output2[1])
