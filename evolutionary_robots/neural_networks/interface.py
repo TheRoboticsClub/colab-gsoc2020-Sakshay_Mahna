@@ -11,80 +11,117 @@ import numpy as np
 class Layer(object):
 	"""
 	Layer Class provides an easier abstraction for developing an Artificial Neural Network
-	Layer objects can be initialized and updated according to the user and passed as initialization parameter to the network
+	Layer Objects can be initialized and updated according to the user and passed as initialization parameters to the network
 	
-	Attributes
+	Parameters
 	----------
+	layer_name: string
+		Specifies the name of the layer
+		
 	number_of_neurons: integer
 		Specifies the number of neurons in the layer
 		
-	type_of_layer: integer
-		Specifies the type of layer, be it Input, Simple or Continuous
+	type_of_layer: string
+		Specifies the type of layer
+		There are two options: "STATIC" or "DYNAMIC"
+		
+		*Use capitals
 		
 	activation_function: ActvationFunction object
-		Specifies the activation function of the Layer, ignored if type of layer is Input
+		Specifies the activation function of the Layer
+		Use IdentityActivation(), if layer is an input layer
 		
-	input_connections: array like
-		Specifies the layer indices that provide input to the current layer
+	sensor_input: string
+		Specifies the sensors that input the current layer
+		There are two options: "CAMERA" or "INFRARED"
+		
+		*Use captials
 		
 	output_connections: array_like
-		Specifies the layer indices that the current layer provides output to
+		Specifies the name of the layers and hardware the layer outputs to
+		The array is to be a list of strings
+		
+		Names must be taken from the layer_name attributes set for other layers
+		The hardware components must be in capitals
+		
+		Example: ["layer1", "MOTORS"]
+		
+	
+	Attributes
+	----------
+	The attributes are same as the parameters
+		
 		
 	Additional Attributes
 	---------------------
-	gains: array like
-		Specifies the gain of input values for a layer
 		
-	time_constants: array like
-		Specifies the time constants of the layer(useful for continuous layer)
+	delayed_connections: array_like
+		Specifies the list of output connections whose input should be delayed before sending to other layer
+		The array is to be a list of strings
 		
-	delay_connections: array_like
-		Specifies the list of input connections whose input should be delayed before using in the layer
+		Example: ["layer1", "layer2"]
 	"""
-	def __init__(self, number_of_neurons = 1, type_of_layer = 1, activation_function = LinearActivation(), input_connections = [], output_connections = []):
+	def __init__(self, layer_name, number_of_neurons = 1, type_of_layer = "STATIC", activation_function = LinearActivation(), sensor_input = "", output_connections = []):
+		""" 
+		Initialization function of Layer
+		
+		...
+		
+		Parameters
+		----------
+		Parameters specified in the class docstring
+			
+		Returns
+		-------
+		None
+		
+		Raises
+		------
+		None
+		
+		"""
+		
 		# Attributes
+		self.__layer_name = layer_name
 		self.number_of_neurons = number_of_neurons
 		self.type_of_layer = type_of_layer
 		self.activation_function = activation_function
-		self.input_connections = input_connections
+		self.sensor_input = sensor_input
 		self.output_connections = output_connections
 		
-		# Some defaults
-		self.gains = np.ones((number_of_neurons, ))
-		self.time_constants = np.ones((number_of_neurons, ))
+		# Default attribute
+		self.delayed_connections = []
 		
 	# Getters and Setters
 	@property
 	def number_of_neurons(self):
-		""" Getter for Number of Neurons """
+		""" Attribute for Number of Neurons """
 		return self._number_of_neurons
 		
 	@number_of_neurons.setter
 	def number_of_neurons(self, neuron):
 		self._number_of_neurons = neuron
-		self._gains = np.ones((neuron, ))
-		self._time_constants = np.ones((neuron, ))
 		
 	@property
 	def type_of_layer(self):
-		""" Getter for Type of Layer """
-		# Type of Layer in words based on index
-		if(self._type_of_layer == 0):
-			return "Input"
-		elif(self._type_of_layer == 1):
-			return "Simple"
-		elif(self._type_of_layer == 2):
-			return "Continuous Time Recurrent"
-		else:
-			return "Undefined"
+		""" Attribute for Type of Layer """
+		return self._type_of_layer
 		
 	@type_of_layer.setter
 	def type_of_layer(self, layer):
-		self._type_of_layer = layer
+		# Just using the first letter of the layer word
+		# So spelling mistakes are taken care of!
+		if(layer[0].upper() == "D"):
+			self._type_of_layer = "DYNAMIC"
+		elif(layer[0].upper() == "S"):
+			self._type_of_layer = "STATIC"
+		else:
+			# Backup Plan, if user enters something entirely different
+			self._type_of_layer = "STATIC"
 		
 	@property
 	def activation_function(self):
-		""" Getter for Activation Function """
+		""" Attribute for Activation Function """
 		# Better readability
 		return type(self._activation_function)
 		
@@ -93,50 +130,18 @@ class Layer(object):
 		self._activation_function = function
 		
 	@property
-	def input_connections(self):
-		""" Getter for a list of input_connections """
-		# Converts to integer behind the scenes
-		connections = [index[0] for index in self._input_connections]
-		return connections
+	def sensor_input(self):
+		""" Attribute for Sensor Input """
+		# Parameter made for entering the sensor input
+		return self._sensor_input
 		
-	@input_connections.setter
-	def input_connections(self, connections):
-		# Try Except Block for any exception
-		try:
-			# Converts to tuple behind the scenes
-			if(type(connections[0]) is int):
-				self._input_connections = [[i, False] for i in connections]
-				
-			else:
-				self._input_connections = connections
-		except:
-			self._input_connections = connections
-			
-	@property
-	def delayed_connections(self):
-		""" Getter for a list of connections that are delayed by one step """
-		# Input connections that have a tuple value of True are delayed
-		connections = [index[0] for index in self._input_connections if index[1] is True]
-		return connections
-		
-	@delayed_connections.setter
-	def delayed_connections(self, connections):
-		# The input connections should have been called before calling this!
-		# First convert the list of tuples to a dictionary(Lazy Execution)
-		input_connections = dict(self._input_connections)
-		for index in connections:
-			input_connections[index] = True
-			
-		# Reflect the changes in input_connections
-		for index in range(len(self._input_connections)):
-			try:
-				self._input_connections[index][1] = input_connections[self._input_connections[index][0]]
-			except:
-				self._input_connections[index][1] = False
+	@sensor_input.setter
+	def sensor_input(self, sensor):
+		self._sensor_input = sensor
 			
 	@property
 	def output_connections(self):
-		""" Getter for a list of output connections """
+		""" Attribute for a list of output connections """
 		return self._output_connections
 		
 	@output_connections.setter
@@ -144,22 +149,15 @@ class Layer(object):
 		self._output_connections = connections
 		
 	@property
-	def gains(self):
-		""" Getter for a list of gains """
-		return self._gains
+	def delayed_connections(self):
+		""" Attribute for a list of connections that are delayed by one step """
+		return self._delayed_connections
 		
-	@gains.setter
-	def gains(self, gains):
-		self._gains = np.array(gains)
 		
-	@property
-	def time_constants(self):
-		""" Getter for a list of time constants """
-		return self._time_constants
-		
-	@time_constants.setter
-	def time_constants(self, time_constants):
-		self._time_constants = np.array(time_constants)
+	@delayed_connections.setter
+	def delayed_connections(self, connections):
+		# The connections that are delayed should be present as output connections
+		self._delayed_connections = [layer for layer in connections if layer in self._output_connections]
 		
 	# Get Item to make the Layer behave as a list
 	def __getitem__(self, index):
@@ -167,28 +165,29 @@ class Layer(object):
 		getitem function for the class to behave like a list
 		The Layers are declared as a variable and passed to the ANN class
 		
-		This function is more of an internal API
+		This function is an internal API
+		Quite useful for internal workings and construction of the network
 		"""
 		if(index == 0):
-			return self._number_of_neurons
+			return self.__layer_name
 			
 		elif(index == 1):
-			return self._type_of_layer
+			return self._number_of_neurons
 			
 		elif(index == 2):
-			return self._activation_function
+			return self._type_of_layer
 			
 		elif(index == 3):
-			return self._input_connections
+			return self._activation_function
 			
 		elif(index == 4):
-			return self._output_connections
+			return self._sensor_input
 		
 		elif(index == 5):
-			return self._gains
+			return self._output_connections
 			
 		elif(index == 6):
-			return self._time_constants
+			return self._delayed_connections
 			
 		else:
 			raise IndexError("List Index out of Range")

@@ -1,9 +1,9 @@
 """Docstring for the ann.py module
 
 This module implements Artificial Neural Networks
-The Network can have variable number of layers,
+The Network can have a variable number of layers,
 variable number of neurons in each layer, variable
-activation function and variable type of layer(Simple or Continuous)
+activation function and variable type of layer(Static or Dynamic)
 
 """
 
@@ -18,29 +18,47 @@ import warnings
 class ArtificialNeuralNetwork(object):
 	"""
 	The Artificial Neural Network Class
+	The network is created using a list of Layer interface
+	
+	The ANN class can:
+		Generate a Neural Network
+		Generate the output using the input provided
+		Change the weight parameters
+		Save and Load the parameters in a file
 	
 	...
 	
-	Attributes
+	Parameters
 	----------
 	layer_vector: array_like
-		Specifies the configuration of each layer in an array format
-		[[number_of_neurons, type_of_layer, activation_function, input_connections, output_connections], ...]	*for each layer
+		A list of interface.Layer objects
 		
-		number_of_neurons: number of neurons(input dimensions)
-		type_of_layer: 0 for input, 1 for simple and 2 for ctr
-		activation_function: a class with attribute calculate_activation
-		input_connections: tuple which specifies the index of the layer and an optional delay as a boolen, True for delay and False for not
-		output_connections: List of layers connected to the output
-		
-		The layer configuration should be according to the order of execution. It is upto the user to decide the order of execution
-		of the Neural Network! The layers are numbered according to the order of execution.
-		
-	time_constants(optional): array_like
-		Dictionary specifying the time constants of a given layer index
+		The configuration of the array should be according to the order of execution.
+		It is upto the user to decide the order of execution of the Neural Network!
+		The layers are by default, numbered according to the order of execution.
 		
 	time_interval(optional): integer
 		Integer specifying the time interval
+		
+		*Useful especially for networks with Dynamic Layers
+		
+	Attributes
+	----------
+	number_of_layers: integer
+		Specifies the number of layers in the network
+		
+	order_of_execution: array_like
+		Specifies the order in which layer outputs should be calculated to generate the overall output
+		
+		*It is a list of layer names defined in the Layer interface object
+		
+	time_interval: integer
+		Integer specifying the time interval
+		
+		*Useful for networks with Dynamic Layers
+		
+	output_matrix: dictionary
+		A dictionary containing the current and previous outputs of all the layers in the current iteration
 		
 	Methods
 	-------
@@ -61,16 +79,36 @@ class ArtificialNeuralNetwork(object):
 	"""
 	
 	def __init__(self, layer_vector, time_interval=0.01):
+		"""
+		Initialization function of ArtificialNeuralNetwork class		
+		...
+		
+		Parameters
+		----------
+		Specified in the class docstring
+			
+		Returns
+		-------
+		None
+		
+		Raises
+		------
+		None
+	
+		"""
 		# Class declarations
 		self.__number_of_layers = len(layer_vector)
-		self.__order_of_execution = range(self.__number_of_layers)
+		self.__order_of_execution = [layer[0] for layer in layer_vector]		# Ordered collection of names
 		self.__time_interval = time_interval
 		
-		# Private declarations
-		self.__input_layers = []
-		self.__output_layers = []
+		# Internal Attributes
+		self.__input_connections = {}		# To store the input connections of various layers
+		self.__output_connections = {}		# To store the output connections of various layers
 		
-		# Construct the layers and the graph
+		self.__output_layers = []			# To store the layers that are used as output
+		self.__input_layers = []			# To store the layers that are used as input
+		
+		# Construct the layers and the execution graph
 		self._construct_layers(layer_vector)
 		
 		# Output matrix dictionary for Dynamic Programming Solution
@@ -88,10 +126,8 @@ class ArtificialNeuralNetwork(object):
 		Parameters
 		----------
 		layer_vector: array_like
+			List of Layer interface objects
 			To specify the dimensions and options of the layers of the network
-			
-		time_constants: array_like
-			Specify the time constants of the ctr layer. Should be empty if all the layers are simple
 			
 		Returns
 		-------
@@ -106,21 +142,29 @@ class ArtificialNeuralNetwork(object):
 		# A dictionary for storing each layer
 		self.__layer_map = {}
 		
-		# List for input output connections
-		self.__input_connections = []
-		self.__output_connections = []
-		
 		try:
-			# Append the Layer classes
-			for index in range(self.__number_of_layers):
-				# 0 => input layer
-				if(layer_vector[index][1] == 0):
-					# Input Layer
-					self.__input_layers.append("layer_" + str(index))
+			# Construct the input-output dictionaries
+			for layer in self.__order_of_execution:
+				# An instance of output connections for the current layer
+				self.__output_connections[layer[0]] = layer[5]
 				
-					# No need to collect the input dimensions as input layer doesn't take input from other layers
-					input_dimension = layer_vector[index][0]
-					self.__input_connections.append([])
+				# Iterate over the output connections and fill the input connections
+				for output_layer in layer[5]:
+					# Layer tuple to insert as input connections
+					# If output_layer is present in the 6th index, then a True to delayed
+					layer_tuple = (layer[5], output_layer in layer[6])
+					try:
+						self.__input_connections[output_layer].append(layer_tuple)
+					except:
+						self.__input_connections[output_layer] = [layer_tuple] 
+				
+			# Iterate the layer names according to the order of execution
+			for layer in self.__order_of_execution:
+				# Static Layer
+				if(layer[2] == "STATIC"):
+					# Is it an input/hidden or output layer?
+					if(layer_vector[inde])
+					
 					
 					# Collect the output dimensions
 					connect = []

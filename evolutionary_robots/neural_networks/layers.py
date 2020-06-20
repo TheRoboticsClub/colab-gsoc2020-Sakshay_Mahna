@@ -11,115 +11,22 @@ import numpy as np
 from activation_functions import ActivationFunction
 import warnings
 
-# Input Layer, only for taking inputs from the user
-class InputLayer(object):
-	"""
-	Input Layer takes input from the user and sends
-	it to the other layers ahead!
-	
-	...
-	
-	Attributes
-	----------
-	input_dim: integer
-		Specifies the number of input nodes
-	
-	layer_name: string
-		Specifies the name of the layer 
-		
-	delay(optional): integer
-		Specifies the delay of the connection
-		
-	Methods
-	-------
-	forward_propagate(input_vector, delay)
-		An identity function with an optional delay
-		
-	"""
-	def __init__(self, input_dim, layer_name, delay = 2):
-		# Private Class declarations
-		self.__input_dim = (input_dim, )
-		self.__layer_name = layer_name
-		self.__delay = delay
-		
-		# Protected Class Variables
-		self._gain = np.ones((input_dim, ))
-
-		# Output matrix is used to work with delays
-		self.__output_matrix = np.zeros((delay, input_dim))
-		
-	# Function to take input from user
-	def forward_propagate(self, input_vector):
-		""" 
-		Generate the output of the Layer when input_vector
-		is passed to the Layer
-		
-		Parameters
-		----------
-		input_vector: array_like
-			The input_vector to be passed to the Layer
-			
-		Returns
-		-------
-		output_matrix: array_like
-			The output_vector generated from the input_vector
-			
-		Raises
-		------
-		ValueException
-			The input_vector should be of the dimension as specified by the user earlier
-			
-		Notes
-		-----
-		The input_matrix stores the various values input in the various time frames
-		The output vector is returned according to the specified delay
-		"""
-		try:
-			# Multiply with the gain
-			input_vector = np.multiply(np.array(input_vector), self._gain)
-			# Insert the input_vector and remove the oldest one
-			self.__output_matrix = np.insert(self.__output_matrix, 0, input_vector, axis=0)
-			self.__output_matrix = np.delete(self.__output_matrix, self.__delay, axis=0)
-			
-		except:
-			raise ValueError("Please check dimensions of " + self.__layer_name)
-			
-		# Return according to the delay
-		return self.__output_matrix
-		
-	# Getters and Setters
-	@property
-	def input_dim(self):
-		""" Getter for input_dim """
-		return self.__input_dim
-		
-	@property
-	def layer_name(self):
-		""" Getter for layer name """
-		return self.__layer_name
-		
-	@property
-	def gain(self):
-		""" Getter for gain """
-		return self._gain
-		
-	@gain.setter
-	def gain(self, gain):
-		if(self.gain.shape != self.__input_dim):
-			raise ValueError("The dimensions of gain are not correct for " + self.__layer_name)
-		
-		self._gain = gain
-
 # Simple Layer, simple feed forward connection with a specified delay #################################
-class SimpleLayer(object):
+class StaticLayer(object):
 	"""
-	Simple Layer works by calculating the activation of each neuron
+	Static Layer works by calculating the activation of each neuron
 	using the feed forward algorithm and supplies the output according
 	to the delay of the layer
 	
 	...
-	
 	Attributes
+	----------
+	weight_matrix: numpy_matrix
+		The weight matrix used to calculate the output using feed forward algorithm
+		
+	 
+	
+	Parameters
 	----------
 	input_dim: integer
 		Specifies the number of input nodes
@@ -156,26 +63,38 @@ class SimpleLayer(object):
 		Get the parameters of activation function
 	"""
 	def __init__(self, input_dim, output_dim, activation_function, layer_name, delay = 2):
+		"""
+		Initialization function of StaticLayer class		
+		...
+		
+		Parameters
+		----------
+		Specified in the class docstring
+			
+		Returns
+		-------
+		None
+		
+		Raises
+		------
+		None
+		"""
 		# Set the layer name
 		self.__layer_name = layer_name
 	
 		# Initialize the weight and bias dimensions
 		self.__weight_dim = (output_dim, input_dim)
-		self.__bias_dim = (output_dim, )
 		self.__delay = delay
 		
 		# Initialize the weight matrix
-		self.__weight_matrix = np.random.rand(*self.weight_dim)
-		
-		# Initialize the bias vector
-		self.__bias_vector = np.random.rand(output_dim)
+		self.weight_matrix = np.random.rand(*self.weight_dim)
 		
 		# Initialize the output matrix
 		self.__output_matrix = np.zeros((delay, output_dim))
 		
 		# Set the gain of the sensors values that are going to be input
-		# as an associative layer
-		self._gain = np.ones((output_dim, ))
+		# as an associative layer or input layer
+		self.gain = np.ones((output_dim, ))
 		
 		# Set the activation function
 		self.__activation_function = activation_function
@@ -211,13 +130,12 @@ class SimpleLayer(object):
 		The input_vector has dimensions (input_dim, )
 		The output_vector has dimensions (output_dim, )
 		The sensor_input should have dimensions (output_dim, )
-		The bias_vector has dimensions (output_dim, )
 		The weight_matrix has dimensions (output_dim, input_dim)
 		Each of the columns of the weight_matrix tune for a single input node
 		Each of the rows of the weight_matrix tune for a single output node
 		
 		The output_vector is generated using the formula
-		output_vector = weight_matrix . input_vector + bias_vector
+		output_vector = activation(beta * (weight_matrix . input_vector + theta ) )
 		"""
 		
 		try:
@@ -226,13 +144,13 @@ class SimpleLayer(object):
 			sensor_input = np.array(sensor_input)
 			
 			# Output vector is obtained by dotting weight and input, then adding with bias
-			output_vector = np.add(np.dot(self.weight_matrix, input_vector), self.bias_vector)
+			output_vector = np.dot(self.weight_matrix, input_vector)
 			
 			# Activate the output
 			output_vector = self.__activation_function.calculate_activation(output_vector)
 			
 			# Add the sensor input
-			output_vector = output_vector + np.multiply(self._gain, sensor_input)
+			output_vector = output_vector + np.multiply(self.gain, sensor_input)
 			
 			# Insert the input_vector and remove the oldest one
 			self.__output_matrix = np.insert(self.__output_matrix, 0, output_vector, axis=0)
@@ -248,15 +166,15 @@ class SimpleLayer(object):
 	# Function to update the parameters
 	def update_parameters(self, parameter_vector):
 		"""
-		Load the parameters of the Simple Layer in the form of
+		Load the parameters of the Static Layer in the form of
 		an array / vector
 		
 		Parameters
 		----------
 		parameter_vector: array_like
 			The parameter vector follows the layout as
-			[w_11, w_21, w_12, w_22, w_13, w_23, b_1, b_2, b_3, a_1g, a_1b, a_2g, a_2b, a_3g, a_3b, w_11, w_21, w_31, b_1, ...]
-			Here, w_ij implies the weight between ith input node and jth output node. b_i is the bias for the ith output node.
+			[w_11, w_21, w_12, w_22, w_13, w_23, a_1g, a_2g, a_3g, a_1b, a_2b, a_3b, w_11, w_21, w_31, a_1g, ...]
+			Here, w_ij implies the weight between ith input node and jth output node.
 			a_ib is the bias activation parameter of ith output node and a_ig is the gain activation parameter of ith output node. 
 			
 		Returns
@@ -280,10 +198,10 @@ class SimpleLayer(object):
 		# Get the interval at which the weight and bias seperate
 		weight_interval = self.weight_dim[0] * self.weight_dim[1]
 		
-		# Get the interval at which the bias and next weight vector seperate
-		bias_interval = self.bias_dim[0]
+		# Get the interval at which activatation parameters seperate
+		activation_interval = self.weight_dim[0]
 		
-		# Seperate the weights and bias and then reshape them
+		# Seperate the weights and activation parameters and then reshape them
 		# Numpy raises a None Type Exception, as it cannot reshape a None object
 		# If such an excpetion occurs, raise a value error as our parameter_vector
 		# is shorter than required
@@ -291,11 +209,8 @@ class SimpleLayer(object):
 			self.weight_matrix = parameter_vector[interval_counter:interval_counter + weight_interval].reshape(self.weight_dim)
 			interval_counter = interval_counter + weight_interval
 			
-			self.bias_vector = parameter_vector[interval_counter:interval_counter + bias_interval].reshape(self.bias_dim[0],)
-			interval_counter = interval_counter + bias_interval
-			
-			self.set_activation_parameters(parameter_vector[interval_counter], parameter_vector[interval_counter + 1])
-			interval_counter = interval_counter + 2
+			self.set_activation_parameters(parameter_vector[interval_counter:interval_counter+activation_interval], parameter_vector[interval_counter+activation_interval: interval_counter+2*activation_interval])
+			interval_counter = interval_counter + 2 * activation_interval
 			
 		except:
 			raise ValueError("The parameter_vector of " + self.__layer_name + " consists of elements less than required")
@@ -309,7 +224,7 @@ class SimpleLayer(object):
 	# Function to return the parameters
 	def return_parameters(self):
 		"""
-		Return the parameters of the Simple Layer in the form of
+		Return the parameters of the Static Layer in the form of
 		a an array / vector.
 		
 		Parameters
@@ -329,12 +244,12 @@ class SimpleLayer(object):
 		-----
 		The numpy flatten function works in row major order.
 		The parameter vector follows the layout as
-		[w_11, w_21, w_12, w_22, w_13, w_23, b_1, b_2, b_3, a_1g, a_1b, a_2g, a_2b, a_3g, a_3b, w_11, w_21, w_31, b_1, ...]
-		Here, w_ij implies the weight between ith input node and jth output node. b_i is the bias for the ith output node.
+		[w_11, w_21, w_12, w_22, w_13, w_23, a_1g, a_2g, a_3g, a_1b, a_2b, a_3b, w_11, w_21, w_31, a_1g, ...]
+		Here, w_ij implies the weight between ith input node and jth output node
 		a_ib is the bias activation parameter of ith output node and a_ig is the gain activation parameter of ith output node.
 		"""
 		# Initialize the output vector
-		# Determine an individual layer's weight matrix in row major form and then it's bias
+		# Determine an individual layer's weight matrix in row major form and activation parameters
 		# Then concatenate it with the previous output vector
 		output = np.array([])
 		
@@ -342,20 +257,18 @@ class SimpleLayer(object):
 		# flatten() works in row major order
 		weight_vector = self.weight_matrix.flatten()
 		
-		# The vector we get from flattening the bias vector
-		bias_vector = self.bias_vector.flatten()
-		
 		# The vector of activation parameters
-		activation_vector = np.array(self.get_activation_parameters())
+		activation_vector = self.get_activation_parameters()
 		
-		# The output vector is concatenated form of weight_vector, bias_vector and activation_vector
-		output = np.concatenate([output, weight_vector, bias_vector, activation_vector])
+		# The output vector is concatenated form of weight_vector and activation_vector
+		output = np.concatenate([output, weight_vector, activation_vector])
 		
 		return output
 	
 	# Setters and Getters	
 	@property
 	def weight_matrix(self):
+		""" Attribute for weight matrix """
 		return self.__weight_matrix
 		
 	@weight_matrix.setter
@@ -370,45 +283,22 @@ class SimpleLayer(object):
 		
 		self.__weight_matrix = weight_matrix
 		
-	@property
-	def bias_vector(self):
-		return self.__bias_vector
-		
-	# Function to set the bias vector
-	@bias_vector.setter	
-	def bias_vector(self, bias_vector):
-		"""
-		Set a user defined bias vector
-		
-		Raises a Value Exception if the dimensions do not match
-		"""
-		if(bias_vector.shape != self.bias_dim):
-			raise ValueError("The dimensions of bias vector do not match for " + self.__layer_name)
-			
-		self.__bias_vector = bias_vector
-		
 	# Function to return the layer name
 	@property
 	def layer_name(self):
-		""" Get the name of the Layer """
+		""" Attribute for the name of the Layer """
 		return self.__layer_name
 		
 	# Function to return the weight dimensions
 	@property
 	def weight_dim(self):
-		""" Get the dimensions of the weight matrix """
+		""" Attribute for the dimensions of the weight matrix """
 		return self.__weight_dim
-		
-	# Function return the bias dimensions
-	@property
-	def bias_dim(self):
-		""" Get the dimensions of the bias vector """
-		return self.__bias_dim
 
 	# For changing the gain values
 	@property
 	def gain(self):
-		""" Getter for gain """
+		""" Attribute for gain """
 		
 		return self._gain
 		
@@ -428,20 +318,22 @@ class SimpleLayer(object):
 	# Function to return the activation parameters(tuple)	
 	def get_activation_parameters(self):
 		""" Get the parameters of activation function """
-		return self.__activation_function.beta, self.__activation_function.theta
+		return np.concatenate([self.__activation_function.beta, self.__activation_function.theta])
 		
 
-# CTR Layer ################################################################
-class CTRLayer(object):
+# Dynamic Layer ################################################################
+class DynamicLayer(object):
 	"""
-	CTR Layer is used in the Continuous Time Recurrent Neural Network.
-	CTR has to save the state of the previous output and then calculate
+	Dynamic Layer is used in the Continuous Time Recurrent Neural Network.
+	Dynamic has to save the state of the previous output and then calculate
 	the weighted average of the previous and the current output to get
 	the total output
 	
 	...
-	
 	Attributes
+	----------
+	
+	Parameters
 	----------
 	input_dim: integer
 		The input dimension of the Layer
@@ -484,24 +376,22 @@ class CTRLayer(object):
 		
 		# Weight and bias dimensions
 		self.__weight_dim = (output_dim, input_dim)
-		self.__bias_dim = (output_dim, )
 		self.__time_dim = (output_dim, )
 		
 		# Initialize the weight and bias
-		self.__weight_matrix = np.random.rand(*self.weight_dim)
-		self.__bias_vector = np.random.rand(output_dim)
+		self.weight_matrix = np.random.rand(*self.weight_dim)
 		self.__delay = delay
 		
 		# Initialize the output matrix
 		self.__output_matrix = np.zeros((delay, output_dim))
 		
 		# Initialize the gain vector
-		self._gain = np.ones((output_dim, ))
+		self.gain = np.ones((output_dim, ))
 		
 		# Generate the weights for the weighted average
 		self.__time_interval = time_interval
-		self.__time_constant = time_constant
-		self.__time_weight = np.asarray(float(self.__time_interval) / np.array(self.__time_constant))
+		self.time_constant = time_constant
+		self.__time_weight = np.asarray(float(self.__time_interval) / np.array(self.time_constant))
 		
 		# A check for the dimension of time constant list
 		if(self.__time_weight.shape != self.__time_dim):
@@ -545,7 +435,6 @@ class CTRLayer(object):
 		The input_vector is of dimensions (input_dim, )
 		The output_vector is of dimensions (output_dim, )
 		The weight_matrix is of dimensions (output_dim, input_dim)
-		The bias vector is of dimensions (output_dim, )
 		
 		Each of the columns of the weight_matrix tune for a single input node
 		Each of the rows of the weight_matrix tune for a single output node
@@ -557,9 +446,9 @@ class CTRLayer(object):
 			input_vector = np.array(input_vector)
 			
 			# Get the current activation
-			current_activation = np.add(np.dot(self.__weight_matrix, input_vector), self.__bias_vector)
+			current_activation = np.dot(self.weight_matrix, input_vector)
 			current_activation = self.__activation_function.calculate_activation(current_activation)
-			current_activation = current_activation + np.multiply(self._gain, sensor_input)
+			current_activation = current_activation + np.multiply(self.gain, sensor_input)
 			
 			# Generate the current output
 			# This equation is the first order euler solution
@@ -587,15 +476,15 @@ class CTRLayer(object):
 	# Function to update the parameters of the layer
 	def update_parameters(self, parameter_vector):
 		"""
-		Load the parameters of the CTRNN Layer in the form of
+		Load the parameters of the Dynamic Layer in the form of
 		an array / vector
 		
 		Parameters
 		----------
 		parameter_vector: array_like
 			The parameter vector follows the layout as
-			[tc_1, tc_2, tc_3, w_11, w_21, w_12, w_22, w_13, w_23, b_1, b_2, b_3, a_1g, a_1b, a_2g, a_2b, a_3g, a_3b, w_11, w_21, w_31, b_1, ...]
-			Here, w_ij implies the weight between ith input node and jth output node. b_i is the bias for the ith output node.
+			[tc_1, tc_2, tc_3, w_11, w_21, w_12, w_22, w_13, w_23, a_1g, a_2g, a_3g, a_1b, a_2b, a_3b, w_11, w_21, w_31, b_1, ...]
+			Here, w_ij implies the weight between ith input node and jth output node.
 			a_ib is the bias activation parameter of ith output node and a_ig is the gain activation parameter of ith output node.
 			tc_i is the time constant of ith neuron of the current layer 
 			
@@ -618,15 +507,15 @@ class CTRLayer(object):
 		interval_counter = 0
 		
 		# Get the interval at which time constants seperate
-		time_interval = self.__time_dim[0]
+		time_interval = self.time_dim[0]
 		
-		# Get the interval at which weight and bias seperate
-		weight_interval = self.__weight_dim[0] * self.__weight_dim[1]
+		# Get the interval at which weight seperates
+		weight_interval = self.weight_dim[0] * self.weight_dim[1]
 		
-		# Get the interval at which the bias and next weight vector seperate
-		bias_interval = self.__bias_dim[0]
+		# Get the interval at which activation function parameters seperate
+		activation_interval = self.weight_dim[0]
 		
-		# Seperate the weights and bias and then reshape them
+		# Seperate the weights and then reshape them
 		# Numpy raises a None Type Exception, as it cannot reshape a None object
 		# If such an excpetion occurs, raise a value error as our parameter_vector
 		# is shorter than required
@@ -637,11 +526,8 @@ class CTRLayer(object):
 			self.__weight_matrix = parameter_vector[interval_counter:interval_counter + weight_interval].reshape(self.__weight_dim)
 			interval_counter = interval_counter + weight_interval
 			
-			self.__bias_vector = parameter_vector[interval_counter:interval_counter + bias_interval].reshape(self.__bias_dim[0],)
-			interval_counter = interval_counter + bias_interval
-			
-			self.set_activation_parameters(parameter_vector[interval_counter], parameter_vector[interval_counter + 1])
-			interval_counter = interval_counter + 2
+			self.set_activation_parameters(parameter_vector[interval_counter:interval_counter + activation_interval], parameter_vector[interval_counter + activation_interval: interval_counter + 2 * activation_interval])
+			interval_counter = interval_counter + 2 * activation_interval
 			
 		except:
 			raise ValueError("The parameter_vector for " + self.__layer_name + " consists of elements less than required")
@@ -655,7 +541,7 @@ class CTRLayer(object):
 	# Function to return the parameters of a layer
 	def return_parameters(self):
 		"""
-		Return the parameters of the CTRNN Neural Network in the form of
+		Return the parameters of the Dynamic Neural Network in the form of
 		a an array / vector.
 		
 		Parameters
@@ -675,38 +561,35 @@ class CTRLayer(object):
 		-----
 		The numpy flatten function works in row major order.
 		The parameter vector follows the layout as
-		[tc_1, tc_2, tc_3, w_11, w_21, w_12, w_22, w_13, w_23, b_1, b_2, b_3, a_1g, a_1b, a_2g, a_2b, a_3g, a_3b, w_11, w_21, w_31, b_1, ...]
-		Here, w_ij implies the weight between ith input node and jth output node. b_i is the bias for the ith output node.
+		[tc_1, tc_2, tc_3, w_11, w_21, w_12, w_22, w_13, w_23, a_1g, a_2g, a_3g, a_1b, a_2b, a_3b, w_11, w_21, w_31, b_1, ...]
+		Here, w_ij implies the weight between ith input node and jth output node
 		a_ib is the bias activation parameter of ith output node and a_ig is the gain activation parameter of ith output node.
 		tc_i is the time constant of ith neuron of the current layer
 		"""
 		# Initialize the output vector
-		# Determine an individual layer's weight matrix in row major form, it's bias and then activation function parameters
+		# Determine an individual layer's weight matrix in row major form and then activation function parameters
 		# Then concatenate it with the previous output vector
 		output = np.array([])
 		
 		# The vector we get from flattening time constants
-		time_vector = self.__time_constant.flatten()
+		time_vector = self.time_constant.flatten()
 	
 		# The vector we get from flattening the weight matrix
 		# flatten() works in row major order
-		weight_vector = self.__weight_matrix.flatten()
-		
-		# The vector we get from flattening the bias vector
-		bias_vector = self.__bias_vector.flatten()
+		weight_vector = self.weight_matrix.flatten()
 		
 		# The vector of activation parameters
-		activation_vector = np.array(self.get_activation_parameters())
+		activation_vector = self.get_activation_parameters()
 		
 		# The output vector is concatenated form of time_vector, weight_vector, bias_vector and activation_vector
-		output = np.concatenate([output, time_vector, weight_vector, bias_vector, activation_vector])
+		output = np.concatenate([output, time_vector, weight_vector, activation_vector])
 		
 		return output
 		
 	# Function to return the weight matrix
 	@property
 	def weight_matrix(self):
-		""" Function used to return the weight matrix """
+		""" Attribute for Weight Matrix """
 		return self.__weight_matrix
 		
 	# Function to set the weight matrix
@@ -720,58 +603,35 @@ class CTRLayer(object):
 			raise ValueError("The dimensions of the weight matrix do not match for " + self.__layer_name)
 		self.__weight_matrix = weight_matrix
 		
-	# Function to return the bias vector
-	@property
-	def bias_vector(self):
-		""" Function to return the bias vector """
-		return self.__bias_vector
-		
-	# Function to set the bias vector
-	@bias_vector.setter	
-	def bias_vector(self, bias_vector):
-		"""
-		Sets the bias vector to be used by the layer
-		Raise a value exception if dimensions do not match
-		"""
-		if(bias_vector.shape != self.bias_dim):
-			raise ValueError("The dimensions of the bias vector do not match for " + self.__layer_name)
-		self.__bias_vector = bias_vector
-		
 	# Function to return the layer name
 	@property
 	def layer_name(self):
-		""" Function to return the name of the layer """
+		""" Attribute for the name of layer """
 		return self.__layer_name
 		
 	# Function to return the weight dimensions
 	@property
 	def weight_dim(self):
-		""" Function to return the dimensions of the weight matrix """
+		""" Attribute for the dimensions of weight matrix """
 		return self.__weight_dim
-		
-	# Function return the bias dimensions
-	@property
-	def bias_dim(self):
-		""" Function to return the dimensions of the bias vector """
-		return self.__bias_dim
 		
 	# Function to return the time constant dimension
 	@property
 	def time_dim(self):
-		""" Function to return the dimensions of the time constant vector """
+		""" Attribute for the dimensions of time constant """
 		return self.__time_dim
 	
 	# Function to return the time constant list
 	@property
 	def time_constant(self):
-		""" Function to return the list of time constants """
+		""" Attribute for the time constants """
 		return self.__time_constant
 		
 	# Function to set the time constant list
 	@time_constant.setter
 	def time_constant(self, time_constant):
 		"""
-		Function to set the time constant list of neurons
+		Sets the time constant list of neurons
 		Raises an excpetion if the dimensions do not match!
 		"""
 		self.time_constant = np.array(time_constant)
@@ -785,7 +645,7 @@ class CTRLayer(object):
 	# For changing the gain values
 	@property
 	def gain(self):
-		""" Getter for gain """
+		""" Attribute for gain """
 		return self._gain
 		
 	@gain.setter
@@ -804,4 +664,4 @@ class CTRLayer(object):
 	# Function to return the activation parameters(tuple)	
 	def get_activation_parameters(self):
 		""" Get the parameters of activation function """
-		return self.__activation_function.beta, self.__activation_function.theta
+		return np.concatenate([self.__activation_function.beta, self.__activation_function.theta])
