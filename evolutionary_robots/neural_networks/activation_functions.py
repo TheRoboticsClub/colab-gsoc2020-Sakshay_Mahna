@@ -48,8 +48,8 @@ class ActivationFunction(object):
 	"""  
 	def __init__(self, beta = 1, theta = 0):
 		# Set the protected class variables
-		self._beta = beta
-		self._theta = theta
+		self.beta = beta
+		self.theta = theta
 		
 	@property
 	def beta(self):
@@ -58,7 +58,7 @@ class ActivationFunction(object):
 		
 	@beta.setter
 	def beta(self, beta):
-		self._beta = beta
+		self._beta = np.array(beta)
 		
 	@property
 	def theta(self):
@@ -67,12 +67,25 @@ class ActivationFunction(object):
 		
 	@theta.setter
 	def theta(self, theta):
-		self._theta = theta
+		self._theta = np.array(theta)
 		
 	def calculate_activation(self, x):
 		# Different implementation of different functions
 		pass
 
+
+# The identity actvation class
+class IdentityActivation(ActivationFunction):
+	# Inherit the docstring of parent class
+	__doc__ = ActivationFunction.__doc__
+	
+	def calculate_activation(self, x):
+		""" Returns the input as it is """
+		
+		# Calculate the argument
+		argument = x
+		
+		return argument
 
 # The linear activation class
 class LinearActivation(ActivationFunction):

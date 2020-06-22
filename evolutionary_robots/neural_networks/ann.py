@@ -10,7 +10,7 @@ activation function and variable type of layer(Static or Dynamic)
 import numpy as np
 import pickle
 from graphviz import Digraph
-from layers import InputLayer, SimpleLayer, CTRLayer
+from layers import StaticLayer, DynamicLayer
 
 # Library used to genrate warnings
 import warnings
@@ -52,8 +52,8 @@ class ArtificialNeuralNetwork(object):
 		
 		*It is a list of layer names defined in the Layer interface object
 		
-	time_interval: integer
-		Integer specifying the time interval
+	time_interval: float
+		Float specifying the time interval
 		
 		*Useful for networks with Dynamic Layers
 		
@@ -98,18 +98,18 @@ class ArtificialNeuralNetwork(object):
 		"""
 		# Class declarations
 		self.__number_of_layers = len(layer_vector)
-		self.__order_of_execution = [layer[0] for layer in layer_vector]		# Ordered collection of names
+		self._order_of_execution = [layer for layer in layer_vector]		# Ordered collection of layer variables
 		self.__time_interval = time_interval
 		
 		# Internal Attributes
 		self.__input_connections = {}		# To store the input connections of various layers
 		self.__output_connections = {}		# To store the output connections of various layers
 		
-		self.__output_layers = []			# To store the layers that are used as output
+		self.__output_layers = []			# To store the layers that are used as output(majorly hardware layers)
 		self.__input_layers = []			# To store the layers that are used as input
 		
 		# Construct the layers and the execution graph
-		self._construct_layers(layer_vector)
+		self._construct_layers()
 		
 		# Output matrix dictionary for Dynamic Programming Solution
 		self.__output_matrix = {}
@@ -117,7 +117,7 @@ class ArtificialNeuralNetwork(object):
 	
 	# Function to construct the layers given the inputs
 	# in essence, a Neural Network
-	def _construct_layers(self, layer_vector):
+	def _construct_layers(self):
 		"""
 		Private function for the construction of the layers for the Neural Network
 		
@@ -125,9 +125,7 @@ class ArtificialNeuralNetwork(object):
 		
 		Parameters
 		----------
-		layer_vector: array_like
-			List of Layer interface objects
-			To specify the dimensions and options of the layers of the network
+		None
 			
 		Returns
 		-------
@@ -142,105 +140,80 @@ class ArtificialNeuralNetwork(object):
 		# A dictionary for storing each layer
 		self.__layer_map = {}
 		
-		try:
-			# Construct the input-output dictionaries
-			for layer in self.__order_of_execution:
-				# An instance of output connections for the current layer
-				self.__output_connections[layer[0]] = layer[5]
+		# Helper Dictionary used to store the number of layers for each layer
+		self.__neuron_map = {}
+		
+		# Construct the input-output dictionaries
+		for layer in self._order_of_execution:
+			# Store the number of neurons for each layer
+			self.__neuron_map[layer[0]] = layer[1]
+		
+			# An instance of output connections for the current layer
+			self.__output_connections[layer[0]] = layer[5]
+			
+			# Iterate over the output connections and fill the input connections
+			for output_layer in layer[5]:
+				# Layer tuple to insert as input connections
+				# If output_layer is present in the 6th index, then a True to delayed
+				layer_tuple = (layer[0], output_layer in layer[6])
+				try:
+					self.__input_connections[output_layer].append(layer_tuple)
+				except:
+					self.__input_connections[output_layer] = [layer_tuple] 
+			
+		# Iterate the layer names according to the order of execution
+		for layer in self._order_of_execution:
+			# Static Layer
+			if(layer[2] == "STATIC"):
+				# Input dimensions
+				input_dimension = 0
+			
+				# Is it an input layer?
+				try:
+					for connection in self.__input_connections[layer[0]]:
+						input_dimension = input_dimension + self.__neuron_map[connection[0]]
+				except:
+					self.__input_layers.append(layer[0])
+					input_dimension = layer[1]
 				
-				# Iterate over the output connections and fill the input connections
-				for output_layer in layer[5]:
-					# Layer tuple to insert as input connections
-					# If output_layer is present in the 6th index, then a True to delayed
-					layer_tuple = (layer[5], output_layer in layer[6])
-					try:
-						self.__input_connections[output_layer].append(layer_tuple)
-					except:
-						self.__input_connections[output_layer] = [layer_tuple] 
+				# Output dimensions
+				output_dimension = layer[1]
 				
-			# Iterate the layer names according to the order of execution
-			for layer in self.__order_of_execution:
-				# Static Layer
-				if(layer[2] == "STATIC"):
-					# Is it an input/hidden or output layer?
-					if(layer_vector[inde])
-					
-					
-					# Collect the output dimensions
-					connect = []
-					for connection in layer_vector[index][4]:
-						connect.append("layer_" + str(connection))
+				# Activation Function
+				activation_function = layer[3]
+				
+				# Generate the layer
+				self.__layer_map[layer[0]] = StaticLayer(input_dimension, output_dimension, activation_function, layer[0])
+				
+			# Dynamic Layer
+			elif(layer[2] == "DYNAMIC"):
+				# Input dimensions
+				input_dimension = 0
+				
+				# Is it an input layer?
+				try:
+					for connection in self.__input_connections[layer[0]]:
+						input_dimension = input_dimension + self.__neuron_map[connection[0]]		
+				except:
+					self.__input_layers.append(layer[0])
+					input_dimension = layer[1]
 						
-					self.__output_connections.append(connect)
-					
-					# Generate the layer
-					self.__layer_map["layer_" + str(index)] = InputLayer(input_dimension, "layer_"+str(index))
-					self.__layer_map["layer_" + str(index)].gain = layer_vector[index][5]
-					
-				# 1 => Simple Layer
-				elif(layer_vector[index][1] == 1):
-					# Collect the input dimensions
-					input_dimension = 0
-					connect = []
-					for connection in layer_vector[index][3]:
-						# Taking account the delay as well
-						 connect.append(("layer_" + str(connection[0]), connection[1]))
-						 input_dimension = input_dimension + layer_vector[connection[0]][0]
-						 
-					self.__input_connections.append(connect)
-					
-					# Collect the output dimensions
-					output_dimension = layer_vector[index][0]
-					connect = []
-					for connection in layer_vector[index][4]:
-						connect.append("layer_" + str(connection))
-						
-					# Determine the output layer
-					if(len(connect) == 0):
-						self.__output_layers.append("layer_" + str(index))
-							
-					self.__output_connections.append(connect)	
-					
-					# Collect the activation function
-					activation_function = layer_vector[index][2]
-					
-					# Generate the layer
-					self.__layer_map["layer_" + str(index)] = SimpleLayer(input_dimension, output_dimension, activation_function, "layer_"+str(index))
-					self.__layer_map["layer_" + str(index)].gain = layer_vector[index][5]
-					
-				# 2 => CTR Layer
-				elif(layer_vector[index][1] == 2):
-					# Collect the input dimensions
-					input_dimension = 0
-					connect = []
-					for connection in layer_vector[index][3]:
-						# Taking account the delay as well
-						connect.append(("layer_" + str(connection[0]), connection[1]))
-						input_dimension = input_dimension + layer_vector[connection[0]][0]
-						
-					self.__input_connections.append(connect)
-					
-					# Collect the output dimensions
-					output_dimension = layer_vector[index][0]
-					connect = []
-					for connection in layer_vector[index][4]:
-						connect.append("layer_" + str(connection))
-						
-					# Determine the output layer
-					if(len(connect) == 0):
-						self.__output_layers.append("layer_" + str(index))
-						
-					self.__output_connections.append(connect)
-						
-					# Collect the activaiton function
-					activation_function = layer_vector[index][2]
-					
-					# Generate the layer
-					self.__layer_map["layer_" + str(index)] = CTRLayer(input_dimension, output_dimension, activation_function, self.__time_interval, layer_vector[index][6], "layer_"+str(index))
-					self.__layer_map["layer_" + str(index)].gain = layer_vector[index][5]
-						
-		except:
-			raise Exception("There is something wrong with the configuration dictionary of the network!")
+				# Output dimensions
+				output_dimension = layer[1]
+				
+				# Collect the activation function
+				activation_function = layer[3]
+				
+				# Generate the layer
+				self.__layer_map[layer[0]] = DynamicLayer(input_dimension, output_dimension, activation_function, self.__time_interval, np.ones((output_dimension, )), layer[0])
+				
+		# Generate the output layers variable
+		layer_keys = self.__output_connections.keys()
+		for layers in self.__input_connections.keys():
+			# Is it a hardware layer?
+			if layers not in layer_keys:
+				# If it is, then push to output layers
+				self.__output_layers.append(layers)
 
 
 	# The function to calculate the output
@@ -258,10 +231,12 @@ class ArtificialNeuralNetwork(object):
 		-------
 		output_dict: dictionary
 			Dictionary specifying the output of layers that do not have any output connections further(Output Layers, in essence)
+			They are generally supposed to be hardware layers
 			
 		Raises
 		------
-		None
+		Exception
+			Make sure the layers that provide output to the same hardware layer have the same dimensions
 		
 		Notes
 		-----
@@ -275,48 +250,59 @@ class ArtificialNeuralNetwork(object):
 		** Perfect Example of EAFP
 		"""
 		# Iterate according to order of execution
-		for index in self.order_of_execution:
-			# Used in various places throughout
-			layer_key = "layer_" + str(index)
-			
-			if layer_key in self.__input_layers:
-				try:
-					# If the layer is a part of the input
-					self.__output_matrix[layer_key] = self.__layer_map[layer_key].forward_propagate(input_dict[index])
-				except:
-					# If the user does not specify an input for the layer
-					input_dimension = self.__layer_map[layer_key].weight_dim[1]
-					self.__output_matrix[layer_key] = self.__layer_map[layer_key].forward_propagate(np.zeros((input_dimension, )))
+		try:
+			for layer in self._order_of_execution:
+				# Used in various places throughout
+				layer_name = layer[0]
+				sensor_input = None
 				
-			else:
-				# If the layer is not a part of the input
-				# Does the user give a sensor input?
-				if index not in input_dict:
-					# If it is not, we define the input for the sensor
-					input_dict[index] = np.zeros(self.__layer_map[layer_key].bias_dim)
-					
+				# Get the sensor input
+				try:
+					sensor_input = input_dict[layer[4]]
+				except:
+					sensor_input = np.zeros((layer[1], ))
+				
 				# Concatenate the inputs required
-				input_vector = np.array([])
-				for connection in self.__input_connections[index]:
-					# Additional check for delay
-					try:
-						if(connection[1] == True):
-							# If a delay is required
-							input_vector = np.concatenate([input_vector, self.__output_matrix[connection[0]][1]], axis=0)
-						else:
-							# Delay not required
-							input_vector = np.concatenate([input_vector, self.__output_matrix[connection[0]][0]], axis=0)
-					except:
-						input_vector = np.concatenate([input_vector, np.zeros(self.__layer_map[connection[0]].bias_dim)], axis=0)
-						
+				input_vector = np.array([])	
+				
+				try:
+					for connection in self.__input_connections[layer_name]:
+						# Additional check for delay
+						try:
+							if(connection[1] == True):
+								# Delay required
+								input_vector = np.concatenate([input_vector, self.__output_matrix[connection[0]][1]], axis = 0)
+							else:
+								# Delay not required
+								input_vector = np.concatenate([input_vector, self.__output_matrix[connection[0]][0]], axis = 0)
+								
+						except:
+							input_vector = np.concatenate([input_vector, np.zeros(self.__neuron_map[connection[0]])], axis = 0)
+							
+				except:
+					input_vector = np.zeros((layer[1], ))
+				
 				# Calculate the output
-				self.__output_matrix[layer_key] = self.__layer_map[layer_key].forward_propagate(input_vector, input_dict[index])
+				self.__output_matrix[layer_name] = self.__layer_map[layer_name].forward_propagate(input_vector, sensor_input)
+				
+		except:
+			raise Exception("There is something wrong with the network configurations")
 		
+			
 		# Return the output_dict
 		output_dict = {}
 		for layer in self.__output_layers:
-			index = int(layer[6:])
-			output_dict[index] = self.__output_matrix[layer][0]
+			output_vector = None
+			for connection in self.__input_connections[layer]:
+				try:
+					if output_vector == None:
+						output_vector = np.array(self.__output_matrix[connection[0]][0])
+					else:
+						output_vector = np.sum(output_vector, self.__output_matrix[connection[0]][0])
+				except:
+					raise Exception("There is something wrong with the configuration of " + layer)
+					
+			output_dict[layer] = output_vector
 			
 		return output_dict
 		
@@ -399,13 +385,13 @@ class ArtificialNeuralNetwork(object):
 		parameter_vector = np.array(parameter_vector)
 		
 		# Load the parameters layer by layer
-		for index in range(self.__number_of_layers):
+		for index in range(len(self._order_of_execution)):
 			# For further use
-			layer_key = "layer_" + str(index)
+			layer_name = self._order_of_execution[index][0]
 			
-			if(layer_key not in self.__input_layers):
+			if(layer_name not in self.__input_layers):
 				# Layer present as hidden
-				self.__layer_map[layer_key].update_parameters(parameter_vector[index])
+				self.__layer_map[layer_name].update_parameters(parameter_vector[index])
 					
 		# Raise a warning if the user specifies more parameters than required
 		if(len(parameter_vector) > self.__number_of_layers):
@@ -414,28 +400,31 @@ class ArtificialNeuralNetwork(object):
 	# Getters and Setters
 	@property
 	def number_of_layers(self):
-		""" Getter for number of layers """
+		""" Attribute for number of layers 
+			Denotes the number of layers of the network
+		"""
 		return self.__number_of_layers
 		
 	@property
 	def order_of_execution(self):
-		""" Getter for the order of execution """
-		return self.__order_of_execution
-		
-	@order_of_execution.setter
-	def order_of_execution(self, order_list):
-		""" Setter for order of exeuction """
-		self.__order_of_execution = order_list
+		""" Attribute for the order of execution 
+			Specifies the order in which layer outputs should be calculated to generate the overall output
+		"""
+		order = [layer[0] for layer in self._order_of_execution]
+		return order
 		
 	@property
 	def time_interval(self):
-		""" Getter for time_interval """
+		""" Attribute for time_interval
+			Float specifying the time interval
+		"""
 		return self.__time_interval
 		
 	@property
 	def output_matrix(self):
-		""" Getter for the output matrix
-			Shows the outputs of every layer """
+		""" Output matrix
+			Shows the outputs of every layer
+		"""
 		
 		return self.__output_matrix
 		

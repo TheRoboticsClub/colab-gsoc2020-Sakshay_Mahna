@@ -19,6 +19,14 @@ class TestActivationFunctions(unittest.TestCase):
 		Sigmoid.theta = 1
 		np.testing.assert_almost_equal(Sigmoid.calculate_activation(self.input_vector), np.array([0.5, 0.11920292, 0.09975049]))
 	
+		Sigmoid.beta = [2, 2, 2]
+		Sigmoid.theta = [1, 1, 1]
+		np.testing.assert_almost_equal(Sigmoid.calculate_activation(self.input_vector), np.array([0.5, 0.11920292, 0.09975049]))
+	
+	def test_identity(self):
+		Identity = activation_functions.IdentityActivation()
+		np.testing.assert_almost_equal(Identity.calculate_activation(self.input_vector), self.input_vector)
+	
 	def test_linear(self):
 		Linear = activation_functions.LinearActivation(2, 1)
 		np.testing.assert_almost_equal(Linear.calculate_activation(self.input_vector), np.array([0, -2, -2.2]))

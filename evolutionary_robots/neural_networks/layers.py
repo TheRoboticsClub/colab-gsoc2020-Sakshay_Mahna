@@ -94,7 +94,7 @@ class StaticLayer(object):
 		
 		# Set the gain of the sensors values that are going to be input
 		# as an associative layer or input layer
-		self.gain = np.ones((output_dim, ))
+		self._gain = np.ones((output_dim, ))
 		
 		# Set the activation function
 		self.__activation_function = activation_function
@@ -304,7 +304,7 @@ class StaticLayer(object):
 		
 	@gain.setter
 	def gain(self, gain):
-		if(self.gain.shape != self.__bias_dim):
+		if(self._gain.shape != self.__weight_dim[0]):
 			raise ValueError("The dimensions of gain are not correct for " + self.__layer_name)
 		
 		self._gain = gain
@@ -379,18 +379,18 @@ class DynamicLayer(object):
 		self.__time_dim = (output_dim, )
 		
 		# Initialize the weight and bias
-		self.weight_matrix = np.random.rand(*self.weight_dim)
+		self.__weight_matrix = np.random.rand(*self.weight_dim)
 		self.__delay = delay
 		
 		# Initialize the output matrix
 		self.__output_matrix = np.zeros((delay, output_dim))
 		
 		# Initialize the gain vector
-		self.gain = np.ones((output_dim, ))
+		self._gain = np.ones((output_dim, ))
 		
 		# Generate the weights for the weighted average
 		self.__time_interval = time_interval
-		self.time_constant = time_constant
+		self.__time_constant = time_constant
 		self.__time_weight = np.asarray(float(self.__time_interval) / np.array(self.time_constant))
 		
 		# A check for the dimension of time constant list

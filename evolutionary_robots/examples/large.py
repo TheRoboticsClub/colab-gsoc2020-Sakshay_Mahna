@@ -4,7 +4,7 @@ sys.path.append('./../')
 from neural_networks.ann import ArtificialNeuralNetwork
 from neural_networks.interface import Layer
 import numpy as np
-from neural_networks.activation_functions import LinearActivation, SigmoidActivation
+from neural_networks.activation_functions import LinearActivation, IdentityActivation
 
 print("Large Recurrent Example")
 # There are 30 layers in this network
@@ -14,17 +14,17 @@ print("Large Recurrent Example")
 
 # In order to make large number of layers we use a loop structure
 layers = [None] * 30
-layers[0] = Layer(1, 0, None, [], [i for i in range(1, 29)])
+layers[0] = Layer("layer0", 1, "STATIC", IdentityActivation(), "SENSOR", ["layer" + str(i) for i in range(1, 29)])
 
 # Defining Layers from 1 to 28 using loop
 for i in range(1, 29):
-	layers[i] = Layer(1, 1, LinearActivation(), [0], [29])
+	layers[i] = Layer("layer" + str(i), 1, "STATIC", LinearActivation(), "", ["layer29"])
 	
 # Defining the final layer as CTRNN with 2 neurons
-layers[29] = Layer(2, 2, LinearActivation(), [i for i in range(1, 29)], [])
+layers[29] = Layer("layer29", 2, "DYNAMIC", LinearActivation(), "", ["ACTUATORS"])
 
 # Assuming we want 1 neuron for the output and convert to Simple Layer, the structure can be changed as
-layers[29].type_of_layer = 1
+layers[29].type_of_layer = "STATIC"
 layers[29].number_of_neurons = 1
 
 # Constructing the Network
@@ -34,7 +34,7 @@ nn = ArtificialNeuralNetwork(layers)		# Simply passing the layers 2d matrix
 
 # Input the Neural Network through a dictionary
 input_dict = {
-		0: np.array([1.0])		# Input to Layer 0
+		"SENSOR": np.array([1.0])		# Input to Layer 0
 	     }
 output = nn.forward_propagate(input_dict)
 print(output)
