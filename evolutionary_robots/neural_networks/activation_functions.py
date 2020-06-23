@@ -4,6 +4,7 @@ This is a library of activation functions that the user can choose from!
 These are passed as a parameter to the neural network. The following
 activation functions are present in this library
 
+- Identity Activation
 - Linear Activation
 - Step Activation
 - Sigmoid Activation
@@ -32,13 +33,23 @@ class ActivationFunction(object):
     Class of Activation Function
 
 	...
+	Parameters
+	----------
+	beta(optional) : float / array_like
+	    The gain of the activation function
+	theta(optional) : float / array_like
+		The bias/offset of the activation function
+		
+	* An array can be used for beta and theta, if we want different activation for different neuron
 
 	Attributes
 	----------
-	beta(optional) : float
+	beta(optional) : float / array_like
 	    The gain of the activation function
-	theta(optional) : float
+	theta(optional) : float / array_like
 		The bias/offset of the activation function
+		
+	* An array can be used for beta and theta, if we want different activation for different neuron
 
 	Methods
 	-------
@@ -47,13 +58,29 @@ class ActivationFunction(object):
 	    
 	"""  
 	def __init__(self, beta = 1, theta = 0):
+		"""
+		Initialization function of ActivationFunction class		
+		...
+		
+		Parameters
+		----------
+		Specified in the class docstring
+			
+		Returns
+		-------
+		None
+		
+		Raises
+		------
+		None
+		"""
 		# Set the protected class variables
 		self.beta = beta
 		self.theta = theta
 		
 	@property
 	def beta(self):
-		""" Get the beta parameter """
+		""" Beta parameter defining the gain"""
 		return self._beta
 		
 	@beta.setter
@@ -62,7 +89,7 @@ class ActivationFunction(object):
 		
 	@property
 	def theta(self):
-		""" Get the theta parameter """
+		""" Theta parameter defining the offset"""
 		return self._theta
 		
 	@theta.setter

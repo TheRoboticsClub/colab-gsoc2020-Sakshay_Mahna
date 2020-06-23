@@ -1,8 +1,7 @@
 """Docstring for the layers.py module.
 
 This library contains the various layers that constitute
-a Neural Network. Combining these layers in different ways
-more Neural Networks can be generated.
+a Neural Network.
 
 """
 
@@ -23,7 +22,19 @@ class StaticLayer(object):
 	----------
 	weight_matrix: numpy_matrix
 		The weight matrix used to calculate the output using feed forward algorithm
+		This attribute can be changed
 		
+	weight_dim: tuple
+		The dimensions of the weight matrix
+		This attribute cannot be changed
+		
+	gain: array_like
+		The gain array used to modify the sensor input that is taken
+		This attribute can be changed
+		
+	layer_name: string
+		The name of the layer
+		This attribute cannot be changed
 	 
 	
 	Parameters
@@ -41,7 +52,10 @@ class StaticLayer(object):
 		Specifies the name of the layer 
 		
 	delay(optional): integer
-		Specifies the delay of the connection
+		The delay specifies how many previous outputs along with the current outputs
+		should be returned.
+		
+		* Previous outputs are useful for the overall network
 		
 	Methods
 	-------
@@ -113,12 +127,12 @@ class StaticLayer(object):
 			The input_vector to be passed to the Layer
 			
 		sensor_input: array_like
-			The sensor input to be added(for associative layer)
+			The sensor input to be added
 			
 		Returns
 		-------
 		output_matrix: array_like
-			The output_vector according according to the delay specified above
+			The output_matrix according according to the delay specified above
 			
 		Raises
 		------
@@ -135,7 +149,7 @@ class StaticLayer(object):
 		Each of the rows of the weight_matrix tune for a single output node
 		
 		The output_vector is generated using the formula
-		output_vector = activation(beta * (weight_matrix . input_vector + theta ) )
+		output_vector = activation(beta * (weight_matrix . input_vector - theta ) )
 		"""
 		
 		try:
@@ -187,7 +201,12 @@ class StaticLayer(object):
 			The parameter array is shorter than required
 			
 		Warning
-			The parameter array is greater than required
+			The parameter array is not of the right dimension
+			
+		Notes
+		-----
+		The Exception will not always take place for parameter vectors shorter than required
+		The layer will generate output or not also cannot be said so, therefore, a warning is enough
 		"""
 		# Convert to numpy array
 		parameter_vector = np.array(parameter_vector)
@@ -195,7 +214,7 @@ class StaticLayer(object):
 		# Interval counter maintains the current layer index
 		interval_counter = 0
 		
-		# Get the interval at which the weight and bias seperate
+		# Get the interval at which the weight and activation seperate
 		weight_interval = self.weight_dim[0] * self.weight_dim[1]
 		
 		# Get the interval at which activatation parameters seperate
@@ -216,10 +235,9 @@ class StaticLayer(object):
 			raise ValueError("The parameter_vector of " + self.__layer_name + " consists of elements less than required")
 			
 		# The interval counter should contain the number of elements in parameter_vector
-		# Otherwise the user has specified parameters more than required
-		# Just a warning is enough
-		if(len(parameter_vector) > interval_counter):
-			warnings.warn("The parameter vector of " + self.__layer_name + " consists of elements greater than required")
+		# Otherwise the user has specified parameters different than required
+		if(len(parameter_vector) != interval_counter):
+			warnings.warn("The number of parameters entered do not match the parameter vector of " + self.__layer_name)
 			
 	# Function to return the parameters
 	def return_parameters(self):
@@ -268,16 +286,14 @@ class StaticLayer(object):
 	# Setters and Getters	
 	@property
 	def weight_matrix(self):
-		""" Attribute for weight matrix """
+		""" The weight matrix 
+			A user defined weight matrix can also be set
+			Raises a Value Exception if the dimensions do not match
+		"""
 		return self.__weight_matrix
 		
 	@weight_matrix.setter
 	def weight_matrix(self, weight_matrix):
-		"""
-		Set a user defined weight matrix
-		
-		Raises a Value Exception if the dimensions do not match
-		"""
 		if(weight_matrix.shape != self.weight_dim):
 			raise ValueError("The dimensions of weight matrix do not match for " + self.__layer_name)
 		
@@ -286,19 +302,22 @@ class StaticLayer(object):
 	# Function to return the layer name
 	@property
 	def layer_name(self):
-		""" Attribute for the name of the Layer """
+		""" The name of the Layer """
 		return self.__layer_name
 		
 	# Function to return the weight dimensions
 	@property
 	def weight_dim(self):
-		""" Attribute for the dimensions of the weight matrix """
+		""" The dimensions of the weight matrix """
 		return self.__weight_dim
 
 	# For changing the gain values
 	@property
 	def gain(self):
-		""" Attribute for gain """
+		""" The gain for sensor input 
+			This is an adjustable parameter
+			Raises a Value Exception if the dimensions do not match
+		"""
 		
 		return self._gain
 		
@@ -311,13 +330,13 @@ class StaticLayer(object):
 		
 	# Function to set the activation parameters
 	def set_activation_parameters(self, beta, theta):
-		""" Set the parameters of activation function """
+		""" Function to set the parameters of activation function """
 		self.__activation_function.beta = beta
 		self.__activation_function.theta = theta
 	
 	# Function to return the activation parameters(tuple)	
 	def get_activation_parameters(self):
-		""" Get the parameters of activation function """
+		""" Function to get the parameters of activation function """
 		return np.concatenate([self.__activation_function.beta, self.__activation_function.theta])
 		
 
@@ -325,13 +344,36 @@ class StaticLayer(object):
 class DynamicLayer(object):
 	"""
 	Dynamic Layer is used in the Continuous Time Recurrent Neural Network.
-	Dynamic has to save the state of the previous output and then calculate
+	Dynamic Layer has to save the state of the previous output and then calculate
 	the weighted average of the previous and the current output to get
 	the total output
 	
 	...
 	Attributes
 	----------
+	weight_matrix: numpy_matrix
+		The weight matrix used to calculate the output using feed forward algorithm
+		This attribute can be changed
+		
+	weight_dim: tuple
+		The dimensions of the weight matrix
+		This attribute cannot be changed
+		
+	time_constant: array_like
+		The time constants of the neurons used for calculation of CTRnetwork output
+		This attribute can be changed
+		
+	time_dim: tuple
+		The dimensions of the time constant array
+		This attribute cannot be changed
+		
+	gain: array_like
+		The gain array used to modify the sensor input that is taken
+		This attribute can be changed
+		
+	layer_name: string
+		The name of the layer
+		This attribute cannot be changed
 	
 	Parameters
 	----------
@@ -345,10 +387,13 @@ class DynamicLayer(object):
 		SPecifies the activation function to be used
 		
 	layer_name: string
-		THe name of the layer
+		The name of the layer
 		
 	delay(optional): integer
-		Set the delay of the output connection
+		The delay specifies how many previous outputs along with the current outputs
+		should be returned.
+		
+		* Previous outputs are useful for the overall network
 		
 	Methods
 	-------
@@ -371,6 +416,22 @@ class DynamicLayer(object):
 		
 	"""
 	def __init__(self, input_dim, output_dim, activation_function, time_interval, time_constant, layer_name, delay = 2):
+		"""
+		Initialization function of DynamicLayer class		
+		...
+		
+		Parameters
+		----------
+		Specified in the class docstring
+			
+		Returns
+		-------
+		None
+		
+		Raises
+		------
+		None
+		"""
 		# Name of the layer
 		self.__layer_name = layer_name
 		
@@ -406,7 +467,7 @@ class DynamicLayer(object):
 		# Set the previous state output, zero for initial
 		self.__previous_output = np.zeros(output_dim)
 		
-	# First order euler step
+	# Function that calculates the first order euler step 
 	# Private function
 	def _euler_step(self, input_vector, sensor_input, delay=0):
 		"""
@@ -418,12 +479,12 @@ class DynamicLayer(object):
 			THe input_vector to be passed to the layer
 			
 		sensor_input: array_like
-			The values of the sensor that are to be added(associative layer)
+			The values of the sensor that are to be added
 			
 		Returns
 		-------
 		output_matrix: array_like
-			The delayed output
+			The output_matrix according to the delay specified above
 			
 		Raises
 		------
@@ -499,6 +560,11 @@ class DynamicLayer(object):
 			
 		Warning
 			The parameter array is greater than required
+			
+		Notes
+		-----
+		The Exception will not always take place for parameter vectors shorter than required
+		The layer will generate output or not also cannot be said so, therefore, a warning is enough
 		"""
 		# Convert to numpy array
 		parameter_vector = np.array(parameter_vector)
@@ -533,10 +599,9 @@ class DynamicLayer(object):
 			raise ValueError("The parameter_vector for " + self.__layer_name + " consists of elements less than required")
 			
 		# The interval counter should contain the number of elements in parameter_vector
-		# Otherwise the user has specified parameters more than required
-		# Just a warning is enough
-		if(len(parameter_vector) > interval_counter):
-			warnings.warn("The parameter vector for " + self.__layer_name + " consists of elements greater than required")
+		# Otherwise the user has specified parameters not equal to the ones required
+		if(len(parameter_vector) != interval_counter):
+			warnings.warn("The number of parameters entered do not match the parameter vector of " + self.__layer_name)
 		
 	# Function to return the parameters of a layer
 	def return_parameters(self):
@@ -589,16 +654,15 @@ class DynamicLayer(object):
 	# Function to return the weight matrix
 	@property
 	def weight_matrix(self):
-		""" Attribute for Weight Matrix """
+		""" The Weight Matrix of the layer
+			The user can set the weight matrix to be used
+			Raise a value exception if dimensions do not match
+		"""
 		return self.__weight_matrix
 		
 	# Function to set the weight matrix
 	@weight_matrix.setter
 	def set_weight_matrix(self, weight_matrix):
-		"""
-		Sets the weight matrix to be used by the layer
-		Raise a value exception if dimensions do not match
-		"""
 		if(weight_matrix.shape != self.weight_dim):
 			raise ValueError("The dimensions of the weight matrix do not match for " + self.__layer_name)
 		self.__weight_matrix = weight_matrix
@@ -606,34 +670,33 @@ class DynamicLayer(object):
 	# Function to return the layer name
 	@property
 	def layer_name(self):
-		""" Attribute for the name of layer """
+		""" The name of layer """
 		return self.__layer_name
 		
 	# Function to return the weight dimensions
 	@property
 	def weight_dim(self):
-		""" Attribute for the dimensions of weight matrix """
+		""" The dimensions of weight matrix """
 		return self.__weight_dim
 		
 	# Function to return the time constant dimension
 	@property
 	def time_dim(self):
-		""" Attribute for the dimensions of time constant """
+		""" The dimensions of time constant array """
 		return self.__time_dim
 	
 	# Function to return the time constant list
 	@property
 	def time_constant(self):
-		""" Attribute for the time constants """
+		""" The time constant array 
+			The user can set the time constants to be used
+			Raises an exception if the dimensions do not match
+		"""
 		return self.__time_constant
 		
 	# Function to set the time constant list
 	@time_constant.setter
 	def time_constant(self, time_constant):
-		"""
-		Sets the time constant list of neurons
-		Raises an excpetion if the dimensions do not match!
-		"""
 		self.time_constant = np.array(time_constant)
 		
 		if(self.time_constant.shape != self.time_dim):
@@ -645,7 +708,7 @@ class DynamicLayer(object):
 	# For changing the gain values
 	@property
 	def gain(self):
-		""" Attribute for gain """
+		""" The gain for sensor input """
 		return self._gain
 		
 	@gain.setter
@@ -657,11 +720,11 @@ class DynamicLayer(object):
 		
 	# Function to set the activation parameters
 	def set_activation_parameters(self, beta, theta):
-		""" Set the parameters of activation function """
+		""" Function to set the parameters of activation function """
 		self.__activation_function.beta = beta
 		self.__activation_function.theta = theta
 	
 	# Function to return the activation parameters(tuple)	
 	def get_activation_parameters(self):
-		""" Get the parameters of activation function """
+		""" Function to get the parameters of activation function """
 		return np.concatenate([self.__activation_function.beta, self.__activation_function.theta])

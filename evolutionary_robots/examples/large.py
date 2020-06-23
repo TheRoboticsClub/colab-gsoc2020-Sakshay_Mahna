@@ -1,3 +1,5 @@
+# An example showing the creation of a Large Neural Network
+
 import sys
 sys.path.append('./../')
 

@@ -29,11 +29,13 @@ class Layer(object):
 		
 	activation_function: ActvationFunction object
 		Specifies the activation function of the Layer
-		Use IdentityActivation(), if layer is an input layer
+		Use IdentityActivation, if layer is an input layer
 		
 	sensor_input: string
 		Specifies the sensors that input the current layer
-		There are two options: "CAMERA" or "INFRARED"
+		The name can be set whatever we want, but needs to be coherent everywhere
+		
+		Example: "CAMERA" or "INFRARED"
 		
 		*Use captials
 		
@@ -58,6 +60,8 @@ class Layer(object):
 	delayed_connections: array_like
 		Specifies the list of output connections whose input should be delayed before sending to other layer
 		The array is to be a list of strings
+		
+		* The names should be chosen from the output connections
 		
 		Example: ["layer1", "layer2"]
 	"""
@@ -95,7 +99,7 @@ class Layer(object):
 	# Getters and Setters
 	@property
 	def number_of_neurons(self):
-		""" Attribute for Number of Neurons """
+		""" The number of neurons in the layer """
 		return self._number_of_neurons
 		
 	@number_of_neurons.setter
@@ -104,7 +108,7 @@ class Layer(object):
 		
 	@property
 	def type_of_layer(self):
-		""" Attribute for Type of Layer """
+		""" The type of Layer """
 		return self._type_of_layer
 		
 	@type_of_layer.setter
@@ -121,7 +125,7 @@ class Layer(object):
 		
 	@property
 	def activation_function(self):
-		""" Attribute for Activation Function """
+		""" The Activation Function of the Layer """
 		# Better readability
 		return type(self._activation_function)
 		
@@ -131,7 +135,7 @@ class Layer(object):
 		
 	@property
 	def sensor_input(self):
-		""" Attribute for Sensor Input """
+		""" The Sensor Input """
 		# Parameter made for entering the sensor input
 		return self._sensor_input
 		
@@ -141,7 +145,7 @@ class Layer(object):
 			
 	@property
 	def output_connections(self):
-		""" Attribute for a list of output connections """
+		""" A list of output connections """
 		return self._output_connections
 		
 	@output_connections.setter
@@ -150,7 +154,7 @@ class Layer(object):
 		
 	@property
 	def delayed_connections(self):
-		""" Attribute for a list of connections that are delayed by one step """
+		""" A list of connections that are delayed by one step """
 		return self._delayed_connections
 		
 		

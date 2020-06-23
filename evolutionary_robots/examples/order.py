@@ -1,3 +1,7 @@
+# This example shows the concept of order of execution
+# The Layers should be passed to the ANN class in correct sequence
+# Otherwise the outputs will not be as desired
+
 import sys
 sys.path.append('./../')
 
@@ -7,12 +11,16 @@ import numpy as np
 from neural_networks.activation_functions import LinearActivation, IdentityActivation
 
 # An ANN with 3 Layers, which are input, hidden and output
-# The output layer depends on the output of input and hidden layers
+# The input layer consists of 2 neurons, takes input from SENSOR and outputs to hiddenLayer and outputLayer
+# The hidden layer consists of 2 neurons, with a linear activation and outputs to outputLayer
+# The output layer consists of 2 neurons with linear activation and outputs to GRIPPERS
 inputLayer = Layer("inputLayer", 2, "STATIC", IdentityActivation(), "SENSOR", ["hiddenLayer", "outputLayer"])
-hiddenLayer = Layer("hiddenLayer", 2, "STATIC", LinearActivation(), "", ["outputLayer"])		# Connections are made according to the initialization of Neural Network object
+hiddenLayer = Layer("hiddenLayer", 2, "STATIC", LinearActivation(), "", ["outputLayer"])
 outputLayer = Layer("outputLayer", 2, "STATIC", LinearActivation(), "", ["GRIPPERS"])
 
 print("Static ANN example of order: Wrong Way")
+# The order entered here is not correct
+# This may result in wrong results
 nn = ArtificialNeuralNetwork([
 				inputLayer, 		# Layer 0 (Input Layer)
 				outputLayer, 		# Layer 1 (Output Layer)
@@ -29,7 +37,7 @@ nn.load_parameters_from_vector(parameter_vector)
 
 # Input the Neural Network through a dictionary
 input_dict = {
-		"SENSOR": np.array([1.0, 1.0])		# Input to Layer 0
+		"SENSOR": np.array([1.0, 1.0])		# Input for SENSOR
 	     }
 output = nn.forward_propagate(input_dict)
 print(output)
@@ -39,7 +47,7 @@ print(output)
 
 ###################################################################
 print("Static ANN example of order: Correct Way")
-# Different initialization, which results in a different order of initialization
+# Different order of initialization, which results in a different order of initialization
 nn = ArtificialNeuralNetwork([
 				inputLayer, 		# Layer 0 (Input Layer)
 				hiddenLayer, 		# Layer 1 (Hidden Layer)
@@ -56,7 +64,7 @@ nn.load_parameters_from_vector(parameter_vector)
 
 # Input the Neural Network through a dictionary
 input_dict = {
-		"SENSOR": np.array([1.0, 1.0])		# Input to Layer 0
+		"SENSOR": np.array([1.0, 1.0])		# Input for SENSOR
 	     }
 output = nn.forward_propagate(input_dict)
 print(output)

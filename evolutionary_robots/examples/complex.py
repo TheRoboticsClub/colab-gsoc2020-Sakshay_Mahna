@@ -1,3 +1,6 @@
+# A complex example with more number of layers
+# Including Input Layer, Hidden Layer, Associative Layer and Output Layer
+
 import sys
 sys.path.append('./../')
 
@@ -7,17 +10,17 @@ import numpy as np
 from neural_networks.activation_functions import LinearActivation, IdentityActivation
 
 print("Complex Recurrent Example")
-# There are 6 Layers in this network
-# The output of a hidden layer depends only on the input layer
-# 2 other hidden layers depend on the output of the previous hidden layer
-# The 2 hidden layers are then connected to another hidden layer
-# That final hidden layer is connected with the first hidden layer as a recurrent connection
-# The output layer is then connected to the final hidden layer
+# There are 5 Layers in this network
+# The input layer consists of 2 neurons, takes input from SENSOR1 and outputs to hiddenLayer1
+# The hiddenLayer1 consists of 2 neurons with Linear Activation and outputs to hiddenLayer2, hiddenLayer3 and outputLayer
+# THe hiddenLayer2 consists of 2 neurons with LinearActivation and outputs to outputLayer
+# The hiddenLayer3 consists of 2 neurons with LinearActivation, takes input from SENSOR2 and outputs to outputLayer(in essence an associative layer)
+# The outputLayer consists of 1 neuron with LinearActivation and outputs to hiddenLayer1(recurrent connection) and MOTORLEFT
 inputLayer = Layer("inputLayer", 2, "STATIC", IdentityActivation(), "SENSOR1", ["hiddenLayer1"])
 hiddenLayer1 = Layer("hiddenLayer1", 2, "STATIC", LinearActivation(), "", ["hiddenLayer2", "hiddenLayer3", "outputLayer"])
 hiddenLayer2 = Layer("hiddenLayer2", 2, "STATIC", LinearActivation(), "", ["outputLayer"])
 hiddenLayer3 = Layer("hiddenLayer3", 2, "STATIC", LinearActivation(), "SENSOR2", ["outputLayer"])
-outputLayer = Layer("outputLayer", 1, "STATIC", LinearActivation(), "", ["hiddenLayer1", "MOTORLeft"])
+outputLayer = Layer("outputLayer", 1, "STATIC", LinearActivation(), "", ["hiddenLayer1", "MOTORLEFT"])
 
 nn = ArtificialNeuralNetwork([
 				inputLayer, 		# Layer 0 (Input Layer)
@@ -40,8 +43,10 @@ nn.load_parameters_from_vector(parameter_vector)
 
 # Input the Neural Network through a dictionary
 input_dict = {
-		"SENSOR1": np.array([1.0, 1.0])		# Input to Layer 0
+		"SENSOR1": np.array([1.0, 1.0])		# Input to SENSOR1
 	     }
+	     
+# By default the input to SENSOR2 are taken as 0
 output = nn.forward_propagate(input_dict)
 print(output)
 output = nn.forward_propagate(input_dict)
@@ -49,8 +54,8 @@ print(output)
 
 # Input the Neural Network through a dictionary
 input_dict = {
-		"SENSOR1": np.array([1.0, 1.0]), 	# Input to Layer 0
-		"SENSOR2": np.array([1.0, 1.0])		# Associative Input to Layer 3
+		"SENSOR1": np.array([1.0, 1.0]), 	# Input for SENSOR1
+		"SENSOR2": np.array([1.0, 1.0])		# Associative Input for SENSOR2
 	     }
 output = nn.forward_propagate(input_dict)
 print(output)

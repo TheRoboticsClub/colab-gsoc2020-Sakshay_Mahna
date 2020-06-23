@@ -35,10 +35,10 @@ class ArtificialNeuralNetwork(object):
 		
 		The configuration of the array should be according to the order of execution.
 		It is upto the user to decide the order of execution of the Neural Network!
-		The layers are by default, numbered according to the order of execution.
+		The layers are indexed according to the order of execution.
 		
-	time_interval(optional): integer
-		Integer specifying the time interval
+	time_interval(optional): float
+		A float specifying the time interval
 		
 		*Useful especially for networks with Dynamic Layers
 		
@@ -50,7 +50,7 @@ class ArtificialNeuralNetwork(object):
 	order_of_execution: array_like
 		Specifies the order in which layer outputs should be calculated to generate the overall output
 		
-		*It is a list of layer names defined in the Layer interface object
+		*It is a list of layer variables defined as the Layer interface object
 		
 	time_interval: float
 		Float specifying the time interval
@@ -241,13 +241,11 @@ class ArtificialNeuralNetwork(object):
 		Notes
 		-----
 		Dynamic Programming is used for the calculation of the output
-		Based on the order of execution specified according to the user(by default taken as order of indices of layers),
+		Based on the order of execution specified according to the user(taken as order of indices of layers),
 		the output is calculated and stored in the output matrix.
 		
-		The layer outputs the activation for both the current and previous
-		instances. The delay specifies which output to select!
+		The layer outputs the activation for all the instances as specified by the delay
 		
-		** Perfect Example of EAFP
 		"""
 		# Iterate according to order of execution
 		try:

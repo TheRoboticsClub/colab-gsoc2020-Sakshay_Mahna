@@ -1,8 +1,10 @@
 # Examples
 
+Follow the examples in the given order for a clearer understanding of the API.
+
 ### Example 1
 
-`perceptron.py` Contains an example of 2 layers(Input and Output) with Linear Activation. The input layer consists of 2 neurons and the output layer consists of 3 neurons. The output layer is Simple or Continuous Time Recurrent.
+`perceptron.py` Contains an example of 2 layers(Input and Output) with Linear Activation. The input layer consists of 2 neurons and the output layer consists of 3 neurons. The output layer is Static or Continuous Time Recurrent.
 
 ### Example 2
 
@@ -14,7 +16,7 @@
 
 ### Example 4
 
-`complex.py` Contains an example showing how to design a complex hypothetical Neural Network, which takes associative inputs as well in accordance with a gain. There are 6 layers in total, of which 4 are hidden and 1 input and 1 output layer. The 5th layer is connected as a recurrence to the 2nd layer. However, the weights are adjusted such that the recurrence is not able to show it's effect.
+`complex.py` Contains an example showing how to design a complex hypothetical Neural Network, which takes associative inputs as well. There are 5 layers in total, of which 3 are hidden and 1 input and 1 output layer. The 5th layer is connected as a recurrence to the 2nd layer. However, the weights are adjusted such that the recurrence is not able to show it's effect.
 
 ### Example 5
 
