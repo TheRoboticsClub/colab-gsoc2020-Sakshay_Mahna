@@ -1,4 +1,4 @@
-# This example shows the use delayed connections
+# This example shows the use of delayed connections
 # Delayed connections is useful in the case where we have recurrent
 # connections between layers at the same level
 # For instance two hidden layers at the same level
@@ -19,10 +19,10 @@ from neural_networks.activation_functions import LinearActivation, IdentityActiv
 # The outputLayer contains 1 neuron with Linear activation and gives output to MOTOR actuator
 
 # The format followed is Layer(name_of_layer, number_of_neurons, type_of_layer, activation_function, sensor_input, [list_of_output_connections])
-inputLayer = Layer("inputLayer", 2, "STATIC", IdentityActivation(), "SENSOR", ["hiddenLayer1", "hiddenLayer2"])				# Input Layer
+inputLayer = Layer("inputLayer", 2, "STATIC", IdentityActivation(), "SENSOR", ["hiddenLayer1", "hiddenLayer2"])		# Input Layer
 hiddenLayer1 = Layer("hiddenLayer1", 1, "STATIC", LinearActivation(), "", ["hiddenLayer2", "outputLayer"])		# Hidden Layer 1
 hiddenLayer2 = Layer("hiddenLayer2", 1, "STATIC", LinearActivation(), "", ["hiddenLayer1", "outputLayer"])		# Hidden Layer 2
-outputLayer = Layer("outputLayer", 1, "STATIC", LinearActivation(), "", ["MOTOR"])		# Output Layer
+outputLayer = Layer("outputLayer", 1, "STATIC", LinearActivation(), "", ["MOTOR"])					# Output Layer
 
 # Delay the input connection of Hidden Layer 2 that is received from Hidden Layer 1
 hiddenLayer1.delayed_connections = ["hiddenLayer2"]
