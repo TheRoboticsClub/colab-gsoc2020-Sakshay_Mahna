@@ -30,9 +30,9 @@ percpetron = ArtificialNeuralNetwork([
 ```python
 perceptron.load_parameters_from_vector([
                                         [],                         # Input Layer
-                                        [							# Output Layer
-                                        	0.5, 0.5,				# Weight Matrix
-                                        	1, 0					# Activation Parameters
+                                        [			    
+                                        	0.5, 0.5,	    # Weight Matrix of Output Layer
+                                        	1, 0		    # Activation Parameters of Output Layer
                                         ]         
                                        ])
 ```
@@ -63,7 +63,7 @@ The following covers the specifics:
 | Maximum Value			| MaximumActivation() | None				  |
 | Identity Function		| IdentityActivation()| None				  |
 
-**Note**: In case of activation functions with parameters less than 2. The format of parameter input of Neural Networks remains the same. Therefore, they are to be given any arbitrary values(for correct syntax). These values do not affect the activation function parameters.
+**Note**: In case of activation functions with parameters less than 2. The format of parameter input of Neural Networks remains the same. Therefore, they are to be given any arbitrary values(for correct syntax). These values affect neither the activation function parameters nor their result.
 
 **There are two ways to set the parameters of the Activation Function** Either while initializing the object or explicitly. The default values of beta and theta are taken to be 1 and 0 respectively.
 
@@ -101,36 +101,36 @@ Layer class allows easier initialization and management of layers of the Neural 
 layer = Layer(name_of_layer, number_of_neurons, type_of_layer, activation_function, sensor_input, list_of_output_connections)
 
 # Initializing with attributes or changing the attributes
-layer = Layer('layer0')				# The layer name attribute is required for initialization
-layer.number_of_neurons = 1
-layer.type_of_layer = "DYNAMIC"
-layer.activation_function = SigmoidActivation()
-layer.sensor_input = "CAMERA"
-layer.output_connections = ["some_other_layer_name"]
+layer = Layer(layer_name)		# The layer name attribute is a required parameter for initialization
+layer.number_of_neurons = number_of_neurons
+layer.type_of_layer = type_of_layer
+layer.activation_function = activation_function
+layer.sensor_input = sensor_input
+layer.output_connections = list_of_output_connections
 ```
 
-**name_of_layer** specifies the name of the layer
+**name_of_layer** specifies the name of the layer. This parameter is a string. The name of each layer should be unique and is a required parameter while initializing the Layer object. The names can be any string, such as : "layer0", "inputLayer" or "layer_0"
 
-**number_of_neurons** specifies the number of neurons in a particular layer
+**number_of_neurons** specifies the number of neurons in a particular layer. This parameter is an integer data type.
 
 **type_of_layer** specifies the type of layer. There are 2 types of layers for the Neural Network, Static and Dynamic
 
-- The *Static layer* is a simple feed forward layer that calculates the output through forward propagation. Using specific input connections, this layer can behave as a recurrent layer as well. In addition to it, sensor input can be passed to the Layer interface to make it behave as an associative or input layer as well. **To use this layer we use** "STATIC"
+- The *Static layer* is a simple feed forward layer that calculates the output through forward propagation. Using specific input connections, this layer can behave as a recurrent layer as well. In addition to it, sensor input can be passed to the Layer interface to make it behave as an associative or input layer as well. **To use this layer we use** "STATIC" string.
 
-- The *Dynamic layer* is a feed forward layer that calculates the output using first order euler approximation. Similar to the *static layer*, this layer can be made to behave accordingly. **To use this layer we use** "DYNAMIC"
+- The *Dynamic layer* is a layer that calculates the output using first order euler approximation. Similar to the *static layer*, this layer can be made to behave according to the sensor input provided. **To use this layer we use** "DYNAMIC" string.
 
 **activation_function** specifies the activation function class. This is usually taken from the activation functions library. In order to allow an outside class, it should possess a method called `calculate_activation` that takes in a single numpy array and outputs the activation result.
 
 **sensor_input** is a string specifying the sensor from which the layer is to take input. This sensor string determines the keys of the input dictionary that we pass to forward propagate function to calculate the output of the network. It can be any string such as: "CAMERA", "SENSOR" or "INFRARED" . Conventionally, these should be in CAPTIALS.
 
-**output_connections** is a list of strings specifying the name of the layers which the current layer provides output to. For layers that output to an actuator or hardware, they have an additional member for that as well. The output dictionary returned by `forward_propagate()` returns the output of these hardware. These hardware outputs can be any name. Conventionally, these outputs should be in CAPITALS. For example: ["layer_0", "layer_1"] or ["layer0", "HARDWARE"]
+**output_connections** is a list of strings specifying the name of the layers which the current layer provides output to. For layers that output to an actuator or hardware, they have an additional member for that as well. The output dictionary returned by `forward_propagate()` returns the output of these hardware. These hardware outputs can have any name. Conventionally, these outputs should be in CAPITALS. For example: ["layer_0", "layer_1"] or ["layer0", "HARDWARE"]
 
-**delayed_connections** is an optional attribute that has to be set explicitly apart from initialization. It is a list of layer names specifying the layers from which the output from current layer is to be delayed by one iteration of the network. By default, delay_connections is an empty list and are used to construct some specific networks. For example [recurrent.py](./../examples/recurrent.py)
+**delayed_connections** is an optional attribute that has to be set explicitly apart from initialization. It is a list of layer names specifying the layers from which the output from current layer is to be delayed by one iteration of the network. By default, delayed_connections is an empty list and is used to construct some specific networks. For example [recurrent.py](./../examples/recurrent.py)
 
 ```python
 layer = Layer()
-layer.output_connections(["layer_name_1", "layer_name_2"])		# Layer gives output to the given layers
-layer.delayed_connections(["layer_name_2"])		# Layer delays the output of these layers
+layer.output_connections(["layer_name_1", "layer_name_2"])	# Layer gives output to the given layers
+layer.delayed_connections(["layer_name_2"])			# Layer delays the output of these layers
 
 ```
 
@@ -141,31 +141,29 @@ layer.delayed_connections(["layer_name_2"])		# Layer delays the output of these 
 
 Methods supported by the ArtificialNeuralNetwork class are:
 
-**Generate a Neural Network** with a given number of layers, number of neurons in each layer, the input and output connections and the activation function.
+**Generate a Neural Network** with a given number of layers, number of neurons in each layer, the sensor input and output connections and the activation function.
 
 ```python
 nn = ArtificialNeuralNetwork(a_list_of_layer_object, time_interval)
 ```
 
-The `list_of_layer_object` parameter is a list of layer variables declared using the `Layer()` interface. The order of the layers is very important as the order specified during initialization of the network is taken as the **order of execution**
+The `list_of_layer_object` parameter is a list of `Layer()` objects. The order of the layers is very important as the order specified during initialization of the network is taken as the **order of execution**. For a better understanding check the example [order.py](./../examples/order.py)
 
-The `time_interval` is an optional parameter that specifies the time interval of the network. This is useful in the case when a continuous layer is used, otherwise this is ignored. By default, the time interval is 0.01.
+The `time_interval` is an optional parameter that specifies the time interval of the network. This is useful in the case when a Dynamic Layer is used, otherwise this is ignored. By default, the time interval is 0.01.
 
 **Generate the output of Neural Network** An input dictionary specifying the input specific to each sensor is passed to the `forward_propagate` function of the ArtificialNeuralNetwork class. The sensor input for both the input and associative layers is passed through this input dictionary. Input for any sensor not passed is assumed to be zero.
-
-The Neural Network in another sense is a computational graph. The order in which the computations are done is specified according to the **order of execution**.
-
-The output is in the form of a dictionary. The dictionary is keyed according to the output hardware specified in the `Layer()` interface (output connections)
 
 ```python
 # For instance we have two sensors that serve as the input
 input_dictionary = {
-	"SENSOR1": [1, 2]
+	"SENSOR1": [1, 2],
 	"SENSOR2": [1, 1]
 }
 
 nn.forward_propagate(input_dictionary)
 ```
+
+The output is in the form of a dictionary. The dictionary is keyed according to the output hardware specified in the `Layer()` interface (output connections)
 
 **Save and load the parameters from a file**
 
@@ -177,7 +175,9 @@ nn.save_parameters_to_file(path_to_directory_with_file_name_in_quotes)
 nn.load_parameters_from_file(path_to_directory_with_file_name_in_quotes)
 ```
 
-**Return and load the parameters in the form of a list**. The format of parameter list for each Neural Network is given in the [next section](#format-for-parameter-vector). **If any layer serves as an input layer, the weights specified in the parameter vector will be ignored for that layer. Therefore, they should not be passed**
+**Return and load the parameters in the form of a list**. The format of parameter list for each Neural Network is given in the [next section](#format-for-parameter-vector). 
+
+**If any layer serves as an input layer, the weights specified in the parameter vector will be ignored for that layer.** Therefore, they should not be passed
 
 ```python
 # Return the parameters
@@ -187,7 +187,7 @@ nn.return_parameters_as_vectors()
 nn.load_parameters_from_vector(a_list_with_appropriate_format)
 ```
 
-**View the output of each layer** The output of each and every layer(previous and current) is avaialable as class variable of the Neural Network class
+**View the output of each layer** The output of each and every layer(previous and current) is avaialable as a class variable of the Neural Network class
 
 ```python
 nn.output_matrix
@@ -212,9 +212,6 @@ The format followed is:
 # a_ib is the bias activation parameter of ith output node and a_ig is the gain activation parameter of ith output node.
 ```
 
-The jth output node corresponds to the index of the neuron of the layer under consideration.
-The ith input node corresponds to the index of the neuron of the layer specified in the order of `input_connections` above.
-
 #### Continuous Time Recurrent Layer
 
 The format followed is:
@@ -225,5 +222,3 @@ The format followed is:
 # a_ib is the bias activation parameter of ith output node and a_ig is the gain activation parameter of ith output node.
 # tc_i is the time constant of ith neuron of the current layer
 ```
-
-The i and j format are similar to the Simple Layer.
