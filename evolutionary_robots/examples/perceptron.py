@@ -15,22 +15,22 @@ print("Static ANN")
 # The output layer consists of 3 neurons with Linear activation and gives output to MOTOR actuators
 
 # The format followed is Layer(name_of_layer, number_of_neurons, type_of_layer, activation_function, sensor_input, [list_of_output_connections])
-inputLayer = Layer("inputLayer", 				# Name of the Layer
-					2,							# Number of neurons
-					"STATIC",					# Type of Layer
-				 	IdentityActivation(), 		# Activation Function(Input Layers should use IdentityActivation function)
-				 	"CAMERA", 					# The sensor from which input is taken
-				 	["outputLayer"]				# The list of output connections
-				   )			
+inputLayer = Layer("inputLayer", 			# Name of the Layer
+		   2,					# Number of neurons
+		   "STATIC",				# Type of Layer
+		   IdentityActivation(), 		# Activation Function(Input Layers should use IdentityActivation function)
+		   "CAMERA", 				# The sensor from which input is taken
+		   ["outputLayer"]			# The list of output connections
+		   )			
 
 				 	
-outputLayer = Layer("outputLayer",				# Name of the Layer
-					 3,							# Number of neurons
-					 "STATIC", 					# Type of Layer
-					 LinearActivation(), 		# Activation Function
-					 "", 						# The sensor from which input is taken(no sensor input in this case)
-					 ["MOTOR"]					# The list of output connections(this is connected to MOTOR actuator)
-					)	
+outputLayer = Layer("outputLayer",			# Name of the Layer
+		    3,					# Number of neurons
+		    "STATIC", 				# Type of Layer
+		    LinearActivation(), 		# Activation Function
+		    "", 				# The sensor from which input is taken(no sensor input in this case)
+		    ["MOTOR"]				# The list of output connections(this is connected to MOTOR actuator)
+		    )	
 
 nn = ArtificialNeuralNetwork([
 				inputLayer,		# Layer 0
@@ -39,17 +39,18 @@ nn = ArtificialNeuralNetwork([
 
 # Loading the parameters from a list
 parameter_vector = [
-			[],									# Layer 0 (Any parameters given to input layers are ignored, therefore do not specify) 
-			[									# Layer 1
-				0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 	# The weight matrix
-				1, 1, 1, 						# The gain of the activation
-				-1, -1, -1						# The bias of the activation
+			[],						# Layer 0 (Any parameters given to input layers are ignored, therefore do not specify) 
+			[						# Layer 1
+				0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 		# The weight matrix
+				1, 1, 1, 				# The gain of the activation
+				-1, -1, -1				# The bias of the activation
 			]		
 		   ]
 
 nn.load_parameters_from_vector(parameter_vector)
 
 # Input the Neural Network through a dictionary
+# The input dictionary is keyed according to the sensor inputs provided for the network
 input_dict = {
 		"CAMERA": np.array([1.0, 1.0])		# Input for the Sensor
 	     }
@@ -61,7 +62,7 @@ print(output)
 ########################################################################
 print("CTRNN")
 # CTRNN with 2 layers
-# The input layer consists of 2 neurons and takes input from CAMERA sensor, input layer should be taken static
+# The input layer consists of 2 neurons and takes input from CAMERA sensor, input layer is always considered as static
 # The output layer consists of 3 neurons with Linear activation and gives output to MOTOR actuators, output layer is dynamic
 
 # The input Layer is same, therefore no changes
@@ -74,12 +75,12 @@ nn = ArtificialNeuralNetwork([
 
 # Loading the parameters from a list
 parameter_vector = [
-			[], 								# Layer 0
-			[									# Layer 1
-			 1, 1, 1,							# Time Constants
+			[], 					# Layer 0
+			[					# Layer 1
+			 1, 1, 1,				# Time Constants
 			 0.1, 0.2, 0.3, 0.4, 0.5, 0.6,		# Weight Matrix
-			 1, 1, 1,							# Gain of activation
-			 -1, -1, -1							# Bias of activation
+			 1, 1, 1,				# Gain of activation
+			 -1, -1, -1				# Bias of activation
 			]		
 		   ]
 				   
