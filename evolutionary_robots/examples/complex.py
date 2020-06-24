@@ -16,6 +16,9 @@ print("Complex Recurrent Example")
 # THe hiddenLayer2 consists of 2 neurons with LinearActivation and outputs to outputLayer
 # The hiddenLayer3 consists of 2 neurons with LinearActivation, takes input from SENSOR2 and outputs to outputLayer(in essence an associative layer)
 # The outputLayer consists of 1 neuron with LinearActivation and outputs to hiddenLayer1(recurrent connection) and MOTORLEFT
+
+
+# The format followed is Layer(name_of_layer, number_of_neurons, type_of_layer, activation_function, sensor_input, [list_of_output_connections])
 inputLayer = Layer("inputLayer", 2, "STATIC", IdentityActivation(), "SENSOR1", ["hiddenLayer1"])
 hiddenLayer1 = Layer("hiddenLayer1", 2, "STATIC", LinearActivation(), "", ["hiddenLayer2", "hiddenLayer3", "outputLayer"])
 hiddenLayer2 = Layer("hiddenLayer2", 2, "STATIC", LinearActivation(), "", ["outputLayer"])
@@ -46,7 +49,7 @@ input_dict = {
 		"SENSOR1": np.array([1.0, 1.0])		# Input to SENSOR1
 	     }
 	     
-# By default the input to SENSOR2 are taken as 0
+# By default the input to SENSOR2 is taken as 0
 output = nn.forward_propagate(input_dict)
 print(output)
 output = nn.forward_propagate(input_dict)
