@@ -16,6 +16,8 @@ print("Large Recurrent Example")
 
 # In order to make large number of layers we use a loop structure
 layers = [None] * 30
+
+# The format followed is Layer(name_of_layer, number_of_neurons, type_of_layer, activation_function, sensor_input, [list_of_output_connections])
 layers[0] = Layer("layer0", 1, "STATIC", IdentityActivation(), "SENSOR", ["layer" + str(i) for i in range(1, 29)])
 
 # Defining Layers from 1 to 28 using loop
