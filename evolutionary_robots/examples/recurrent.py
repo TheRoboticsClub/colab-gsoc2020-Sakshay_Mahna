@@ -34,6 +34,8 @@ nn = ArtificialNeuralNetwork([
 				hiddenLayer2, 		# Layer 2 (Hidden Layer)
 				outputLayer		# Layer 3 (Output Layer)
 			     ])
+			     
+nn.visualize('repr/recurrent', True)
 
 # Loading the parameters from a list
 parameter_vector = [

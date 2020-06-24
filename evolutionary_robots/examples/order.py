@@ -56,7 +56,9 @@ nn = ArtificialNeuralNetwork([
 				hiddenLayer, 		# Layer 1 (Hidden Layer)
 				outputLayer		# Layer 2 (Output Layer)
 			     ])
-							
+
+nn.visualize('repr/order', True)
+					
 # Loading the parameters from a list
 parameter_vector = [
 			[], 							# Parameters for Layer 0

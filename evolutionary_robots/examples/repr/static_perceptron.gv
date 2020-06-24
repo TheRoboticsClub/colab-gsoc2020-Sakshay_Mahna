@@ -1,0 +1,22 @@
+digraph ANN {
+	graph [rankdir=LR]
+	subgraph cluster_2 {
+		node [style=filled]
+		color=black label=SENSORS
+		hiddenoutputLayer [style=invis]
+		CAMERA
+	}
+	subgraph cluster_1 {
+		node [style=filled]
+		color=black label=LAYERS
+		inputLayer -> outputLayer [constraint=false]
+	}
+	subgraph cluster_0 {
+		node [style=filled]
+		color=black label=HARDWARE
+		MOTOR
+	}
+	outputLayer -> MOTOR
+	hiddenoutputLayer -> outputLayer [style=invis]
+	CAMERA -> inputLayer
+}

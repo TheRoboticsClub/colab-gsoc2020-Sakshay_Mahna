@@ -1,0 +1,34 @@
+digraph ANN {
+	graph [concentrate=true rankdir=LR]
+	subgraph cluster_2 {
+		node [style=filled]
+		color=black label=SENSORS
+		hiddenoutputLayer [style=invis]
+		SENSOR2
+		hiddenhiddenLayer2 [style=invis]
+		hiddenhiddenLayer1 [style=invis]
+		SENSOR1
+	}
+	subgraph cluster_1 {
+		node [style=filled]
+		color=black label=LAYERS
+		inputLayer -> hiddenLayer1 [constraint=false]
+		hiddenLayer1 -> hiddenLayer2 [constraint=false]
+		hiddenLayer1 -> hiddenLayer3 [constraint=false]
+		hiddenLayer1 -> outputLayer [constraint=false]
+		hiddenLayer2 -> outputLayer [constraint=false]
+		hiddenLayer3 -> outputLayer [constraint=false]
+		outputLayer -> hiddenLayer1 [constraint=false]
+	}
+	subgraph cluster_0 {
+		node [style=filled]
+		color=black label=HARDWARE
+		MOTORLEFT
+	}
+	outputLayer -> MOTORLEFT
+	hiddenoutputLayer -> outputLayer [style=invis]
+	SENSOR2 -> hiddenLayer3
+	hiddenhiddenLayer2 -> hiddenLayer2 [style=invis]
+	hiddenhiddenLayer1 -> hiddenLayer1 [style=invis]
+	SENSOR1 -> inputLayer
+}

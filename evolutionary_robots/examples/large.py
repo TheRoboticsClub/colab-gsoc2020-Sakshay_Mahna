@@ -36,6 +36,8 @@ nn = ArtificialNeuralNetwork(layers)		# Simply passing the layers 2d matrix
 
 # Considering we do not change the weights
 
+nn.visualize('repr/large', True)
+
 # Input the Neural Network through a dictionary
 input_dict = {
 		"SENSOR": np.array([1.0])		# Input to Layer 0

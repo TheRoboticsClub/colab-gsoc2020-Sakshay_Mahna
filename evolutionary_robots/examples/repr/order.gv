@@ -1,0 +1,22 @@
+digraph ANN {
+	graph [rankdir=LR]
+	subgraph cluster_2 {
+		node [style=filled]
+		color=black label=SENSORS
+		SENSOR
+	}
+	subgraph cluster_1 {
+		node [style=filled]
+		color=black label=LAYERS
+		inputLayer -> hiddenLayer [constraint=false]
+		inputLayer -> outputLayer [constraint=false]
+		hiddenLayer -> outputLayer [constraint=false]
+	}
+	subgraph cluster_0 {
+		node [style=filled]
+		color=black label=HARDWARE
+		GRIPPERS
+	}
+	outputLayer:e -> GRIPPERS:w
+	SENSOR:e -> inputLayer:w
+}

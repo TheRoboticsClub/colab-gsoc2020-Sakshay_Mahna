@@ -1,0 +1,29 @@
+digraph ANN {
+	graph [newrank=true rankdir=LR]
+	subgraph cluster_2 {
+		node [style=filled]
+		color=black label=SENSORS
+		SENSOR
+	}
+	subgraph cluster_1 {
+		graph [rankdir=TD]
+		node [style=filled]
+		color=black label=LAYERS rank=same
+		outputLayer -> hiddenLayer2 [style=invis]
+		hiddenLayer2 -> hiddenLayer1 [style=invis]
+		hiddenLayer1 -> inputLayer [style=invis]
+		inputLayer -> hiddenLayer1 [constraint=false]
+		inputLayer -> hiddenLayer2 [constraint=false]
+		hiddenLayer1 -> hiddenLayer2 [constraint=false]
+		hiddenLayer1 -> outputLayer [constraint=false]
+		hiddenLayer2 -> hiddenLayer1 [constraint=false]
+		hiddenLayer2 -> outputLayer [constraint=false]
+	}
+	subgraph cluster_0 {
+		node [style=filled]
+		color=black label=HARDWARE
+		MOTOR
+	}
+	outputLayer -> MOTOR
+	SENSOR -> inputLayer
+}

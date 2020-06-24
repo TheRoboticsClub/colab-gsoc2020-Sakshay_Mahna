@@ -32,6 +32,8 @@ nn = ArtificialNeuralNetwork([
 				hiddenLayer3, 		# Layer 3 (Hidden Layer 3)
 				outputLayer		# Layer 4 (Output Layer)
 			     ])
+			     
+nn.visualize('repr/complex', True)
 
 # Weights are such that the recurrence is not able to show itself!
 # Loading the parameters from a list

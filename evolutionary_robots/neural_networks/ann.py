@@ -394,6 +394,65 @@ class ArtificialNeuralNetwork(object):
 		# Raise a warning if the user specifies more parameters than required
 		if(len(parameter_vector) > self.__number_of_layers):
 			warnings.warn("The parameter vector consists of elements greater than required")
+			
+	# Function to visualize the network
+	def visualize(self, file_name, show=False):
+		ann = Digraph('ANN', filename=file_name + '.gv')
+		ann.graph_attr['rankdir'] = 'LR'
+		ann.graph_attr['concentrate'] = 'true'
+		
+		# We are going to use 3 clusters, hardware output, nodes and sensor input
+			
+		# Sensor Cluster
+		with ann.subgraph(name="cluster_2") as cluster:
+			cluster.attr(color="black", label="SENSORS")
+			cluster.node_attr['style'] = 'filled'
+			
+			# There are no edges within the sensor cluster
+			# Only nodes
+			for layer in reversed(self._order_of_execution):
+				if(layer[4] != ""):
+					cluster.node(layer[4])
+				else:
+					cluster.node("hidden" + layer[0], style="invis")		
+		
+		# Node Cluster
+		with ann.subgraph(name="cluster_1") as cluster:
+			cluster.attr(color="black", label="LAYERS")
+			cluster.node_attr['style'] = 'filled'
+			
+			# Add the edges within the node cluster
+			for layer in self._order_of_execution:
+				for output in layer[5]:
+					if(output not in self.__output_layers):
+						cluster.edge(layer[0], output, constraint='false')
+					
+		# Hardware Cluster
+		with ann.subgraph(name="cluster_0") as cluster:
+			cluster.attr(color='black', label="HARDWARE")
+			cluster.node_attr['style'] = 'filled'
+			
+			# There are no edges within the hardware cluster
+			# Only nodes
+			for hardware in self.__output_layers:
+				cluster.node(hardware)
+					
+		# Combine everything now
+		for layer in reversed(self._order_of_execution):
+			# Check for hardware output
+			for output in layer[5]:
+				if(output in self.__output_layers):
+					ann.edge(layer[0], output)
+					
+			# Check for sensor input
+			if(layer[4] != ""):
+				ann.edge(layer[4], layer[0])
+			else:
+				ann.edge("hidden" + layer[0], layer[0], style='invis')
+				
+		if(show is True):
+			ann.view()
+				
 		
 	# Getters and Setters
 	@property
