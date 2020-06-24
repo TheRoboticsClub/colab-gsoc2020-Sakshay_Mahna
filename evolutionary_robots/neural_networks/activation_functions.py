@@ -30,7 +30,7 @@ import numpy as np
 
 class ActivationFunction(object):
 	"""
-    Class of Activation Function
+    	Class of Activation Function
 
 	...
 	Parameters
