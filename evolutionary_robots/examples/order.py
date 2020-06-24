@@ -14,6 +14,9 @@ from neural_networks.activation_functions import LinearActivation, IdentityActiv
 # The input layer consists of 2 neurons, takes input from SENSOR and outputs to hiddenLayer and outputLayer
 # The hidden layer consists of 2 neurons, with a linear activation and outputs to outputLayer
 # The output layer consists of 2 neurons with linear activation and outputs to GRIPPERS
+
+
+# The format followed is Layer(name_of_layer, number_of_neurons, type_of_layer, activation_function, sensor_input, [list_of_output_connections])
 inputLayer = Layer("inputLayer", 2, "STATIC", IdentityActivation(), "SENSOR", ["hiddenLayer", "outputLayer"])
 hiddenLayer = Layer("hiddenLayer", 2, "STATIC", LinearActivation(), "", ["outputLayer"])
 outputLayer = Layer("outputLayer", 2, "STATIC", LinearActivation(), "", ["GRIPPERS"])
