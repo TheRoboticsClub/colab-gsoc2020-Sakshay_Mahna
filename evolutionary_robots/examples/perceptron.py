@@ -37,7 +37,7 @@ nn = ArtificialNeuralNetwork([
 				outputLayer		# Layer 1
 			     ])
 			     
-nn.visualize('repr/static_perceptron', True)
+nn.visualize('repr/static_perceptron')
 
 # Loading the parameters from a list
 parameter_vector = [

@@ -35,7 +35,7 @@ nn = ArtificialNeuralNetwork([
 				outputLayer		# Layer 3 (Output Layer)
 			     ])
 			     
-nn.visualize('repr/recurrent', True)
+nn.visualize('repr/recurrent')
 
 # Loading the parameters from a list
 parameter_vector = [
@@ -58,8 +58,6 @@ print(output)
 ####################################################
 # The difference lies where we have put the delay between Layer 1 and Layer 2
 # Remove the delay from Hidden Layer 1 and put it in Hidden Layer 2
-hiddenLayer1.delayed_connections = []
-hiddenLayer2.delayed_connections = ["hiddenLayer1"]
 
 print("Static Recurrent ANN: Second Way (Wrong Way)")
 nn = ArtificialNeuralNetwork([
