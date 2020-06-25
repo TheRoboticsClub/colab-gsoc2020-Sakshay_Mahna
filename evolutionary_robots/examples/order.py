@@ -1,6 +1,6 @@
-# This example shows the concept of order of execution
-# The Layers should be passed to the ANN class in correct sequence
-# Otherwise the outputs will not be as desired
+# The Layers can be passed to the ANN class in any order
+# The Neural Network will automatically generate the layers
+# by looking at the connections of the layers specified in the interface
 
 import sys
 sys.path.append('./../')
@@ -21,9 +21,8 @@ inputLayer = Layer("inputLayer", 2, "STATIC", IdentityActivation(), "SENSOR", ["
 hiddenLayer = Layer("hiddenLayer", 2, "STATIC", LinearActivation(), "", ["outputLayer"])
 outputLayer = Layer("outputLayer", 2, "STATIC", LinearActivation(), "", ["GRIPPERS"])
 
-print("Static ANN example of order: Wrong Way")
+print("Static ANN example of order")
 # The order entered here is not correct
-# This may result in wrong results
 nn = ArtificialNeuralNetwork([
 				inputLayer, 		# Layer 0 (Input Layer)
 				outputLayer, 		# Layer 1 (Output Layer)
@@ -49,15 +48,15 @@ print(output)
 
 
 ###################################################################
-print("Static ANN example of order: Correct Way")
-# Different order of initialization, which results in a different order of initialization
+print("Static ANN example of order")
+# Different order of initialization, which is the correct one
 nn = ArtificialNeuralNetwork([
 				inputLayer, 		# Layer 0 (Input Layer)
 				hiddenLayer, 		# Layer 1 (Hidden Layer)
 				outputLayer		# Layer 2 (Output Layer)
 			     ])
 
-nn.visualize('repr/order', True)
+nn.visualize('repr/order')
 					
 # Loading the parameters from a list
 parameter_vector = [

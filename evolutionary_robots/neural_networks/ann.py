@@ -113,7 +113,8 @@ class ArtificialNeuralNetwork(object):
 		
 		# Output and State matrix dictionary
 		self.__output_matrix = {}
-		self.__state_matrix = dict((layer[0], np.zeros((layer[1], ))) for layer in layer_vector)
+		self.__state_matrix = dict((layer[0], tf.Variable(np.zeros((layer[1], )), dtype=tf.float64)) for layer in layer_vector)
+		self.__state = dict((layer[0], np.zeros((layer[1], ))) for layer in layer_vector)
 		
 		# Construct the layers and the execution graph
 		self._construct_layers(layer_vector)
@@ -256,7 +257,7 @@ class ArtificialNeuralNetwork(object):
 					# Get the sensor input
 					self.__sensor_inputs[layer] = tf.compat.v1.placeholder(tf.float64)
 					# Generate the input vector
-					input_vector = np.array([])
+					input_vector = tf.constant(np.array([]))
 					
 					# Get the input from other layers
 					# If the layer is an input layer, then we have to pass a constant tensor of zero
@@ -270,11 +271,11 @@ class ArtificialNeuralNetwork(object):
 							# An additional check for delay
 							if(connection[1] == True):
 								# If delay is required then the input is taken from state matrix
-								input_vector = tf.concat([input_vector, self.__state_matrix[connection[0]]], axis=0)
+								input_vector = tf.compat.v1.concat([input_vector, self.__state_matrix[connection[0]]], axis=0)
 							else:
 								# If delay is not required then the input is taken from output matrix
 								try:
-									input_vector = tf.concat([input_vector, self.__output_matrix[connection[0]]], axis=0)
+									input_vector = tf.compat.v1.concat([input_vector, self.__output_matrix[connection[0]]], axis=0)
 								except:
 									new_error_queue.append(layer)
 									continue
@@ -307,7 +308,7 @@ class ArtificialNeuralNetwork(object):
 						# Get the sensor input
 						self.__sensor_inputs[layer] = tf.compat.v1.placeholder(tf.float64)
 						# Generate the input vector
-						input_vector = np.array([])
+						input_vector = tf.constant(np.array([]))
 						
 						# Get the input from other layers
 						# If the layer is an input layer, then we have to pass a constant tensor of zero
@@ -323,9 +324,9 @@ class ArtificialNeuralNetwork(object):
 								else:
 									# The layer creating problem is now generated as a state matrix
 									try:
-										input_vector = tf.concat([input_vector, self.__output_matrix[connection[0]]], axis=0)
+										input_vector = tf.compat.v1.concat([input_vector, self.__output_matrix[connection[0]]], axis=0)
 									except:
-										input_vector = tf.concat([input_vector, self.__state_matrix[connection[0]]], axis=0)
+										input_vector = tf.compat.v1.concat([input_vector, self.__state_matrix[connection[0]]], axis=0)
 								
 						# Make an entry to output matrix
 						self.__output_matrix[layer] = tf.numpy_function(self.__layer_map[layer].forward_propagate, [input_vector, self.__sensor_inputs[layer]], tf.float64)
@@ -389,14 +390,18 @@ class ArtificialNeuralNetwork(object):
 			except:
 				sensor_input[self.__sensor_inputs[layer[0]]] = np.zeros((self.__neuron_map[layer[0]], ))
 
-		for layer in self.__layer_map.keys():
-			# Calculate the output
-			with tf.compat.v1.Session() as session:
+		# Calculate the output
+		init_var = tf.compat.v1.global_variables_initializer()
+		with tf.compat.v1.Session() as session:
+			session.run(init_var)
+			
+			for layer in self.__layer_map.keys():
+				session.run(self.__state_matrix[layer].assign(self.__state[layer]))
+			
+			for layer in self.__layer_map.keys():
 				output[layer] = session.run(self.__output_matrix[layer], feed_dict = sensor_input)
 			
-		# Set the state matrix	
-		self.__state_matrix = output
-			
+		self.__state = output
 		# Return the output_dict
 		output_dict = {}
 		for layer in self.__output_layers:
@@ -404,9 +409,9 @@ class ArtificialNeuralNetwork(object):
 			for connection in self.__input_connections[layer]:
 				try:
 					if output_vector == None:
-						output_vector = np.array(self.__state_matrix[connection[0]])
+						output_vector = np.array(output[connection[0]])
 					else:
-						output_vector = np.sum(output_vector, self.__state_matrix[connection[0]])
+						output_vector = np.sum(output_vector, output[connection[0]])
 				except:
 					raise Exception("There is something wrong with the configuration of " + layer)
 					

@@ -1,9 +1,5 @@
 # This example shows the use of delayed connections
-# Delayed connections is useful in the case where we have recurrent
-# connections between layers at the same level
-# For instance two hidden layers at the same level
-# To make the recurrent connections work
-# the delayed connections has to be set according to the order of execution
+# Delayed connections are useful in the case where we have recurrent connections
 
 import sys
 sys.path.append('./../')
@@ -25,9 +21,11 @@ hiddenLayer2 = Layer("hiddenLayer2", 1, "STATIC", LinearActivation(), "", ["hidd
 outputLayer = Layer("outputLayer", 1, "STATIC", LinearActivation(), "", ["MOTOR"])					# Output Layer
 
 # Delay the input connection of Hidden Layer 2 that is received from Hidden Layer 1
+# Delay the input connection of Hidden Layer 1 that is received from Hidden Layer 2
 hiddenLayer1.delayed_connections = ["hiddenLayer2"]
+hiddenLayer2.delayed_connections = ["hiddenLayer1"]
 
-print("Static Recurrent ANN: First Way (Correct Way)")
+print("Static Recurrent ANN")
 nn = ArtificialNeuralNetwork([
 				inputLayer, 		# Layer 0 (Input Layer)
 				hiddenLayer1, 		# Layer 1 (Hidden Layer)
@@ -55,34 +53,3 @@ print(output)
 output = nn.forward_propagate(input_dict)
 print(output)
 
-####################################################
-# The difference lies where we have put the delay between Layer 1 and Layer 2
-# Remove the delay from Hidden Layer 1 and put it in Hidden Layer 2
-
-print("Static Recurrent ANN: Second Way (Wrong Way)")
-nn = ArtificialNeuralNetwork([
-				inputLayer, 		# Layer 0
-				hiddenLayer1, 		# Layer 1 (The connection input from Layer 2 is delayed)
-				hiddenLayer2, 		# Layer 2 (The connection input from Layer 1 is not delayed)
-				outputLayer		# Layer 3
-			     ])
-
-# Loading the parameters from a list
-parameter_vector = [
-			[], 				# Parameters for Layer 0
-			[1, 1, 1, 1, 0], 		# Parameters for Layer 1
-			[1, 1, 1, 1, 0], 		# Parameters for Layer 2
-			[1, 1, 1, 0]			# Parameters for Layer 3
-		    ]
-nn.load_parameters_from_vector(parameter_vector)
-
-# Input the Neural Network through a dictionary
-input_dict = {
-		"SENSOR": np.array([1.0, 1.0])		# Input for SENSOR
-	     }
-output = nn.forward_propagate(input_dict)
-print(output)
-output = nn.forward_propagate(input_dict)
-print(output)
-output = nn.forward_propagate(input_dict)
-print(output)
