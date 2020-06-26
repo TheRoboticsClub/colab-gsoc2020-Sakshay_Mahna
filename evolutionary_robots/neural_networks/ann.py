@@ -36,7 +36,6 @@ class ArtificialNeuralNetwork(object):
 		
 		The configuration of the array should be according to the order of execution.
 		It is upto the user to decide the order of execution of the Neural Network!
-		The layers are indexed according to the order of execution.
 		
 	time_interval(optional): float
 		A float specifying the time interval
@@ -54,7 +53,7 @@ class ArtificialNeuralNetwork(object):
 		*Useful for networks with Dynamic Layers
 		
 	output_matrix: dictionary
-		A dictionary containing the current and previous outputs of all the layers in the current iteration
+		Shows the output of each layer in the previous iteration of the network
 		
 	Methods
 	-------
@@ -105,7 +104,7 @@ class ArtificialNeuralNetwork(object):
 		self.__output_layers = []			# To store the layers that are used as output(majorly hardware layers)
 		self.__input_layers = []			# To store the layers that are used as input
 		
-		# Storing layers according to levels
+		# Storing layers according to levels (* Useful for BFS)
 		self.__level_vector = [[]]
 		
 		# Disable eager execution
@@ -134,9 +133,7 @@ class ArtificialNeuralNetwork(object):
 		layer_vector: array_like
 		A list of interface.Layer objects
 		
-		The configuration of the array should be according to the order of execution.
-		It is upto the user to decide the order of execution of the Neural Network!
-		The layers are indexed according to the order of execution.
+		The network is constructed using the parameters of the objects
 			
 		Returns
 		-------
@@ -231,6 +228,37 @@ class ArtificialNeuralNetwork(object):
 				
 	# Generate the computational graph
 	def _construct_graph(self):
+		"""
+		Private function for the construction of the generation
+		of the computational graph of the Neural Network
+		
+		...
+		
+		Parameters
+		----------
+		None
+			
+		Returns
+		-------
+		None
+		
+		Raises
+		------
+		None
+		
+		Notes
+		-----
+		The computational graph is constructed using Tensorflow
+		
+		Algorithm:
+		1. Iterate in a Breadth First Manner from input to output
+		2. For input layers the input is taken from sensor input only, input_vector is taken as zero
+		3. For other layers the input is taken as a concatenation of vectors from output matrix
+		4. If we have delayed connections the input is taken from state matrix
+		5. If the output matrix gives a key error, we keep the current layer in an error queue
+		6. The error queue is iterated again and again to reduce it's size to 0, so we can move to next level
+		7. If the error queue is not reducing in size, then the output matrix giving error is replaced by state matrix, to avoid the error
+		"""
 		# Iterate the layer names according to Breadth First Search
 		current_level = 0			# Depicts the level of search we are currently at
 		error_queue = []			# Saves the objects of current layer which are to be generated
@@ -254,7 +282,7 @@ class ArtificialNeuralNetwork(object):
 				new_error_queue = []
 				# Iterate over the layers
 				for layer in error_queue:
-					# Get the sensor input
+					# Get the sensor input externally
 					self.__sensor_inputs[layer] = tf.compat.v1.placeholder(tf.float64)
 					# Generate the input vector
 					input_vector = tf.constant(np.array([]))
@@ -279,15 +307,16 @@ class ArtificialNeuralNetwork(object):
 								except:
 									new_error_queue.append(layer)
 									continue
-									
+						
+						# The procedding steps can only be performed if, the new error queue is empty			
 						if(len(new_error_queue) != 0):
 							continue
 									
+					# If all the above stages complete perfectly
 					# Make an entry to output matrix
 					self.__output_matrix[layer] = tf.numpy_function(self.__layer_map[layer].forward_propagate, [input_vector, self.__sensor_inputs[layer]], tf.float64)
 					layers_generated = layers_generated + 1
 					
-					# If all the above stages complete perfectly
 					# Insert all the connections to the next level
 					for connection in self.__output_connections[layer]:
 						# We don't want to pick up the hardware
@@ -305,13 +334,14 @@ class ArtificialNeuralNetwork(object):
 				if(new_error_queue == error_queue):
 					new_error_queue = []
 					for layer in error_queue:
-						# Get the sensor input
+						# Get the sensor input externally
 						self.__sensor_inputs[layer] = tf.compat.v1.placeholder(tf.float64)
 						# Generate the input vector
 						input_vector = tf.constant(np.array([]))
 						
 						# Get the input from other layers
 						# If the layer is an input layer, then we have to pass a constant tensor of zero
+						# Defensive Programming: No input layers will enter this part....yet we have this code
 						if(layer in self.__input_layers):
 							input_vector = tf.constant(np.zeros((self.__neuron_map[layer], )))
 							
@@ -328,11 +358,11 @@ class ArtificialNeuralNetwork(object):
 									except:
 										input_vector = tf.compat.v1.concat([input_vector, self.__state_matrix[connection[0]]], axis=0)
 								
+						# If all the above stages complete perfectly
 						# Make an entry to output matrix
 						self.__output_matrix[layer] = tf.numpy_function(self.__layer_map[layer].forward_propagate, [input_vector, self.__sensor_inputs[layer]], tf.float64)
 						layers_generated = layers_generated + 1
 						
-						# If all the above stages complete perfectly
 						# Insert all the connections to the next level
 						for connection in self.__output_connections[layer]:
 							# Don't pick the hardware
@@ -372,11 +402,8 @@ class ArtificialNeuralNetwork(object):
 		
 		Notes
 		-----
-		Dynamic Programming is used for the calculation of the output
-		Based on the order of execution specified according to the user(taken as order of indices of layers),
-		the output is calculated and stored in the output matrix.
-		
-		The layer outputs the activation for all the instances as specified by the delay
+		Get the sensor input from the input dictionary passed by the user
+		And feed the dictionary to the tensorflow session
 		
 		"""
 		# Iterate through the layers
@@ -395,6 +422,7 @@ class ArtificialNeuralNetwork(object):
 		with tf.compat.v1.Session() as session:
 			session.run(init_var)
 			
+			# The state matrix needs to be updated before every iteration
 			for layer in self.__layer_map.keys():
 				session.run(self.__state_matrix[layer].assign(self.__state[layer]))
 			
@@ -406,6 +434,7 @@ class ArtificialNeuralNetwork(object):
 		output_dict = {}
 		for layer in self.__output_layers:
 			output_vector = None
+			# Collect all the hardware stuff
 			for connection in self.__input_connections[layer]:
 				try:
 					if output_vector == None:
@@ -512,6 +541,33 @@ class ArtificialNeuralNetwork(object):
 			
 	# Function to visualize the network
 	def visualize(self, file_name, show=False):
+		"""
+		Visualize the computational graph of the network
+		
+		Parameters
+		----------
+		file_name: string
+			This specifies the path, where we want to save the file
+			
+		show(optional): boolean
+			This specifies whether we want to view the network or not
+			
+		Returns
+		-------
+		None
+		
+		Raises
+		------			
+		None
+		
+		Notes
+		-----
+		In terms of implementation, this is a simple python automation of graphviz
+		library for generating a network using clusters
+		
+		We generate 3 clusters: Sensor, Layers and Hardware
+		Then provide connections between them
+		"""
 		ann = Digraph('ANN', filename=file_name + '.gv')
 		ann.graph_attr['rankdir'] = 'LR'
 		ann.graph_attr['concentrate'] = 'true'
@@ -564,7 +620,8 @@ class ArtificialNeuralNetwork(object):
 				ann.edge(layer[4], layer[0])
 			else:
 				ann.edge("hidden" + layer[0], layer[0], style='invis')
-				
+		
+		# View the network, if show is True		
 		if(show is True):
 			ann.view()
 				
@@ -598,7 +655,7 @@ class ArtificialNeuralNetwork(object):
 			Shows the outputs of every layer
 		"""
 		
-		return self.__output_matrix
+		return self.__state
 		
 	
 			

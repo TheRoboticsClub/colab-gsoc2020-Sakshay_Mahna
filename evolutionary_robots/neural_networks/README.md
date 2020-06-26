@@ -125,7 +125,7 @@ layer.output_connections = list_of_output_connections
 
 **output_connections** is a list of strings specifying the name of the layers which the current layer provides output to. For layers that output to an actuator or hardware, they have an additional member for that as well. The output dictionary returned by `forward_propagate()` returns the output of these hardware. These hardware outputs can have any name. Conventionally, these outputs should be in CAPITALS. For example: ["layer_0", "layer_1"] or ["layer0", "HARDWARE"]
 
-**delayed_connections** is an optional attribute that has to be set explicitly apart from initialization. It is a list of layer names specifying the layers from which the output from current layer is to be delayed by one iteration of the network. By default, delayed_connections is an empty list and is used to construct some specific networks. For example [recurrent.py](./../examples/recurrent.py)
+**delayed_connections** is an optional attribute that has to be set explicitly apart from initialization. It is a list of layer names specifying the layers from which the output from current layer is to be delayed by one iteration of the network. By default, delayed_connections is an empty list and is used to construct recurrent neural networks. For example [recurrent.py](./../examples/recurrent.py) and [complex.py](./../examples/complex.py)
 
 ```python
 layer = Layer()
@@ -147,7 +147,7 @@ Methods supported by the ArtificialNeuralNetwork class are:
 nn = ArtificialNeuralNetwork(a_list_of_layer_object, time_interval)
 ```
 
-The `list_of_layer_object` parameter is a list of `Layer()` objects. The order of the layers is very important as the order specified during initialization of the network is taken as the **order of execution**. For a better understanding check the example [order.py](./../examples/order.py)
+The `list_of_layer_object` parameter is a list of `Layer()` objects. In general, the order of initialization of the layers will always generate the same network. However, **the elements of parameter vector will need to be changed accordingly**. For a better understanding check the example [order.py](./../examples/order.py)
 
 The `time_interval` is an optional parameter that specifies the time interval of the network. This is useful in the case when a Dynamic Layer is used, otherwise this is ignored. By default, the time interval is 0.01.
 
@@ -192,6 +192,14 @@ nn.load_parameters_from_vector(a_list_with_appropriate_format)
 ```python
 nn.output_matrix
 ```
+
+**Visualize the network** The computational graph of the Neural Network can also be graphically visualized
+
+```python
+nn.visualize(file_name, show)
+# file_name is the path to the file that we want to generate
+# show is a boolean to determine whether we want to view the file or not
+``` 
 
 
 ### Format for parameter vector

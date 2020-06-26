@@ -23,6 +23,7 @@ outputLayer = Layer("outputLayer", 2, "STATIC", LinearActivation(), "", ["GRIPPE
 
 print("Static ANN example of order")
 # The order entered here is not correct
+# Yet the connections and output generated will be the same
 nn = ArtificialNeuralNetwork([
 				inputLayer, 		# Layer 0 (Input Layer)
 				outputLayer, 		# Layer 1 (Output Layer)

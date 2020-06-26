@@ -1,5 +1,5 @@
 # This example shows the basic usage of the API
-# As to how to generate a Static Perceptron and Dynamic Perceptron
+# As to how to generate a Static Perceptron and a Dynamic Perceptron
 
 import sys
 sys.path.append('./../')
