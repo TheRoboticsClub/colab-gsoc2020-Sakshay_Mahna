@@ -13,7 +13,7 @@ digraph ANN {
 STATIC"]
 		inputLayer -> outputLayer
 		outputLayer [label="outputLayer
-STATIC"]
+DYNAMIC"]
 	}
 	subgraph cluster_0 {
 		node [style=filled]

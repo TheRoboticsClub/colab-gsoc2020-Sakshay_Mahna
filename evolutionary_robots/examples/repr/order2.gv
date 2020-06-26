@@ -4,22 +4,26 @@ digraph ANN {
 	subgraph cluster_2 {
 		node [style=filled]
 		color=black label=SENSORS
-		CAMERA
+		SENSOR
 	}
 	subgraph cluster_1 {
 		node [style=filled]
 		color=black label=LAYERS
 		inputLayer [label="inputLayer
 STATIC"]
+		inputLayer -> hiddenLayer
 		inputLayer -> outputLayer
+		hiddenLayer [label="hiddenLayer
+STATIC"]
+		hiddenLayer -> outputLayer
 		outputLayer [label="outputLayer
 STATIC"]
 	}
 	subgraph cluster_0 {
 		node [style=filled]
 		color=black label=HARDWARE
-		MOTOR
+		GRIPPERS
 	}
-	outputLayer -> MOTOR
-	CAMERA -> inputLayer
+	outputLayer -> GRIPPERS
+	SENSOR -> inputLayer
 }

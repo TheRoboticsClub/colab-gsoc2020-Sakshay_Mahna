@@ -33,7 +33,8 @@ nn = ArtificialNeuralNetwork([
 				outputLayer		# Layer 3 (Output Layer)
 			     ])
 			     
-nn.visualize('repr/recurrent')
+# Visualize the network
+nn.visualize('repr/recurrent', True)
 
 # Loading the parameters from a list
 parameter_vector = [

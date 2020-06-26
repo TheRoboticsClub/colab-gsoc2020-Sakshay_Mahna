@@ -569,8 +569,8 @@ class ArtificialNeuralNetwork(object):
 		Then provide connections between them
 		"""
 		ann = Digraph('ANN', filename=file_name + '.gv')
+		ann.node_attr['shape'] = 'box'
 		ann.graph_attr['rankdir'] = 'LR'
-		ann.graph_attr['concentrate'] = 'true'
 		
 		# We are going to use 3 clusters, hardware output, nodes and sensor input
 			
@@ -583,9 +583,7 @@ class ArtificialNeuralNetwork(object):
 			# Only nodes
 			for layer in reversed(self._order_of_execution):
 				if(layer[4] != ""):
-					cluster.node(layer[4])
-				else:
-					cluster.node("hidden" + layer[0], style="invis")		
+					cluster.node(layer[4])		
 		
 		# Node Cluster
 		with ann.subgraph(name="cluster_1") as cluster:
@@ -594,9 +592,14 @@ class ArtificialNeuralNetwork(object):
 			
 			# Add the edges within the node cluster
 			for layer in self._order_of_execution:
+				cluster.node(layer[0], label=layer[0] + "\n" + layer[2])
 				for output in layer[5]:
 					if(output not in self.__output_layers):
-						cluster.edge(layer[0], output, constraint='false')
+						if output in layer[6]:
+							# Recurrent connections marked in red
+							cluster.edge(layer[0], output, color="red")
+						else:
+							cluster.edge(layer[0], output)
 					
 		# Hardware Cluster
 		with ann.subgraph(name="cluster_0") as cluster:
@@ -618,8 +621,6 @@ class ArtificialNeuralNetwork(object):
 			# Check for sensor input
 			if(layer[4] != ""):
 				ann.edge(layer[4], layer[0])
-			else:
-				ann.edge("hidden" + layer[0], layer[0], style='invis')
 		
 		# View the network, if show is True		
 		if(show is True):

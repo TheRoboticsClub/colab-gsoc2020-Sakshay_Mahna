@@ -30,6 +30,10 @@ nn = ArtificialNeuralNetwork([
 				hiddenLayer		# Layer 2 (Hidden Layer)
 			     ])
 
+# Visualize the network
+# Both the visualizations will be the same
+nn.visualize('repr/order1', True)
+
 # Loading the parameters from a list			
 parameter_vector = [
 			[], 								# Parameters for Layer 0
@@ -57,7 +61,9 @@ nn = ArtificialNeuralNetwork([
 				outputLayer		# Layer 2 (Output Layer)
 			     ])
 
-nn.visualize('repr/order')
+# Visualize the network
+# Both the visualizations will be the same
+nn.visualize('repr/order2', True)
 					
 # Loading the parameters from a list
 parameter_vector = [

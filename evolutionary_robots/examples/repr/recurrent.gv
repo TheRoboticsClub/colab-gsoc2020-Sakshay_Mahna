@@ -1,23 +1,28 @@
 digraph ANN {
-	graph [newrank=true rankdir=LR]
+	graph [rankdir=LR]
+	node [shape=box]
 	subgraph cluster_2 {
 		node [style=filled]
 		color=black label=SENSORS
 		SENSOR
 	}
 	subgraph cluster_1 {
-		graph [rankdir=TD]
 		node [style=filled]
-		color=black label=LAYERS rank=same
-		outputLayer -> hiddenLayer2 [style=invis]
-		hiddenLayer2 -> hiddenLayer1 [style=invis]
-		hiddenLayer1 -> inputLayer [style=invis]
-		inputLayer -> hiddenLayer1 [constraint=false]
-		inputLayer -> hiddenLayer2 [constraint=false]
-		hiddenLayer1 -> hiddenLayer2 [constraint=false]
-		hiddenLayer1 -> outputLayer [constraint=false]
-		hiddenLayer2 -> hiddenLayer1 [constraint=false]
-		hiddenLayer2 -> outputLayer [constraint=false]
+		color=black label=LAYERS
+		inputLayer [label="inputLayer
+STATIC"]
+		inputLayer -> hiddenLayer1
+		inputLayer -> hiddenLayer2
+		hiddenLayer1 [label="hiddenLayer1
+STATIC"]
+		hiddenLayer1 -> hiddenLayer2 [color=red]
+		hiddenLayer1 -> outputLayer
+		hiddenLayer2 [label="hiddenLayer2
+STATIC"]
+		hiddenLayer2 -> hiddenLayer1 [color=red]
+		hiddenLayer2 -> outputLayer
+		outputLayer [label="outputLayer
+STATIC"]
 	}
 	subgraph cluster_0 {
 		node [style=filled]

@@ -36,8 +36,9 @@ nn = ArtificialNeuralNetwork([
 				inputLayer,		# Layer 0
 				outputLayer		# Layer 1
 			     ])
-			     
-nn.visualize('repr/static_perceptron')
+	
+# Visualize the network		     
+nn.visualize('repr/static_perceptron', True)
 
 # Loading the parameters from a list
 parameter_vector = [
@@ -88,6 +89,8 @@ parameter_vector = [
 				   
 nn.load_parameters_from_vector(parameter_vector)
 
+# Visualize the network
+nn.visualize('repr/dynamic_perceptron', True)
 
 # Input the Neural Network through a dictionary
 input_dict = {
