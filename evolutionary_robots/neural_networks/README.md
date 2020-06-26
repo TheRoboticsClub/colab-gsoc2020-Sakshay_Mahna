@@ -147,7 +147,7 @@ Methods supported by the ArtificialNeuralNetwork class are:
 nn = ArtificialNeuralNetwork(a_list_of_layer_object, time_interval)
 ```
 
-The `list_of_layer_object` parameter is a list of `Layer()` objects. In general, the order of initialization of the layers will always generate the same network. However, **the elements of parameter vector will need to be changed accordingly**. For a better understanding check the example [order.py](./../examples/order.py)
+The `list_of_layer_object` parameter is a list of `Layer()` objects. In general,different orders of initialization of layers will always generate the same network. However, **the elements of parameter vector will need to be changed accordingly**. For a better understanding check the example [order.py](./../examples/order.py)
 
 The `time_interval` is an optional parameter that specifies the time interval of the network. This is useful in the case when a Dynamic Layer is used, otherwise this is ignored. By default, the time interval is 0.01.
 
