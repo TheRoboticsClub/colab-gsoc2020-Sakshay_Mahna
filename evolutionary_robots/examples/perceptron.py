@@ -1,5 +1,5 @@
 # This example shows the basic usage of the API
-# As to how to generate a Static Perceptron and Dynamic Perceptron
+# As to how to generate a Static Perceptron and a Dynamic Perceptron
 
 import sys
 sys.path.append('./../')
@@ -37,7 +37,7 @@ nn = ArtificialNeuralNetwork([
 				outputLayer		# Layer 1
 			     ])
 			     
-nn.visualize('repr/static_perceptron', True)
+nn.visualize('repr/static_perceptron')
 
 # Loading the parameters from a list
 parameter_vector = [

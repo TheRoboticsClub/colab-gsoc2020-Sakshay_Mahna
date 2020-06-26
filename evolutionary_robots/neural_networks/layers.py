@@ -51,11 +51,6 @@ class StaticLayer(object):
 	layer_name: string
 		Specifies the name of the layer 
 		
-	delay(optional): integer
-		The delay specifies how many previous outputs along with the current outputs
-		should be returned.
-		
-		* Previous outputs are useful for the overall network
 		
 	Methods
 	-------
@@ -76,7 +71,7 @@ class StaticLayer(object):
 	get_activation_parameters()
 		Get the parameters of activation function
 	"""
-	def __init__(self, input_dim, output_dim, activation_function, layer_name, delay = 2):
+	def __init__(self, input_dim, output_dim, activation_function, layer_name):
 		"""
 		Initialization function of StaticLayer class		
 		...
@@ -98,13 +93,9 @@ class StaticLayer(object):
 	
 		# Initialize the weight and bias dimensions
 		self.__weight_dim = (output_dim, input_dim)
-		self.__delay = delay
 		
 		# Initialize the weight matrix
 		self.weight_matrix = np.random.rand(*self.weight_dim)
-		
-		# Initialize the output matrix
-		self.__output_matrix = np.zeros((delay, output_dim))
 		
 		# Set the gain of the sensors values that are going to be input
 		# as an associative layer or input layer
@@ -131,8 +122,8 @@ class StaticLayer(object):
 			
 		Returns
 		-------
-		output_matrix: array_like
-			The output_matrix according according to the delay specified above
+		output_vector: array_like
+			The output_vector according according to the output generated
 			
 		Raises
 		------
@@ -166,12 +157,8 @@ class StaticLayer(object):
 			# Add the sensor input
 			output_vector = output_vector + np.multiply(self.gain, sensor_input)
 			
-			# Insert the input_vector and remove the oldest one
-			self.__output_matrix = np.insert(self.__output_matrix, 0, output_vector, axis=0)
-			self.__output_matrix = np.delete(self.__output_matrix, self.__delay, axis=0)
-			
 			# Output 
-			return self.__output_matrix
+			return output_vector
 			
 		except:
 			raise ValueError("Please check dimensions of " + self.__layer_name)
@@ -389,12 +376,6 @@ class DynamicLayer(object):
 	layer_name: string
 		The name of the layer
 		
-	delay(optional): integer
-		The delay specifies how many previous outputs along with the current outputs
-		should be returned.
-		
-		* Previous outputs are useful for the overall network
-		
 	Methods
 	-------
 	forward_propagate(input_vector)
@@ -415,7 +396,7 @@ class DynamicLayer(object):
 		Get the parameters of activation function
 		
 	"""
-	def __init__(self, input_dim, output_dim, activation_function, time_interval, time_constant, layer_name, delay = 2):
+	def __init__(self, input_dim, output_dim, activation_function, time_interval, time_constant, layer_name):
 		"""
 		Initialization function of DynamicLayer class		
 		...
@@ -441,10 +422,6 @@ class DynamicLayer(object):
 		
 		# Initialize the weight and bias
 		self.__weight_matrix = np.random.rand(*self.weight_dim)
-		self.__delay = delay
-		
-		# Initialize the output matrix
-		self.__output_matrix = np.zeros((delay, output_dim))
 		
 		# Initialize the gain vector
 		self._gain = np.ones((output_dim, ))
@@ -469,7 +446,7 @@ class DynamicLayer(object):
 		
 	# Function that calculates the first order euler step 
 	# Private function
-	def _euler_step(self, input_vector, sensor_input, delay=0):
+	def _euler_step(self, input_vector, sensor_input):
 		"""
 		Function that calculates the next step based on the first degree Euler approximation
 		
@@ -483,8 +460,8 @@ class DynamicLayer(object):
 			
 		Returns
 		-------
-		output_matrix: array_like
-			The output_matrix according to the delay specified above
+		output_vector: array_like
+			The output_vector according to the output generated
 			
 		Raises
 		------
@@ -514,14 +491,11 @@ class DynamicLayer(object):
 			# Generate the current output
 			# This equation is the first order euler solution
 			current_output = self.__previous_output * (1 - self.__time_weight) + current_activation * self.__time_weight
-			# Insert the input_vector and remove the oldest one
-			self.__output_matrix = np.insert(self.__output_matrix, 0, current_output, axis=0)
-			self.__output_matrix = np.delete(self.__output_matrix, self.__delay, axis=0)
 			
 			# Save it!
 			self.__previous_output = current_output
 			
-			return self.__output_matrix
+			return current_output
 			
 		except:
 			raise ValueError("Please check dimensions of " + self.__layer_name)

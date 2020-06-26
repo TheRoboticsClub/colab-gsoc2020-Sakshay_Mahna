@@ -25,6 +25,9 @@ hiddenLayer2 = Layer("hiddenLayer2", 2, "STATIC", LinearActivation(), "", ["outp
 hiddenLayer3 = Layer("hiddenLayer3", 2, "STATIC", LinearActivation(), "SENSOR2", ["outputLayer"])
 outputLayer = Layer("outputLayer", 1, "STATIC", LinearActivation(), "", ["hiddenLayer1", "MOTORLEFT"])
 
+# Add the recurrent connection
+outputLayer.delayed_connections = ["hiddenLayer1"]
+
 nn = ArtificialNeuralNetwork([
 				inputLayer, 		# Layer 0 (Input Layer)
 				hiddenLayer1, 		# Layer 1 (Hidden Layer 1)

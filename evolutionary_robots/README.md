@@ -44,6 +44,7 @@ The project uses the following python modules
 ```
 numpy==1.16.5
 graphviz==0.14
+tensorflow==2.1.0
 ```
 
 ## Installation

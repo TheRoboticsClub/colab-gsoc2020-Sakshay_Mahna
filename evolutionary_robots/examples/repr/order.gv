@@ -1,8 +1,10 @@
 digraph ANN {
-	graph [rankdir=LR]
+	graph [concentrate=true rankdir=LR]
 	subgraph cluster_2 {
 		node [style=filled]
 		color=black label=SENSORS
+		hiddenoutputLayer [style=invis]
+		hiddenhiddenLayer [style=invis]
 		SENSOR
 	}
 	subgraph cluster_1 {
@@ -17,6 +19,8 @@ digraph ANN {
 		color=black label=HARDWARE
 		GRIPPERS
 	}
-	outputLayer:e -> GRIPPERS:w
-	SENSOR:e -> inputLayer:w
+	outputLayer -> GRIPPERS
+	hiddenoutputLayer -> outputLayer [style=invis]
+	hiddenhiddenLayer -> hiddenLayer [style=invis]
+	SENSOR -> inputLayer
 }
