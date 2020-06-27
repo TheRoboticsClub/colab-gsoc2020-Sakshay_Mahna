@@ -14,10 +14,9 @@ print("Static ANN")
 # The input layer consists of 2 neurons and takes input from CAMERA sensor
 # The output layer consists of 3 neurons with Linear activation and gives output to MOTOR actuators
 
-# The format followed is Layer(name_of_layer, number_of_neurons, type_of_layer, activation_function, sensor_input, [list_of_output_connections])
+# The format followed is Layer(name_of_layer, number_of_neurons, activation_function, sensor_input, [list_of_output_connections])
 inputLayer = Layer("inputLayer", 			# Name of the Layer
 		   2,					# Number of neurons
-		   "STATIC",				# Type of Layer
 		   IdentityActivation(), 		# Activation Function(Input Layers should use IdentityActivation function)
 		   "CAMERA", 				# The sensor from which input is taken
 		   ["outputLayer"]			# The list of output connections
@@ -26,7 +25,6 @@ inputLayer = Layer("inputLayer", 			# Name of the Layer
 				 	
 outputLayer = Layer("outputLayer",			# Name of the Layer
 		    3,					# Number of neurons
-		    "STATIC", 				# Type of Layer
 		    LinearActivation(), 		# Activation Function
 		    "", 				# The sensor from which input is taken(no sensor input in this case)
 		    ["MOTOR"]				# The list of output connections(this is connected to MOTOR actuator)
@@ -35,10 +33,10 @@ outputLayer = Layer("outputLayer",			# Name of the Layer
 nn = ArtificialNeuralNetwork([
 				inputLayer,		# Layer 0
 				outputLayer		# Layer 1
-			     ])
+			     ], "STATIC")	# Type of Network
 	
 # Visualize the network		     
-nn.visualize('repr/static_perceptron', True)
+nn.visualize('repr/static_perceptron')
 
 # Loading the parameters from a list
 parameter_vector = [
@@ -66,15 +64,13 @@ print(output)
 print("CTRNN")
 # CTRNN with 2 layers
 # The input layer consists of 2 neurons and takes input from CAMERA sensor, input layer is always considered as static
-# The output layer consists of 3 neurons with Linear activation and gives output to MOTOR actuators, output layer is dynamic
+# The output layer consists of 3 neurons with Linear activation and gives output to MOTOR actuators
 
-# The input Layer is same, therefore no changes
-# The output layer type is changed, 
-outputLayer.type_of_layer = "DYNAMIC"
+
 nn = ArtificialNeuralNetwork([
 				inputLayer,		# Layer 0
 				outputLayer		# Layer 1
-			     ])
+			     ], "DYNAMIC")	# CTRNN
 
 # Loading the parameters from a list
 parameter_vector = [
@@ -90,7 +86,7 @@ parameter_vector = [
 nn.load_parameters_from_vector(parameter_vector)
 
 # Visualize the network
-nn.visualize('repr/dynamic_perceptron', True)
+nn.visualize('repr/dynamic_perceptron')
 
 # Input the Neural Network through a dictionary
 input_dict = {

@@ -21,7 +21,8 @@ class StaticLayer(object):
 	Attributes
 	----------
 	weight_matrix: numpy_matrix
-		The weight matrix used to calculate the output using feed forward algorithm
+		The weight matrix used to calculate the output using 
+		feed forward algorithm
 		This attribute can be changed
 		
 	weight_dim: tuple
@@ -176,7 +177,8 @@ class StaticLayer(object):
 			The parameter vector follows the layout as
 			[w_11, w_21, w_12, w_22, w_13, w_23, a_1g, a_2g, a_3g, a_1b, a_2b, a_3b, w_11, w_21, w_31, a_1g, ...]
 			Here, w_ij implies the weight between ith input node and jth output node.
-			a_ib is the bias activation parameter of ith output node and a_ig is the gain activation parameter of ith output node. 
+			a_ib is the bias activation parameter of ith output node and a_ig is the gain activation parameter of 
+			ith output node. 
 			
 		Returns
 		-------
@@ -251,7 +253,8 @@ class StaticLayer(object):
 		The parameter vector follows the layout as
 		[w_11, w_21, w_12, w_22, w_13, w_23, a_1g, a_2g, a_3g, a_1b, a_2b, a_3b, w_11, w_21, w_31, a_1g, ...]
 		Here, w_ij implies the weight between ith input node and jth output node
-		a_ib is the bias activation parameter of ith output node and a_ig is the gain activation parameter of ith output node.
+		a_ib is the bias activation parameter of ith output node and a_ig is the gain activation parameter of 
+		ith output node.
 		"""
 		# Initialize the output vector
 		# Determine an individual layer's weight matrix in row major form and activation parameters
@@ -339,7 +342,8 @@ class DynamicLayer(object):
 	Attributes
 	----------
 	weight_matrix: numpy_matrix
-		The weight matrix used to calculate the output using feed forward algorithm
+		The weight matrix used to calculate the output using 
+		feed forward algorithm
 		This attribute can be changed
 		
 	weight_dim: tuple
@@ -347,7 +351,8 @@ class DynamicLayer(object):
 		This attribute cannot be changed
 		
 	time_constant: array_like
-		The time constants of the neurons used for calculation of CTRnetwork output
+		The time constants of the neurons used for calculation of 
+		dynamic network output
 		This attribute can be changed
 		
 	time_dim: tuple
@@ -444,11 +449,11 @@ class DynamicLayer(object):
 		# Set the previous state output, zero for initial
 		self.__previous_output = np.zeros(output_dim)
 		
-	# Function that calculates the first order euler step 
-	# Private function
-	def _euler_step(self, input_vector, sensor_input):
+	# Function to calculate the output of the layer
+	def forward_propagate(self, input_vector, sensor_input):
 		"""
-		Function that calculates the next step based on the first degree Euler approximation
+		Function that calculates the next step based on the previous
+		output and current input
 		
 		Parameters
 		----------
@@ -460,8 +465,8 @@ class DynamicLayer(object):
 			
 		Returns
 		-------
-		output_vector: array_like
-			The output_vector according to the output generated
+		current_output: array_like
+			The output vector according to the output generated
 			
 		Raises
 		------
@@ -477,36 +482,32 @@ class DynamicLayer(object):
 		Each of the columns of the weight_matrix tune for a single input node
 		Each of the rows of the weight_matrix tune for a single output node
 		
+		The mathematics working behind is:
+		n_i[k] = n_i[k-1] + time_weight * (g * x_i[k] + sum_j{w * a_j[k-1]})
+		a_i[k] = f(n_i[k])
 		"""
-		
 		try:
 			# Convert to numpy array
 			input_vector = np.array(input_vector)
 			
 			# Get the current activation
 			current_activation = np.dot(self.weight_matrix, input_vector)
-			current_activation = self.__activation_function.calculate_activation(current_activation)
 			current_activation = current_activation + np.multiply(self.gain, sensor_input)
+			current_activation = np.multiply(self.__time_weight, current_activation)
 			
 			# Generate the current output
-			# This equation is the first order euler solution
-			current_output = self.__previous_output * (1 - self.__time_weight) + current_activation * self.__time_weight
+			current_output = self.__previous_output + current_activation
 			
-			# Save it!
+			# Save it
 			self.__previous_output = current_output
 			
+			# Calculate activation and return
+			current_output = self.__activation_function.calculate_activation(current_activation)
 			return current_output
 			
 		except:
 			raise ValueError("Please check dimensions of " + self.__layer_name)
-		
-	# Just a wrapper function for euler_step to maintain uniformity
-	def forward_propagate(self, input_vector, sensor_input):
-		"""
-		Function to generate output of the input vector
-		Just a wrapper function for euler_step()
-		"""
-		return self._euler_step(input_vector, sensor_input)
+			
 		
 	# Function to update the parameters of the layer
 	def update_parameters(self, parameter_vector):

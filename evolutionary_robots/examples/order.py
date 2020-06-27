@@ -16,10 +16,10 @@ from neural_networks.activation_functions import LinearActivation, IdentityActiv
 # The output layer consists of 2 neurons with linear activation and outputs to GRIPPERS
 
 
-# The format followed is Layer(name_of_layer, number_of_neurons, type_of_layer, activation_function, sensor_input, [list_of_output_connections])
-inputLayer = Layer("inputLayer", 2, "STATIC", IdentityActivation(), "SENSOR", ["hiddenLayer", "outputLayer"])
-hiddenLayer = Layer("hiddenLayer", 2, "STATIC", LinearActivation(), "", ["outputLayer"])
-outputLayer = Layer("outputLayer", 2, "STATIC", LinearActivation(), "", ["GRIPPERS"])
+# The format followed is Layer(name_of_layer, number_of_neurons, activation_function, sensor_input, [list_of_output_connections])
+inputLayer = Layer("inputLayer", 2, IdentityActivation(), "SENSOR", ["hiddenLayer", "outputLayer"])
+hiddenLayer = Layer("hiddenLayer", 2, LinearActivation(), "", ["outputLayer"])
+outputLayer = Layer("outputLayer", 2, LinearActivation(), "", ["GRIPPERS"])
 
 print("Static ANN example of order")
 # The order entered here is not correct
@@ -28,7 +28,7 @@ nn = ArtificialNeuralNetwork([
 				inputLayer, 		# Layer 0 (Input Layer)
 				outputLayer, 		# Layer 1 (Output Layer)
 				hiddenLayer		# Layer 2 (Hidden Layer)
-			     ])
+			     ], "STATIC")
 
 # Visualize the network
 # Both the visualizations will be the same
@@ -59,7 +59,7 @@ nn = ArtificialNeuralNetwork([
 				inputLayer, 		# Layer 0 (Input Layer)
 				hiddenLayer, 		# Layer 1 (Hidden Layer)
 				outputLayer		# Layer 2 (Output Layer)
-			     ])
+			     ], "STATIC")
 
 # Visualize the network
 # Both the visualizations will be the same

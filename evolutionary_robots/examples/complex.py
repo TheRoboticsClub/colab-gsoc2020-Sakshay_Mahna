@@ -18,12 +18,12 @@ print("Complex Recurrent Example")
 # The outputLayer consists of 1 neuron with LinearActivation and outputs to hiddenLayer1(recurrent connection) and MOTORLEFT
 
 
-# The format followed is Layer(name_of_layer, number_of_neurons, type_of_layer, activation_function, sensor_input, [list_of_output_connections])
-inputLayer = Layer("inputLayer", 2, "STATIC", IdentityActivation(), "SENSOR1", ["hiddenLayer1"])
-hiddenLayer1 = Layer("hiddenLayer1", 2, "STATIC", LinearActivation(), "", ["hiddenLayer2", "hiddenLayer3", "outputLayer"])
-hiddenLayer2 = Layer("hiddenLayer2", 2, "STATIC", LinearActivation(), "", ["outputLayer"])
-hiddenLayer3 = Layer("hiddenLayer3", 2, "STATIC", LinearActivation(), "SENSOR2", ["outputLayer"])
-outputLayer = Layer("outputLayer", 1, "STATIC", LinearActivation(), "", ["hiddenLayer1", "MOTORLEFT"])
+# The format followed is Layer(name_of_layer, number_of_neurons, activation_function, sensor_input, [list_of_output_connections])
+inputLayer = Layer("inputLayer", 2, IdentityActivation(), "SENSOR1", ["hiddenLayer1"])
+hiddenLayer1 = Layer("hiddenLayer1", 2, LinearActivation(), "", ["hiddenLayer2", "hiddenLayer3", "outputLayer"])
+hiddenLayer2 = Layer("hiddenLayer2", 2, LinearActivation(), "", ["outputLayer"])
+hiddenLayer3 = Layer("hiddenLayer3", 2, LinearActivation(), "SENSOR2", ["outputLayer"])
+outputLayer = Layer("outputLayer", 1, LinearActivation(), "", ["hiddenLayer1", "MOTORLEFT"])
 
 # Add the recurrent connection
 outputLayer.delayed_connections = ["hiddenLayer1"]
@@ -34,7 +34,7 @@ nn = ArtificialNeuralNetwork([
 				hiddenLayer2, 		# Layer 2 (Hidden Layer 2)
 				hiddenLayer3, 		# Layer 3 (Hidden Layer 3)
 				outputLayer		# Layer 4 (Output Layer)
-			     ])
+			     ], "DYNAMIC")
 			     
 nn.visualize('repr/complex', True)
 
@@ -42,10 +42,10 @@ nn.visualize('repr/complex', True)
 # Loading the parameters from a list
 parameter_vector = [
 			[], 					# Parameters for Layer 0
-			[1, 1, 0, 1, 1, 0, 1, 1, 0, 0], 	# Parameters for Layer 1 (The weights of the recurrence with Layer 4 are taken as 0)
-			[1, 1, 1, 1, 1, 1, 0, 0], 		# Parameters for Layer 2 
-			[1, 1, 1, 1, 1, 1, 0, 0], 		# Parameters for Layer 3
-			[1, 1, 1, 1, 1, 1, 1, 0], 		# Parameters for Layer 4
+			[1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 0], 	# Parameters for Layer 1 (The weights of the recurrence with Layer 4 are taken as 0)
+			[1, 1, 1, 1, 1, 1, 1, 1, 0, 0], 		# Parameters for Layer 2 
+			[1, 1, 1, 1, 1, 1, 1, 1, 0, 0], 		# Parameters for Layer 3
+			[1, 1, 1, 1, 1, 1, 1, 1, 0], 		# Parameters for Layer 4
 		   ]
 nn.load_parameters_from_vector(parameter_vector)
 
@@ -65,6 +65,8 @@ input_dict = {
 		"SENSOR1": np.array([1.0, 1.0]), 	# Input for SENSOR1
 		"SENSOR2": np.array([1.0, 1.0])		# Associative Input for SENSOR2
 	     }
+output = nn.forward_propagate(input_dict)
+print(output)
 output = nn.forward_propagate(input_dict)
 print(output)
 

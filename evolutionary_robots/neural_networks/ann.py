@@ -1,9 +1,9 @@
 """Docstring for the ann.py module
 
 This module implements Artificial Neural Networks
-The Network can have a variable number of layers,
-variable number of neurons in each layer, variable
-activation function and variable type of layer(Static or Dynamic)
+which can be Static or Dynamic. The Network can have
+a variable number of layers, variable number of neurons
+in each layer and a variable activation function
 
 """
 
@@ -34,8 +34,13 @@ class ArtificialNeuralNetwork(object):
 	layer_vector: array_like
 		A list of interface.Layer objects
 		
-		The configuration of the array should be according to the order of execution.
-		It is upto the user to decide the order of execution of the Neural Network!
+		The configuration of the array is recommended to be
+		of the correct order of execution.
+		
+	type_of_network: string
+		Specifies the type of network
+		
+		The parameter can take values as "STATIC" or "DYNAMIC"
 		
 	time_interval(optional): float
 		A float specifying the time interval
@@ -73,7 +78,7 @@ class ArtificialNeuralNetwork(object):
 		Load the parameters of the Neural Network from a vector
 	"""
 	
-	def __init__(self, layer_vector, time_interval=0.01):
+	def __init__(self, layer_vector, type_of_network, time_interval=0.01):
 		"""
 		Initialization function of ArtificialNeuralNetwork class		
 		...
@@ -93,6 +98,7 @@ class ArtificialNeuralNetwork(object):
 		"""
 		# Class declarations
 		self.__number_of_layers = len(layer_vector)
+		self.__type_of_network = type_of_network
 		self._order_of_execution = [layer for layer in layer_vector]
 		self.__time_interval = time_interval
 		
@@ -124,7 +130,8 @@ class ArtificialNeuralNetwork(object):
 	# in essence, a Neural Network
 	def _construct_layers(self, layer_vector):
 		"""
-		Private function for the construction of the layers for the Neural Network
+		Private function for the construction of the layers for 
+		the Neural Network
 		
 		...
 		
@@ -157,30 +164,27 @@ class ArtificialNeuralNetwork(object):
 			self.__neuron_map[layer[0]] = layer[1]
 		
 			# An instance of output connections for the current layer
-			self.__output_connections[layer[0]] = layer[5]
+			self.__output_connections[layer[0]] = layer[4]
 			
 			# Iterate over the output connections and fill the input connections
-			for output_layer in layer[5]:
-				# Layer tuple to insert as input connections
-				# If output_layer is present in the 6th index, then a True to delayed
-				layer_tuple = (layer[0], output_layer in layer[6])
+			for output_layer in layer[4]:
 				try:
-					self.__input_connections[output_layer].append(layer_tuple)
+					self.__input_connections[output_layer].append(layer[0])
 				except:
-					self.__input_connections[output_layer] = [layer_tuple] 
+					self.__input_connections[output_layer] = [layer[0]] 
 		
 		
 		# Generate the layers		
 		for layer in layer_vector:	
 			# Static Layer
-			if(layer[2] == "STATIC"):
+			if(self.__type_of_network == "STATIC"):
 				# Input dimensions
 				input_dimension = 0
 			
 				# Is it an input layer?
 				try:
 					for connection in self.__input_connections[layer[0]]:
-						input_dimension = input_dimension + self.__neuron_map[connection[0]]
+						input_dimension = input_dimension + self.__neuron_map[connection]
 				except:
 					self.__input_layers.append(layer[0])
 					self.__level_vector[0].append(layer[0])
@@ -190,20 +194,20 @@ class ArtificialNeuralNetwork(object):
 				output_dimension = layer[1]
 				
 				# Activation Function
-				activation_function = layer[3]
+				activation_function = layer[2]
 				
 				# Generate the layer
 				self.__layer_map[layer[0]] = StaticLayer(input_dimension, output_dimension, activation_function, layer[0])
 				
 			# Dynamic Layer
-			elif(layer[2] == "DYNAMIC"):
+			elif(self.__type_of_network == "DYNAMIC"):
 				# Input dimensions
 				input_dimension = 0
 				
 				# Is it an input layer?
 				try:
 					for connection in self.__input_connections[layer[0]]:
-						input_dimension = input_dimension + self.__neuron_map[connection[0]]		
+						input_dimension = input_dimension + self.__neuron_map[connection]		
 				except:
 					self.__input_layers.append(layer[0])
 					self.__level_vector[0].append(layer[0])
@@ -213,10 +217,13 @@ class ArtificialNeuralNetwork(object):
 				output_dimension = layer[1]
 				
 				# Collect the activation function
-				activation_function = layer[3]
+				activation_function = layer[2]
 				
 				# Generate the layer
-				self.__layer_map[layer[0]] = DynamicLayer(input_dimension, output_dimension, activation_function, self.__time_interval, np.ones((output_dimension, )), layer[0])
+				if(layer[0] in self.__input_layers):
+					self.__layer_map[layer[0]] = StaticLayer(input_dimension, output_dimension, activation_function, layer[0])
+				else:
+					self.__layer_map[layer[0]] = DynamicLayer(input_dimension, output_dimension, activation_function, self.__time_interval, np.ones((output_dimension, )), layer[0])
 				
 		# Generate the output layers variable
 		layer_keys = self.__output_connections.keys()
@@ -252,12 +259,16 @@ class ArtificialNeuralNetwork(object):
 		
 		Algorithm:
 		1. Iterate in a Breadth First Manner from input to output
-		2. For input layers the input is taken from sensor input only, input_vector is taken as zero
-		3. For other layers the input is taken as a concatenation of vectors from output matrix
-		4. If we have delayed connections the input is taken from state matrix
-		5. If the output matrix gives a key error, we keep the current layer in an error queue
-		6. The error queue is iterated again and again to reduce it's size to 0, so we can move to next level
-		7. If the error queue is not reducing in size, then the output matrix giving error is replaced by state matrix, to avoid the error
+		2. For input layers the input is taken from sensor input only, 
+		   input_vector is taken as zero
+		3. For other layers the input is taken as a concatenation of 
+		   vectors from output matrix(if static) or state matrix(if dynamic)
+		4. If the output matrix gives a key error, we keep the current layer 
+		   in an error queue
+		5. The error queue is iterated again and again to reduce it's size to 0,
+		   so we can move to next level
+		6. If the error queue is not reducing in size, then the network is not
+		   correct(only in case of Static)
 		"""
 		# Iterate the layer names according to Breadth First Search
 		current_level = 0			# Depicts the level of search we are currently at
@@ -294,21 +305,22 @@ class ArtificialNeuralNetwork(object):
 						
 					# If the layer is not an input layer, then it needs to concatenate it's inputs
 					else:
-						# A try except block if we try accessing an element of output matrix that is not yet declared
 						for connection in self.__input_connections[layer]:
 							# An additional check for delay
-							if(connection[1] == True):
-								# If delay is required then the input is taken from state matrix
-								input_vector = tf.compat.v1.concat([input_vector, self.__state_matrix[connection[0]]], axis=0)
+							if(self.__type_of_network == "DYNAMIC"):
+								# If the network is DYNAMIC then the input is taken from state matrix
+								input_vector = tf.compat.v1.concat([input_vector, self.__state_matrix[connection]], axis=0)
 							else:
-								# If delay is not required then the input is taken from output matrix
+								# If the network is STATIC then the input is taken from output matrix
+								# A try except block if we try accessing an element of output matrix that is not yet declared
 								try:
-									input_vector = tf.compat.v1.concat([input_vector, self.__output_matrix[connection[0]]], axis=0)
+									input_vector = tf.compat.v1.concat([input_vector, self.__output_matrix[connection]], axis=0)
 								except:
 									new_error_queue.append(layer)
 									continue
 						
-						# The procedding steps can only be performed if, the new error queue is empty			
+						# The procedding steps can only be performed if, the new error queue is empty
+						# Especially for STATIC			
 						if(len(new_error_queue) != 0):
 							continue
 									
@@ -332,46 +344,7 @@ class ArtificialNeuralNetwork(object):
 				# Check if the new error queue is the same as the error queue
 				# Then we have a problem
 				if(new_error_queue == error_queue):
-					new_error_queue = []
-					for layer in error_queue:
-						# Get the sensor input externally
-						self.__sensor_inputs[layer] = tf.compat.v1.placeholder(tf.float64)
-						# Generate the input vector
-						input_vector = tf.constant(np.array([]))
-						
-						# Get the input from other layers
-						# If the layer is an input layer, then we have to pass a constant tensor of zero
-						# Defensive Programming: No input layers will enter this part....yet we have this code
-						if(layer in self.__input_layers):
-							input_vector = tf.constant(np.zeros((self.__neuron_map[layer], )))
-							
-						# If the layer is not an input layer, then it needs to concatenate it's inputs
-						else:
-							for connection in self.__input_connections[layer]:
-								# Delay or not ?
-								if(connection[1] == True):
-									input_vector = tf.concat([input_vector, self.__state_matrix[connection[0]]], axis=0)
-								else:
-									# The layer creating problem is now generated as a state matrix
-									try:
-										input_vector = tf.compat.v1.concat([input_vector, self.__output_matrix[connection[0]]], axis=0)
-									except:
-										input_vector = tf.compat.v1.concat([input_vector, self.__state_matrix[connection[0]]], axis=0)
-								
-						# If all the above stages complete perfectly
-						# Make an entry to output matrix
-						self.__output_matrix[layer] = tf.numpy_function(self.__layer_map[layer].forward_propagate, [input_vector, self.__sensor_inputs[layer]], tf.float64)
-						layers_generated = layers_generated + 1
-						
-						# Insert all the connections to the next level
-						for connection in self.__output_connections[layer]:
-							# Don't pick the hardware
-							if(connection not in self.__output_layers):
-								try:
-									self.__level_vector[current_level + 1].append(connection)
-								except:
-									self.__level_vector.append([])
-									self.__level_vector[current_level + 1].append(connection)
+					raise Exception("There is some problem with the specifications of the network")
 									
 				# Error Queue is the new one
 				error_queue = new_error_queue
@@ -413,7 +386,7 @@ class ArtificialNeuralNetwork(object):
 		for layer in self._order_of_execution:
 			# Get the sensor input
 			try:
-				sensor_input[self.__sensor_inputs[layer[0]]] = input_dict[layer[4]]
+				sensor_input[self.__sensor_inputs[layer[0]]] = input_dict[layer[3]]
 			except:
 				sensor_input[self.__sensor_inputs[layer[0]]] = np.zeros((self.__neuron_map[layer[0]], ))
 
@@ -438,9 +411,9 @@ class ArtificialNeuralNetwork(object):
 			for connection in self.__input_connections[layer]:
 				try:
 					if output_vector == None:
-						output_vector = np.array(output[connection[0]])
+						output_vector = np.array(output[connection])
 					else:
-						output_vector = np.sum(output_vector, output[connection[0]])
+						output_vector = np.sum(output_vector, output[connection])
 				except:
 					raise Exception("There is something wrong with the configuration of " + layer)
 					
@@ -582,24 +555,20 @@ class ArtificialNeuralNetwork(object):
 			# There are no edges within the sensor cluster
 			# Only nodes
 			for layer in reversed(self._order_of_execution):
-				if(layer[4] != ""):
-					cluster.node(layer[4])		
+				if(layer[3] != ""):
+					cluster.node(layer[3])		
 		
 		# Node Cluster
 		with ann.subgraph(name="cluster_1") as cluster:
-			cluster.attr(color="black", label="LAYERS")
+			cluster.attr(color="black", label= self.__type_of_network + " LAYERS")
 			cluster.node_attr['style'] = 'filled'
 			
 			# Add the edges within the node cluster
 			for layer in self._order_of_execution:
-				cluster.node(layer[0], label=layer[0] + "\n" + layer[2])
-				for output in layer[5]:
+				cluster.node(layer[0], label=layer[0])
+				for output in layer[4]:
 					if(output not in self.__output_layers):
-						if output in layer[6]:
-							# Recurrent connections marked in red
-							cluster.edge(layer[0], output, color="red")
-						else:
-							cluster.edge(layer[0], output)
+						cluster.edge(layer[0], output)
 					
 		# Hardware Cluster
 		with ann.subgraph(name="cluster_0") as cluster:
@@ -614,13 +583,13 @@ class ArtificialNeuralNetwork(object):
 		# Combine everything now
 		for layer in reversed(self._order_of_execution):
 			# Check for hardware output
-			for output in layer[5]:
+			for output in layer[4]:
 				if(output in self.__output_layers):
 					ann.edge(layer[0], output)
 					
 			# Check for sensor input
-			if(layer[4] != ""):
-				ann.edge(layer[4], layer[0])
+			if(layer[3] != ""):
+				ann.edge(layer[3], layer[0])
 		
 		# View the network, if show is True		
 		if(show is True):
