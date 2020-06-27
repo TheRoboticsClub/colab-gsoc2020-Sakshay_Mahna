@@ -10,12 +10,11 @@ import numpy as np
 from activation_functions import ActivationFunction
 import warnings
 
-# Simple Layer, simple feed forward connection with a specified delay #################################
+# Simple Layer, simple feed forward connection #################################
 class StaticLayer(object):
 	"""
 	Static Layer works by calculating the activation of each neuron
-	using the feed forward algorithm and supplies the output according
-	to the delay of the layer
+	using the feed forward algorithm
 	
 	...
 	Attributes
@@ -333,10 +332,10 @@ class StaticLayer(object):
 # Dynamic Layer ################################################################
 class DynamicLayer(object):
 	"""
-	Dynamic Layer is used in the Continuous Time Recurrent Neural Network.
-	Dynamic Layer has to save the state of the previous output and then calculate
-	the weighted average of the previous and the current output to get
-	the total output
+	Dynamic Layer is used in the Dynamic Neural Networks.
+	Dynamic Layer has to save the state of the previous output 
+	and then calculate the output by considering the previous 
+	output and the current activations passed to it
 	
 	...
 	Attributes

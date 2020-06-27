@@ -1,5 +1,5 @@
-# This example shows the use of delayed connections
-# Delayed connections are useful in the case where we have recurrent connections
+# This example shows a Dynamic Neural Network
+# with recurrent connections in action
 
 import sys
 sys.path.append('./../')
@@ -20,16 +20,16 @@ hiddenLayer1 = Layer("hiddenLayer1", 1, LinearActivation(), "", ["hiddenLayer2",
 hiddenLayer2 = Layer("hiddenLayer2", 1, LinearActivation(), "", ["hiddenLayer1", "outputLayer"])		# Hidden Layer 2
 outputLayer = Layer("outputLayer", 1, LinearActivation(), "", ["MOTOR"])					# Output Layer
 
-print("Static Recurrent ANN")
+print("Dynamic Recurrent ANN")
 nn = ArtificialNeuralNetwork([
 				inputLayer, 		# Layer 0 (Input Layer)
 				hiddenLayer1, 		# Layer 1 (Hidden Layer)
 				hiddenLayer2, 		# Layer 2 (Hidden Layer)
 				outputLayer		# Layer 3 (Output Layer)
-			     ], "DYNAMIC")
+			     ], "DYNAMIC")	# Dynamic Network
 			     
 # Visualize the network
-nn.visualize('repr/recurrent')
+nn.visualize('repr/recurrent', True)
 
 # Loading the parameters from a list
 parameter_vector = [

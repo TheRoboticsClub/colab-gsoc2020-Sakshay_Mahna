@@ -11,18 +11,18 @@ from neural_networks.interface import Layer
 import numpy as np
 ```
 
-**Initialize the Artificial Neural Network Object** For instance, we have a Perceptron with 2 input nodes and 1 output node along with a sigmoid activation function. In terms of the API, this will result in 2 layers. The input layer having 2 neurons, taking input from a sensor and the output layer having 1 neuron, providing the output to some actuator.
+**Initialize the Artificial Neural Network Object** For instance, we have a Static Perceptron with 2 input nodes and 1 output node along with a sigmoid activation function. In terms of the API, this will result in 2 layers. The input layer having 2 neurons, taking input from a sensor and the output layer having 1 neuron, providing the output to some actuator.
 
 **The input layer should always have an identity activation function**
 
 ```python
-# The format is: Layer(name of layer, number of neurons, type of layer, activation function, sensor input, output connections)
-inputLayer = Layer("inputLayer", 2, "STATIC", IdentityActivation(), "SENSOR", ["outputLayer"])
-outputLayer = Layer("outputLayer", 1, "STATIC", SigmoidActivation(), "", ["ACTUATOR"])
+# The format is: Layer(name of layer, number of neurons, activation function, sensor input, output connections)
+inputLayer = Layer("inputLayer", 2, IdentityActivation(), "SENSOR", ["outputLayer"])
+outputLayer = Layer("outputLayer", 1, SigmoidActivation(), "", ["ACTUATOR"])
 percpetron = ArtificialNeuralNetwork([
                                       inputLayer,           # Input Layer
                                       outputLayer           # Output Layer
-                                      ])
+                                      ], "STATIC")			# Static Neural Network
 ```
 
 **Load self-generated parameters into the Neural Network** Assume, in this case the weights corresponding to second layer are 0.5 and 0.5. And the gain of the Sigmoid Activation is 1 and the offset is 0. Note that the parameters are to be given in a format specific to each layer of the network.
@@ -98,12 +98,11 @@ Layer class allows easier initialization and management of layers of the Neural 
 
 ```python
 # Initializing Layer Object
-layer = Layer(name_of_layer, number_of_neurons, type_of_layer, activation_function, sensor_input, list_of_output_connections)
+layer = Layer(name_of_layer, number_of_neurons, activation_function, sensor_input, list_of_output_connections)
 
 # Initializing with attributes or changing the attributes
 layer = Layer(layer_name)		# The layer name attribute is a required parameter for initialization
 layer.number_of_neurons = number_of_neurons
-layer.type_of_layer = type_of_layer
 layer.activation_function = activation_function
 layer.sensor_input = sensor_input
 layer.output_connections = list_of_output_connections
@@ -113,27 +112,11 @@ layer.output_connections = list_of_output_connections
 
 **number_of_neurons** specifies the number of neurons in a particular layer. This parameter is an integer data type.
 
-**type_of_layer** specifies the type of layer. There are 2 types of layers for the Neural Network, Static and Dynamic
-
-- The *Static layer* is a simple feed forward layer that calculates the output through forward propagation. Using specific input connections, this layer can behave as a recurrent layer as well. In addition to it, sensor input can be passed to the Layer interface to make it behave as an associative or input layer as well. **To use this layer we use** "STATIC" string.
-
-- The *Dynamic layer* is a layer that calculates the output using first order euler approximation. Similar to the *static layer*, this layer can be made to behave according to the sensor input provided. **To use this layer we use** "DYNAMIC" string.
-
 **activation_function** specifies the activation function class. This is usually taken from the activation functions library. In order to allow an outside class, it should possess a method called `calculate_activation` that takes in a single numpy array and outputs the activation result.
 
 **sensor_input** is a string specifying the sensor from which the layer is to take input. This sensor string determines the keys of the input dictionary that we pass to forward propagate function to calculate the output of the network. It can be any string such as: "CAMERA", "SENSOR" or "INFRARED" . Conventionally, these should be in CAPTIALS.
 
 **output_connections** is a list of strings specifying the name of the layers which the current layer provides output to. For layers that output to an actuator or hardware, they have an additional member for that as well. The output dictionary returned by `forward_propagate()` returns the output of these hardware. These hardware outputs can have any name. Conventionally, these outputs should be in CAPITALS. For example: ["layer_0", "layer_1"] or ["layer0", "HARDWARE"]
-
-**delayed_connections** is an optional attribute that has to be set explicitly apart from initialization. It is a list of layer names specifying the layers from which the output from current layer is to be delayed by one iteration of the network. By default, delayed_connections is an empty list and is used to construct recurrent neural networks. For example [recurrent.py](./../examples/recurrent.py) and [complex.py](./../examples/complex.py)
-
-```python
-layer = Layer()
-layer.output_connections(["layer_name_1", "layer_name_2"])	# Layer gives output to the given layers
-layer.delayed_connections(["layer_name_2"])			# Layer delays the output of these layers
-
-```
-
 
 ## Neural Network
 
@@ -144,12 +127,18 @@ Methods supported by the ArtificialNeuralNetwork class are:
 **Generate a Neural Network** with a given number of layers, number of neurons in each layer, the sensor input and output connections and the activation function.
 
 ```python
-nn = ArtificialNeuralNetwork(a_list_of_layer_object, time_interval)
+nn = ArtificialNeuralNetwork(a_list_of_layer_object, type_of_network, time_interval)
 ```
 
-The `list_of_layer_object` parameter is a list of `Layer()` objects. In general,different orders of initialization of layers will always generate the same network. However, **the elements of parameter vector will need to be changed accordingly**. For a better understanding check the example [order.py](./../examples/order.py)
+The `list_of_layer_object` parameter is a list of `Layer()` objects. In general, different orders of initialization of layers will always generate the same network. However, **the elements of parameter vector will need to be changed accordingly**. For a better understanding check the example [order.py](./../examples/order.py)
 
-The `time_interval` is an optional parameter that specifies the time interval of the network. This is useful in the case when a Dynamic Layer is used, otherwise this is ignored. By default, the time interval is 0.01.
+The `type_of_network` parameter is a string specifying whether we want to use a Static or Dynamic Neural Network. A Static Neural Network is a simple feed forward neural network without any memory. A Dynamic Neural Network is a memory based network working on the principle of *Finite Impulse Response Filters*, having all the inputs to each layer delayed by one iteration(time step). To use static net, we pass the string "STATIC" and to use dynamic net, we pass the string "DYNAMIC".
+
+The `time_interval` is an optional parameter that specifies the time interval of the network. This is useful in the case when a Dynamic Network is used, otherwise this is ignored. By default, the time interval is 0.01.
+
+[perceptron.py](./../examples/perceptron.py), [order.py](./../examples/order.py) and [large.py](./../examples/large.py) show examples of Static Neural Network.
+
+[recurrent.py](./../examples/recurrent.py) and [complex.py](./../examples/complex.py) show examples of Dynamic Neural Network.
 
 **Generate the output of Neural Network** An input dictionary specifying the input specific to each sensor is passed to the `forward_propagate` function of the ArtificialNeuralNetwork class. The sensor input for both the input and associative layers is passed through this input dictionary. Input for any sensor not passed is assumed to be zero.
 
@@ -208,11 +197,11 @@ nn.visualize(file_name, show)
 [list_of_parameters_of_layer_0, list_of_parameters_of_layer_1, list_of_parameters_of_layer_2, ...]
 ```
 
-The parameter vector for setting the weights is a list of list. Each layer follows a particular pattern of how the weights are set from the vector.
+The parameter vector for setting the weights is a list of list. The type of Neural Network decides the layer that are to be used in the network. Each layer follows a particular pattern of how the weights are set from the vector.
 
-#### Static Layer
+#### Static Neural Network
 
-The format followed is:
+For Static Neural Networks, all the layers follow the given format:
 
 ```python
 [w_11, w_21, w_12, w_22, w_13, w_23, a_1g, a_2g, a_3g, a_1b, a_2b, a_3b, w_11, w_21, w_31, ...]
@@ -220,9 +209,9 @@ The format followed is:
 # a_ib is the bias activation parameter of ith output node and a_ig is the gain activation parameter of ith output node.
 ```
 
-#### Continuous Time Recurrent Layer
+#### Dynamic Neural Network
 
-The format followed is:
+For Dynamic Neural Networks, all the layers follow the given format:
 
 ```python
 [tc_1, tc_2, tc_3, w_11, w_21, w_12, w_22, w_13, w_23, b_1, b_2, b_3, a_1g, a_2g, a_3g, a_1b, a_2b, a_3b, w_11, w_21, w_31, ...]

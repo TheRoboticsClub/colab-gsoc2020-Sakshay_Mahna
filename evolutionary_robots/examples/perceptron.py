@@ -36,7 +36,7 @@ nn = ArtificialNeuralNetwork([
 			     ], "STATIC")	# Type of Network
 	
 # Visualize the network		     
-nn.visualize('repr/static_perceptron')
+nn.visualize('repr/static_perceptron', True)
 
 # Loading the parameters from a list
 parameter_vector = [
@@ -66,7 +66,7 @@ print("CTRNN")
 # The input layer consists of 2 neurons and takes input from CAMERA sensor, input layer is always considered as static
 # The output layer consists of 3 neurons with Linear activation and gives output to MOTOR actuators
 
-
+# CTRNN is a Dynamic Network
 nn = ArtificialNeuralNetwork([
 				inputLayer,		# Layer 0
 				outputLayer		# Layer 1
@@ -86,7 +86,7 @@ parameter_vector = [
 nn.load_parameters_from_vector(parameter_vector)
 
 # Visualize the network
-nn.visualize('repr/dynamic_perceptron')
+nn.visualize('repr/dynamic_perceptron', True)
 
 # Input the Neural Network through a dictionary
 input_dict = {

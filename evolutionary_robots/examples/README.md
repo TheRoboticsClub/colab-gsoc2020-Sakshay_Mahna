@@ -4,11 +4,11 @@ Follow the examples in the given order for a clearer understanding of the API.
 
 ### Example 1
 
-`perceptron.py` Contains an example of 2 layers(Input and Output) with Linear Activation. The input layer consists of 2 neurons and the output layer consists of 3 neurons. The output layer is Static or Continuous Time Recurrent.
+`perceptron.py` Contains an example of 2 layers(Input and Output) with Linear Activation. The input layer consists of 2 neurons and the output layer consists of 3 neurons. There are 2 examples showing Static and Dynamic Neural Network.
 
 ### Example 2
 
-`recurrent.py` Contains an example of recurrent relation between 2 hidden layers. The input consists of 1 neuron. There are 2 hidden layers with 1 neuron each and an output layer with 1 neuron. The hidden layers are assumed to be at the same level. These layers are connected to each other such that both of them depend on the input layer and the other layer's previous activation to determine it's output. These recurrent connections should be delayed by the user, for a proper output.
+`recurrent.py` Contains an example of a Dynamic Neural Network with recurrent relation between 2 hidden layers. The input consists of 1 neuron. There are 2 hidden layers with 1 neuron each and an output layer with 1 neuron. The hidden layers are assumed to be at the same level. These layers are connected to each other such that both of them depend on the input layer and the other layer's previous activation to determine it's output.
 
 ### Example 3
 

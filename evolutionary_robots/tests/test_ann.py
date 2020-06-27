@@ -18,9 +18,9 @@ class TestANN(unittest.TestCase):
 
 	def test_outputs(self):
 		# Simple ANN with 2 input 3 output and Linear Activation
-		inputLayer = Layer("inputLayer", 2, "STATIC", self.identity, "SENSOR", ["outputLayer"])
-		outputLayer = Layer("outputLayer", 3, "STATIC", self.activation_function, "", ["GRIPPER"])
-		nn = ArtificialNeuralNetwork([inputLayer, outputLayer])
+		inputLayer = Layer("inputLayer", 2, self.identity, "SENSOR", ["outputLayer"])
+		outputLayer = Layer("outputLayer", 3, self.activation_function, "", ["GRIPPER"])
+		nn = ArtificialNeuralNetwork([inputLayer, outputLayer], "STATIC")
 		
 		parameter_vector = [[], [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 1, 1, 1, -1, -1, -1]]
 		nn.load_parameters_from_vector(parameter_vector)
@@ -30,19 +30,18 @@ class TestANN(unittest.TestCase):
 		
 		np.testing.assert_almost_equal(output["GRIPPER"], np.array([1.3, 1.7, 2.1]))
 		
-		outputLayer.type_of_layer = "DYNAMIC"
-		nn = ArtificialNeuralNetwork([inputLayer, outputLayer])
+		nn = ArtificialNeuralNetwork([inputLayer, outputLayer], "DYNAMIC")
 		
 		parameter_vector = [[], [1, 1, 1, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 1, 1, 1, -1, -1, -1]]
 		nn.load_parameters_from_vector(parameter_vector)
 		
 		output = nn.forward_propagate(input_dict)
-		np.testing.assert_almost_equal(output["GRIPPER"], np.array([0.013, 0.017, 0.021]))
+		np.testing.assert_almost_equal(output["GRIPPER"], np.array([1, 1, 1]))
 	
 	def test_parameters(self):
-		inputLayer = Layer("inputLayer", 2, "STATIC", self.identity, "SENSOR", ["outputLayer"])
-		outputLayer = Layer("outputLayer", 3, "STATIC", self.activation_function, "", ["GRIPPER"])
-		nn = ArtificialNeuralNetwork([inputLayer, outputLayer])
+		inputLayer = Layer("inputLayer", 2, self.identity, "SENSOR", ["outputLayer"])
+		outputLayer = Layer("outputLayer", 3, self.activation_function, "", ["GRIPPER"])
+		nn = ArtificialNeuralNetwork([inputLayer, outputLayer], "STATIC")
 		input_dict = {"SENSOR": np.array([1.0, 1.0])}
 		
 		parameter_vector = [[], [1, 1, 1]]
@@ -50,28 +49,19 @@ class TestANN(unittest.TestCase):
 			nn.load_parameters_from_vector(parameter_vector)
 			nn.forward_propagate(input_dict)
 			
-	def test_set_gains(self):
-		inputLayer = Layer("inputLayer", 2, "STATIC", self.identity, "SENSOR", ["outputLayer"])
-		outputLayer = Layer("outputLayer", 3, "STATIC", self.activation_function, "", ["GRIPPER"])
-		nn = ArtificialNeuralNetwork([inputLayer, outputLayer])
-		
-		parameter_vector = [[], [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 1, 1, 1, 1, 0]]
-		nn.load_parameters_from_vector(parameter_vector)
-		
-		input_dict = {0: np.array([1.0, 1.0]), 1: np.array([1.0, 1.0, 1.0])}
-		output1 = nn.forward_propagate(input_dict)
-		output2 = nn.forward_propagate(input_dict)
-		
-		outputLayer.gains = [2.0, 2.0, 2.0]
-		nn = ArtificialNeuralNetwork([inputLayer, outputLayer])
-		
-		parameter_vector = [[], [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 1, 1, 1, 1, 0]]
-		nn.load_parameters_from_vector(parameter_vector)
-		
-		output3 = nn.forward_propagate(input_dict)
-		
-		np.testing.assert_array_equal(output1[1], output2[1])
-		np.testing.assert_array_less(output1[1], output3[1])
+	def test_static_exception(self):
+		inputLayer = Layer("inputLayer", 2, self.identity, "SENSOR", ["hiddenLayer1", "hiddenLayer2"])		# Input Layer
+		hiddenLayer1 = Layer("hiddenLayer1", 1, self.activation_function, "", ["hiddenLayer2", "outputLayer"])		# Hidden Layer 1
+		hiddenLayer2 = Layer("hiddenLayer2", 1, self.activation_function, "", ["hiddenLayer1", "outputLayer"])		# Hidden Layer 2
+		outputLayer = Layer("outputLayer", 1, self.activation_function, "", ["MOTOR"])					# Output Layer
+
+		with self.assertRaises(Exception) as context:
+			nn = ArtificialNeuralNetwork([
+							inputLayer, 		# Layer 0 (Input Layer)
+							hiddenLayer1, 		# Layer 1 (Hidden Layer)
+							hiddenLayer2, 		# Layer 2 (Hidden Layer)
+							outputLayer		# Layer 3 (Output Layer)
+							 ], "STATIC")
 
 if __name__ == "__main__":
 	unittest.main()

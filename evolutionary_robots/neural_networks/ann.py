@@ -35,7 +35,7 @@ class ArtificialNeuralNetwork(object):
 		A list of interface.Layer objects
 		
 		The configuration of the array is recommended to be
-		of the correct order of execution.
+		of the correct order of initialization.
 		
 	type_of_network: string
 		Specifies the type of network
@@ -98,8 +98,8 @@ class ArtificialNeuralNetwork(object):
 		"""
 		# Class declarations
 		self.__number_of_layers = len(layer_vector)
-		self.__type_of_network = type_of_network
-		self._order_of_execution = [layer for layer in layer_vector]
+		self.type_of_network = type_of_network			# A setter function works behind the scenes
+		self._order_of_initialization = [layer for layer in layer_vector]
 		self.__time_interval = time_interval
 		
 		# Internal Attributes
@@ -114,6 +114,7 @@ class ArtificialNeuralNetwork(object):
 		self.__level_vector = [[]]
 		
 		# Disable eager execution
+		# Default setting for tensorflow 2
 		tf.compat.v1.disable_eager_execution()
 		
 		# Output and State matrix dictionary
@@ -148,8 +149,7 @@ class ArtificialNeuralNetwork(object):
 		
 		Raises
 		------
-		Exception
-			If there is something wrong with the layer_vector
+		None
 			
 		"""
 		# A dictionary for storing each layer
@@ -251,7 +251,9 @@ class ArtificialNeuralNetwork(object):
 		
 		Raises
 		------
-		None
+		Exception:
+			There should be no recurrent connections in Static
+			Neural Networks
 		
 		Notes
 		-----
@@ -277,7 +279,7 @@ class ArtificialNeuralNetwork(object):
 		self.__output_matrix = {}
 		
 		# Keep a track of the layers that are already checked
-		layers_done = dict((layer[0], False) for layer in self._order_of_execution)
+		layers_done = dict((layer[0], False) for layer in self._order_of_initialization)
 		
 		# Keep iterating till we have generated all the layers
 		while layers_generated != self.__number_of_layers:
@@ -344,7 +346,7 @@ class ArtificialNeuralNetwork(object):
 				# Check if the new error queue is the same as the error queue
 				# Then we have a problem
 				if(new_error_queue == error_queue):
-					raise Exception("There is some problem with the specifications of the network")
+					raise Exception("The Static Neural Network seems to contain some recurrent connections")
 									
 				# Error Queue is the new one
 				error_queue = new_error_queue
@@ -365,13 +367,16 @@ class ArtificialNeuralNetwork(object):
 		Returns
 		-------
 		output_dict: dictionary
-			Dictionary specifying the output of layers that do not have any output connections further(Output Layers, in essence)
+			Dictionary specifying the output of layers that do not have any 
+			output connections further(Output Layers, in essence).
+			
 			They are generally supposed to be hardware layers
 			
 		Raises
 		------
 		Exception
-			Make sure the layers that provide output to the same hardware layer have the same dimensions
+			Make sure the layers that provide output to the same hardware layer 
+			have the same dimensions
 		
 		Notes
 		-----
@@ -383,7 +388,7 @@ class ArtificialNeuralNetwork(object):
 
 		sensor_input = {}
 		output = {}
-		for layer in self._order_of_execution:
+		for layer in self._order_of_initialization:
 			# Get the sensor input
 			try:
 				sensor_input[self.__sensor_inputs[layer[0]]] = input_dict[layer[3]]
@@ -399,6 +404,7 @@ class ArtificialNeuralNetwork(object):
 			for layer in self.__layer_map.keys():
 				session.run(self.__state_matrix[layer].assign(self.__state[layer]))
 			
+			# Generate the output
 			for layer in self.__layer_map.keys():
 				output[layer] = session.run(self.__output_matrix[layer], feed_dict = sensor_input)
 			
@@ -454,7 +460,8 @@ class ArtificialNeuralNetwork(object):
 		Returns
 		-------
 		output_dict: dictionary
-			Dictionary specifying the parameters of each layer, keyed according to their name. The format of weights is specific to the layer.
+			Dictionary specifying the parameters of each layer, keyed according to their name.
+			The format of weights is specific to the layer.
 			
 		Raises
 		------
@@ -485,7 +492,9 @@ class ArtificialNeuralNetwork(object):
 		Parameters
 		----------
 		parameter_vector: array_like
-			The parameter_vector is a list of list, each parameter list is indexed according to the order of computation specified by the user. The parameter follows the format specific to each layer
+			The parameter_vector is a list of list, each parameter list is indexed according 
+			to the order of initialization specified by the user. 
+			The parameter follows the format specific to each layer
 			
 		Returns
 		-------
@@ -500,9 +509,9 @@ class ArtificialNeuralNetwork(object):
 		parameter_vector = np.array(parameter_vector)
 		
 		# Load the parameters layer by layer
-		for index in range(len(self._order_of_execution)):
+		for index in range(len(self._order_of_initialization)):
 			# For further use
-			layer_name = self._order_of_execution[index][0]
+			layer_name = self._order_of_initialization[index][0]
 			
 			if(layer_name not in self.__input_layers):
 				# Layer present as hidden
@@ -554,7 +563,7 @@ class ArtificialNeuralNetwork(object):
 			
 			# There are no edges within the sensor cluster
 			# Only nodes
-			for layer in reversed(self._order_of_execution):
+			for layer in reversed(self._order_of_initialization):
 				if(layer[3] != ""):
 					cluster.node(layer[3])		
 		
@@ -564,7 +573,7 @@ class ArtificialNeuralNetwork(object):
 			cluster.node_attr['style'] = 'filled'
 			
 			# Add the edges within the node cluster
-			for layer in self._order_of_execution:
+			for layer in self._order_of_initialization:
 				cluster.node(layer[0], label=layer[0])
 				for output in layer[4]:
 					if(output not in self.__output_layers):
@@ -581,7 +590,7 @@ class ArtificialNeuralNetwork(object):
 				cluster.node(hardware)
 					
 		# Combine everything now
-		for layer in reversed(self._order_of_execution):
+		for layer in reversed(self._order_of_initialization):
 			# Check for hardware output
 			for output in layer[4]:
 				if(output in self.__output_layers):
@@ -605,11 +614,25 @@ class ArtificialNeuralNetwork(object):
 		return self.__number_of_layers
 		
 	@property
-	def order_of_execution(self):
-		""" Attribute for the order of execution 
+	def type_of_network(self):
+		"""Attribute for the type of network
+		"""
+		return self.__type_of_network
+		
+	@type_of_network.setter
+	def type_of_network(self, network):
+		# Some inclusions to ignore spelling mistakes by users
+		if(network[0].upper() == "D"):
+			self.__type_of_network = "DYNAMIC"
+		else:
+			self.__type_of_network = "STATIC"
+		
+	@property
+	def order_of_initialization(self):
+		""" Attribute for the order of initialization 
 			Specifies the order in which layer outputs should be calculated to generate the overall output
 		"""
-		order = [layer[0] for layer in self._order_of_execution]
+		order = [layer[0] for layer in self._order_of_initialization]
 		return order
 		
 	@property

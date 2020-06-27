@@ -25,16 +25,13 @@ hiddenLayer2 = Layer("hiddenLayer2", 2, LinearActivation(), "", ["outputLayer"])
 hiddenLayer3 = Layer("hiddenLayer3", 2, LinearActivation(), "SENSOR2", ["outputLayer"])
 outputLayer = Layer("outputLayer", 1, LinearActivation(), "", ["hiddenLayer1", "MOTORLEFT"])
 
-# Add the recurrent connection
-outputLayer.delayed_connections = ["hiddenLayer1"]
-
 nn = ArtificialNeuralNetwork([
 				inputLayer, 		# Layer 0 (Input Layer)
 				hiddenLayer1, 		# Layer 1 (Hidden Layer 1)
 				hiddenLayer2, 		# Layer 2 (Hidden Layer 2)
 				hiddenLayer3, 		# Layer 3 (Hidden Layer 3)
 				outputLayer		# Layer 4 (Output Layer)
-			     ], "DYNAMIC")
+			     ], "DYNAMIC")	# Dynamic Network due to the recurrent connection
 			     
 nn.visualize('repr/complex', True)
 
