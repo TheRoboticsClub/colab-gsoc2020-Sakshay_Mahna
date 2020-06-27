@@ -22,7 +22,7 @@ outputLayer = Layer("outputLayer", 1, SigmoidActivation(), "", ["ACTUATOR"])
 percpetron = ArtificialNeuralNetwork([
                                       inputLayer,           # Input Layer
                                       outputLayer           # Output Layer
-                                      ], "STATIC")			# Static Neural Network
+                                      ], "STATIC")	    # Static Neural Network
 ```
 
 **Load self-generated parameters into the Neural Network** Assume, in this case the weights corresponding to second layer are 0.5 and 0.5. And the gain of the Sigmoid Activation is 1 and the offset is 0. Note that the parameters are to be given in a format specific to each layer of the network.
