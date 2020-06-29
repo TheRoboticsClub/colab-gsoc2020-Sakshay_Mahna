@@ -236,8 +236,8 @@ class ArtificialNeuralNetwork(object):
 	# Generate the computational graph
 	def _construct_graph(self):
 		"""
-		Private function for the construction of the generation
-		of the computational graph of the Neural Network
+		Private function for the generation of the 
+		computational graph of the Neural Network
 		
 		...
 		
