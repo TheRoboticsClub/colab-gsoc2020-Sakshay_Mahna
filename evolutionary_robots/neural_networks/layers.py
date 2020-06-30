@@ -433,7 +433,7 @@ class DynamicLayer(object):
 		# Generate the weights for the weighted average
 		self.__time_interval = time_interval
 		self.__time_constant = time_constant
-		self.__time_weight = np.asarray(float(self.__time_interval) / np.array(self.time_constant))
+		self.__time_weight = np.array(self.time_constant)
 		
 		# A check for the dimension of time constant list
 		if(self.__time_weight.shape != self.__time_dim):
@@ -677,7 +677,7 @@ class DynamicLayer(object):
 			raise ValueError("The dimension of time constant list is not correct for " + self.__layer_name)
 			
 		# Calculate the weights based on the time constants and the time interval!
-		self.__time_weight = np.asarray(float(self.time_interval) / self.time_constant)
+		self.__time_weight = self.time_constant
 		
 	# For changing the gain values
 	@property
