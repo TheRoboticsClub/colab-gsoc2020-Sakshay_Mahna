@@ -2,14 +2,15 @@
 # the sum of it's genes
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 # This class contains the functions for initializing
 # and working with the genetic algorithm
 class GeneticAlgorithm(object):
 	def __init__(self):
 		# Initializations
-		self.population_size = 100
-		self.number_of_generations = 200
+		self.population_size = 1000
+		self.number_of_generations = 1000
 		self.mutation_rate = 0.01
 		self.chromosome_length = 5
 		self.number_of_elites = 0
@@ -17,6 +18,11 @@ class GeneticAlgorithm(object):
 		# The BEST individual
 		self.best_chromosome = None
 		self.best_fitness = -999
+		
+		# Plotting parameters
+		self.max_fitness = []
+		self.min_fitness = []
+		self.avg_fitness = []
 	
 	# Generates a population of individuals
 	def generate_population(self):
@@ -52,6 +58,11 @@ class GeneticAlgorithm(object):
 		sum_fitness = np.sum(self.fitness_vector)
 		
 		print("Max Fitness: " + str(max_fitness) + "\tMin Fitness: " + str(min_fitness) + "\tAverage Fitness: " + str(sum_fitness / self.population_size))
+		
+		# Append to plots
+		self.min_fitness.append(min_fitness)
+		self.max_fitness.append(max_fitness)
+		self.avg_fitness.append(sum_fitness / self.population_size)
 		
 		# Remove the elites from the calculation
 		if(self.number_of_elites != 0):
@@ -114,6 +125,29 @@ class GeneticAlgorithm(object):
 			if(mutate[0] == 1):
 				# Mutate
 				self.population[row, column] = np.random.randint(-10, 11)
+				
+	# Plotting Function
+	def plot_fitness(self):
+		# Generate the range of Generations
+		generations = range(1, self.number_of_generations)
+		
+		# Plot Max Fitness
+		plt.plot(generations, self.max_fitness, label="MAX")
+		
+		# Plot Min Fitness
+		plt.plot(generations, self.min_fitness, label="MIN")
+		
+		# Plot Average Fitness
+		plt.plot(generations, self.avg_fitness, label="AVERAGE")
+		
+		# Name the axes
+		plt.xlabel("Generations")
+		plt.ylabel("Fitness Value")
+		
+		# Show
+		plt.title("Fitness Plot")
+		plt.legend()
+		plt.show()
 		
 	# Run the complete Genetic Algorithm
 	def run(self):
@@ -141,6 +175,9 @@ class GeneticAlgorithm(object):
 		# Print the best fitness and chromosome
 		print(self.best_fitness)
 		print(self.best_chromosome)
+		
+		# Pyplot
+		self.plot_fitness()
 		
 if __name__ == "__main__":
 	ga = GeneticAlgorithm()
