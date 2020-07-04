@@ -12,7 +12,7 @@ class GeneticAlgorithm(object):
 		self.number_of_generations = 200
 		self.mutation_rate = 0.01
 		self.chromosome_length = 5
-		self.number_of_elites = 4
+		self.number_of_elites = 0
 		
 		# The BEST individual
 		self.best_chromosome = None
@@ -46,10 +46,23 @@ class GeneticAlgorithm(object):
 		# Numpy conversion, to maintain defaut settings
 		self.fitness_vector = np.array(self.fitness_vector, np.float64)
 		
-		# Normalize the fitness values to lie between 0 and 1 and sum to 1
+		# Get some statistics and print
 		min_fitness = self.fitness_vector.min()
 		max_fitness = self.fitness_vector.max()
 		sum_fitness = np.sum(self.fitness_vector)
+		
+		print("Max Fitness: " + str(max_fitness) + "\tMin Fitness: " + str(min_fitness) + "\tAverage Fitness: " + str(sum_fitness / self.population_size))
+		
+		# Remove the elites from the calculation
+		if(self.number_of_elites != 0):
+			elite_index = np.argpartition(self.fitness_vector, -self.number_of_elites)[-self.number_of_elites:]
+			self.elites = self.population[elite_index]
+			self.fitness_vector = np.delete(self.fitness_vector, elite_index)
+		
+		# Normalize the fitness values to lie between 0 and 1 and sum to 1
+		min_fitness = self.fitness_vector.min()
+		max_fitness = self.fitness_vector.max()
+		
 		try:
 			self.fitness_vector = (self.fitness_vector - min_fitness) / (max_fitness - min_fitness)
 		except:
@@ -58,26 +71,21 @@ class GeneticAlgorithm(object):
 		# Average the fitness
 		self.fitness_vector = self.fitness_vector / np.sum(self.fitness_vector)
 		
-		# Print some statistics
-		print("Max Fitness: " + str(max_fitness) + "\tMin Fitness: " + str(min_fitness) + "\tAverage Fitness: " + str(sum_fitness / self.population_size))
-		
 	# Roullete based selection
 	def selection(self):
 		# Random choice, roullete selection
 		try:
-			self.roullete_selection = np.random.choice(self.population_size, self.population_size, p = self.fitness_vector)
+			effective_population = self.population_size - self.number_of_elites
+			self.roullete_selection = np.random.choice(effective_population, effective_population, p = self.fitness_vector)
 		except:
 			pass
-		
-		# Cross over generates the next generation
-		self.crossover()
 		
 	# Crossover Logic
 	def crossover(self):
 		# New population
 		new_population = []
 		# Based on the roullete selection, we crossover mum and dad!
-		for index in range(0, self.population_size, 2):
+		for index in range(0, self.population_size - self.number_of_elites, 2):
 			mum = self.population[self.roullete_selection[index]]
 			dad = self.population[self.roullete_selection[index + 1]]
 			
@@ -90,7 +98,12 @@ class GeneticAlgorithm(object):
 			new_population.append(son); new_population.append(daughter)
 			
 		# The offsprings are the new population now
+		# Along with the elites
 		self.population = np.array(new_population)
+		try:
+			self.population = np.concatenate([self.population, self.elites])
+		except:
+			pass
 		
 	# Mutation Logic
 	def mutation(self):
@@ -116,8 +129,11 @@ class GeneticAlgorithm(object):
 			# Determine the fitness of all the individuals
 			self.determine_fitness()
 			
-			# Select the individuals, the next generation
+			# Select the individuals for crossover
 			self.selection()
+			
+			# Cross over generates the next generation
+			self.crossover()
 			
 			# Apply mutation
 			self.mutation()
