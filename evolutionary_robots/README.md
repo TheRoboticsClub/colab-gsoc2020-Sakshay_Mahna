@@ -45,6 +45,7 @@ The project uses the following python modules
 numpy==1.16.5
 graphviz==0.14
 tensorflow==2.1.0
+matplotlib==2.1.0
 ```
 
 ## Installation
@@ -66,7 +67,9 @@ pip install -r requirements.txt
 
 API Reference for [Neural Networks](./neural_networks/README.md)
 
-[Examples](./examples) for the use of API
+API Reference for [Genetic Algorithm](./genetic_algorithm/README.md)
+
+[Examples](./examples) for the use of APIs
 
 
 ## Tests
