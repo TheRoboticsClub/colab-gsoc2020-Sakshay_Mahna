@@ -8,6 +8,7 @@ is required to design the fitness function.
 
 import numpy as np
 import matplotlib.pyplot as plt
+import warnings
 
 # The Genetic Algorithm class
 class GeneticAlgorithm(object):
@@ -338,7 +339,9 @@ class GeneticAlgorithm(object):
 	# Getters and Setters
 	@property
 	def population_size(self):
-		""" Attribute for the size of population """
+		""" Attribute for the size of population 
+			Population Size should be an even number
+		"""
 		return self._population_size
 		
 	@population_size.setter
@@ -347,6 +350,9 @@ class GeneticAlgorithm(object):
 			self._population_size = 10
 		else:
 			self._population_size = population_size
+			
+		if(self._population_size % 2 == 0):
+			warnings.warn("The population size should be even!")
 			
 	@property
 	def number_of_generations(self):
@@ -397,6 +403,12 @@ class GeneticAlgorithm(object):
 			self._number_of_elites = self.population_size
 		else:
 			self._number_of_elites = number_of_elites
+			
+		# Trick, sum of numbers with same partiy is even
+		if((self._number_of_elites + self._population_size) % 2 == 1):
+			# Reduce the number of elites by 1, as the algorithm
+			# would not work otherwise
+			self._number_of_elites -= 1
 			
 	@property
 	def fitness_function(self):
