@@ -186,7 +186,9 @@ class GeneticAlgorithm(object):
 		max_fitness = self.fitness_vector.max()
 		sum_fitness = np.sum(self.fitness_vector)
 		
-		print("Max Fitness: " + str(max_fitness) + "\tMin Fitness: " + str(min_fitness) + "\tAverage Fitness: " + str(sum_fitness / self.population_size))
+		statistics = [self.current_generation - 1, max_fitness, sum_fitness / self.population_size, min_fitness]
+		
+		print("{: >15} {: >15} {: >15} {: >15}".format(*statistics))
 		
 		# Append to plots
 		self.min_fitness.append(min_fitness)
@@ -311,12 +313,15 @@ class GeneticAlgorithm(object):
 		# Generate a random population
 		self.generate_population()
 		
+		# Print the legend
+		legend = ["Generation", "Maximum Fitness", "Average Fitness", "Minimum Fitness"]
+		print("{: >15} {: >15} {: >15} {: >15}".format(*legend))
+		
 		# Keep going through generations with selection,
 		# crossover and mutation
 		for generation in range(1, self.number_of_generations):
 			# For statistics
 			self.current_generation = generation
-			print("Generation: " + str(generation-1))
 			
 			# Determine the fitness of all the individuals
 			self.determine_fitness()
@@ -351,7 +356,7 @@ class GeneticAlgorithm(object):
 		else:
 			self._population_size = population_size
 			
-		if(self._population_size % 2 == 0):
+		if(self._population_size % 2 == 1):
 			warnings.warn("The population size should be even!")
 			
 	@property
