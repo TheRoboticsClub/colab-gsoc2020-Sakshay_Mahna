@@ -16,14 +16,13 @@ def fitness_function(chromosome):
 	return np.sum(chromosome)
 ```
 
-**Initialize the GeneticAlgorithm object** For our specefic example, the size of population is assumed to be 100, the number of generations are 50, the chromosome length is 3 and the range of alleles varies from -3 to 3(both inclusive)
+**Initialize the GeneticAlgorithm object** For our specefic example, the size of population is assumed to be 100, the number of generations are 50, the chromosome length is 3.
 
 ```python
 ga = GeneticAlgorithm()
 ga.population_size = 100
 ga.number_of_generations = 50
 ga.chromosome_length = 3
-ga.allele_range = (-3, 4)
 ```
 
 **Simulate the algorithm and plot the results**
@@ -46,7 +45,6 @@ The [examples directory](./../examples) contains [ga_sum.py](./../examples/ga_su
 - Probability of Mutation
 - Length of Chromosome
 - Number of Elites
-- Range of the Allele values
 - Fitness Function
 
 The fitness function is a crucial parameters, without which the algorithm would not work. The Genetic Algorithm can be used as follows
@@ -55,7 +53,7 @@ The fitness function is a crucial parameters, without which the algorithm would 
 
 ```python
 # Initializing Genetic Algorithm object
-ga = GeneticAlgorithm(population_size, number_of_generations, mutation_probability, chromosome_length, number_of_elites, allele_range)
+ga = GeneticAlgorithm(population_size, number_of_generations, mutation_probability, chromosome_length, number_of_elites)
 
 # Initializing and then changing the attributes
 ga = GeneticAlgorithm()
@@ -64,7 +62,6 @@ ga.number_of_generations = number_of_generations
 ga.mutation_probability = mutation_probability
 ga.chromosome_length = chromosome_length
 ga.number_of_elites = number_of_elites
-ga.allele_range = allele_range
 ```
 
 **population_size** specifies the size of the population for each generation. The default value of the population size is 100.
@@ -76,8 +73,6 @@ ga.allele_range = allele_range
 **chromosome_length** specifies the length of the chromosome of each individual. By default, the length of chromosome is taken to be 5.
 
 **number_of_elites** specifies the number of elites in the algorithm. Elites are not crossovered and directly sent to the next generation. By default, the algorithm runs with 0 elites.
-
-**allele_range** specifies the range of values(floating numbers) from which the alleles of each chromosome are choosen from. By default the range is taken from -10 to 10(both inclusive). The upper limit should 1 greater than the required number.
 
 **Specifiying Fitness Function** The fitness function is set as an attribute for the algorithm. The fitness function variable should be a function object, that takes in a single parameter, which is a numpy list object and returns a single comparable(float or integer) value. In essence, the user-defined fitness function should be able to calculate and return the fitness value of a single chromosome.
 

@@ -36,10 +36,6 @@ class GeneticAlgorithm(object):
 	number_of_elites(optional): integer
 		The number of elites in each generation
 		
-	allele_range(optional): tuple
-		The range of the values that each allele of a 
-		chromosome can take
-		
 	Attributes
 	----------
 	fitness_function: function
@@ -61,10 +57,6 @@ class GeneticAlgorithm(object):
 		
 	number_of_elites: integer
 		The number of elites in each generation
-		
-	allele_range: tuple
-		The range of the values that each allele of a 
-		chromosome can take
 		
 	Methods
 	-------
@@ -102,7 +94,7 @@ class GeneticAlgorithm(object):
 		Mutates the genes of the chromosomes of the indviduals
 		according to the mutation probability
 	"""
-	def __init__(self, population_size=100, number_of_generations=10, mutation_probability=0.01, chromosome_length=5, number_of_elites=0, allele_range=(-10, 11)):
+	def __init__(self, population_size=100, number_of_generations=10, mutation_probability=0.01, chromosome_length=5, number_of_elites=0):
 		"""
 		Initialization function of Genetic Algorithm
 		...
@@ -125,7 +117,10 @@ class GeneticAlgorithm(object):
 		self.mutation_probability = mutation_probability
 		self.chromosome_length = chromosome_length
 		self.number_of_elites = number_of_elites
-		self.allele_range = allele_range
+		
+		# Some constants
+		self.__minimum_crossover_length = 1		# Always 1
+		self.__do_crossover = True
 	
 	# Generates a population of individuals
 	def generate_population(self):
@@ -134,11 +129,13 @@ class GeneticAlgorithm(object):
 		the size of population and the chromsome length
 		"""
 		# Using the range
-		self.population = np.random.uniform(self.allele_range[0], self.allele_range[1], (self.population_size, self.chromosome_length))
+		self.population = np.random.uniform(0, 1, (self.population_size, self.chromosome_length))
+		
 		# Initialize the plots and the BEST individual
 		self.best_chromosome = None
 		self.best_fitness = float('-inf')
-		
+		self.best_generation = None
+		# Plotting lists
 		self.max_fitness = []
 		self.min_fitness = []
 		self.avg_fitness = []
@@ -150,6 +147,12 @@ class GeneticAlgorithm(object):
 		(that is passed as argument) according to the
 		fitness function
 		"""
+		# For simple GA, fitness depends on chromosome
+		# For GA + NN, fitness will depend on output + chromosome
+		# For Gazebo, fitness will depend on the simulation
+		# In the case of simulation, the fitness will be calculated
+		# iteratively for some evaluation time set by user!
+		
 		# Fitness calculated according to fitness function
 		# defined by the user
 		fitness = self.fitness_function(chromosome)
@@ -158,6 +161,7 @@ class GeneticAlgorithm(object):
 		self.best_fitness = max(self.best_fitness, fitness)
 		if(fitness == self.best_fitness):
 			self.best_chromosome = chromosome
+			self.best_generation = self.current_generation
 			
 		return fitness
 		
@@ -229,6 +233,10 @@ class GeneticAlgorithm(object):
 		Cross Over two individuals to generate two new
 		individuals and generate the next generation
 		"""
+		# Check whether it is legal to do crossover or not
+		if(self.__do_crossover == False):
+			return
+		
 		# New population
 		new_population = []
 		# Based on the roullete selection, we crossover mum and dad
@@ -236,7 +244,7 @@ class GeneticAlgorithm(object):
 			mum = self.population[self.roullete_selection[index]]
 			dad = self.population[self.roullete_selection[index + 1]]
 			
-			cross_position = np.random.randint(0, self.chromosome_length)
+			cross_position = np.random.randint(self.__minimum_crossover_length, self.chromosome_length)
 			
 			# Cross over
 			son = np.concatenate([mum[:cross_position], dad[cross_position:]])
@@ -265,7 +273,7 @@ class GeneticAlgorithm(object):
 			mutate = np.random.choice(2, 1, p = [1 - self.mutation_probability, self.mutation_probability])
 			if(mutate[0] == 1):
 				# Mutate
-				self.population[row, column] = np.random.uniform(self.allele_range[0], self.allele_range[1])
+				self.population[row, column] = np.random.uniform(0, 1)
 				
 	# Plotting Function
 	def plot_fitness(self):
@@ -306,6 +314,7 @@ class GeneticAlgorithm(object):
 		# crossover and mutation
 		for generation in range(1, self.number_of_generations):
 			# For statistics
+			self.current_generation = generation
 			print("Generation: " + str(generation-1))
 			
 			# Determine the fitness of all the individuals
@@ -322,6 +331,7 @@ class GeneticAlgorithm(object):
 			
 		# Print the best fitness and return the chromosome
 		print("The best fitness value acheived is: " + str(self.best_fitness))
+		print("Found in generation # " + str(self.best_generation))
 		
 		return self.best_chromosome
 		
@@ -387,18 +397,6 @@ class GeneticAlgorithm(object):
 			self._number_of_elites = self.population_size
 		else:
 			self._number_of_elites = number_of_elites
-			
-	@property
-	def allele_range(self):
-		""" Attribute for the range of the allele values """
-		return self._allele_range
-		
-	@allele_range.setter
-	def allele_range(self, allele_range):
-		if(allele_range[0] > allele_range[1]):
-			self._allele_range = (allele_range[1], allele_range[0])
-		else:
-			self._allele_range = (allele_range[0], allele_range[1]) 
 			
 	@property
 	def fitness_function(self):
