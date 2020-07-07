@@ -64,7 +64,7 @@ ga.chromosome_length = chromosome_length
 ga.number_of_elites = number_of_elites
 ```
 
-**population_size** specifies the size of the population for each generation. The default value of the population size is 100.
+**population_size** specifies the size of the population for each generation. The default value of the population size is 100. **The population size should be an even number**.
 
 **number_of_generations** specifies the number of generations for which the genetic algorithm would run. By default the algorithm runs for 10 generations.
 
@@ -72,7 +72,7 @@ ga.number_of_elites = number_of_elites
 
 **chromosome_length** specifies the length of the chromosome of each individual. By default, the length of chromosome is taken to be 5.
 
-**number_of_elites** specifies the number of elites in the algorithm. Elites are not crossovered and directly sent to the next generation. By default, the algorithm runs with 0 elites.
+**number_of_elites** specifies the number of elites in the algorithm. Elites are not crossovered and directly sent to the next generation. By default, the algorithm runs with 0 elites. **The parity of number of elites and size of population should be same, otherwise the result would be an error**.
 
 **Specifiying Fitness Function** The fitness function is set as an attribute for the algorithm. The fitness function variable should be a function object, that takes in a single parameter, which is a numpy list object and returns a single comparable(float or integer) value. In essence, the user-defined fitness function should be able to calculate and return the fitness value of a single chromosome.
 
