@@ -21,3 +21,7 @@ Follow the examples in the given order for a clearer understanding of the API.
 ### Example 5
 
 `large.py` Contains an example showing how to design a Large Static Neural Network, which has a large number of layers. There are 30 Layers in total, 2 of which are input and output and the other 28 are hidden. In order to pass the parameters of the network a loop structure is used.
+
+### Example 6
+
+`ga_sum.py` Contains an example showing the use of Genetic Algorithm API. The objective is to find 5 parameters ranging from 0 to 1 that maximize their sum.
