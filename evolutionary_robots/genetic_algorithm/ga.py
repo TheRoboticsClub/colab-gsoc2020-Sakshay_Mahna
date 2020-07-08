@@ -304,7 +304,7 @@ class GeneticAlgorithm(object):
 					self.population[row, column] = np.random.uniform(0, 1)
 				
 	# Plotting Function
-	def plot_fitness(self):
+	def plot_fitness(self, filename, show=False):
 		"""
 		Plots the Fitness statistics of a population
 		as a function of generation
@@ -327,8 +327,16 @@ class GeneticAlgorithm(object):
 		
 		# Show the plots and the legend
 		plt.title("Fitness Plot")
-		plt.legend()
-		plt.show()
+		
+		# Make a directory if it does not exist
+		if not os.path.exists('./repr'):
+			os.makedirs('./repr')
+		
+		plt.savefig(filename + '.png')
+		
+		if(show == True):
+			plt.legend()
+			plt.show()
 		
 	# Function to save statistics
 	def save_statistics(self, filename):
