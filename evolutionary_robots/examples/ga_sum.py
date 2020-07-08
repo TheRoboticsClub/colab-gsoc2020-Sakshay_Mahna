@@ -11,7 +11,7 @@ from genetic_algorithm.ga import GeneticAlgorithm
 ga = GeneticAlgorithm()
 
 # Set the population size of the algorithm
-ga.population_size = 1000
+ga.population_size = 50
 
 # Set the chromosome length
 ga.chromosome_length = 5
@@ -23,14 +23,15 @@ ga.mutation_probability = 0.01
 ga.number_of_elites = 4
 
 # Set the number of generations of the algorithm
-ga.number_of_generations = 250
+ga.number_of_generations = 1000
 
 # Set the fitness function we defined above
 # Define the fitness function
-# which is a sum of the alleles of the chromosome
 def fitness_function(chromosome):
+	# Sum of the alleles of the chromosome
 	return np.sum(chromosome)
 
+# Pass the fitness function as an attribute
 ga.fitness_function = fitness_function
 
 # Run the Genetic Algorithm and print it's result

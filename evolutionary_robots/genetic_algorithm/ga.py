@@ -8,6 +8,7 @@ is required to design the fitness function.
 
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 import warnings
 
 # The Genetic Algorithm class
@@ -58,6 +59,10 @@ class GeneticAlgorithm(object):
 		
 	number_of_elites: integer
 		The number of elites in each generation
+		
+	replay_fraction: float
+		A float between 0 to 1 that specifies the fraction
+		of generations the algorithm should save
 		
 	Methods
 	-------
@@ -119,9 +124,15 @@ class GeneticAlgorithm(object):
 		self.chromosome_length = chromosome_length
 		self.number_of_elites = number_of_elites
 		
+		# Other adjustable constants
+		self.replay_fraction = 0.25
+		
 		# Some constants
 		self.__minimum_crossover_length = 1		# Always 1
 		self.__do_crossover = True
+		
+		# Settings to adjust some non required warnings
+		np.seterr(divide='ignore', invalid='ignore')
 	
 	# Generates a population of individuals
 	def generate_population(self):
@@ -136,6 +147,12 @@ class GeneticAlgorithm(object):
 		self.best_chromosome = None
 		self.best_fitness = float('-inf')
 		self.best_generation = None
+		
+		# Lists to be saved
+		self.__best_chromosomes = []
+		self.__generations = []
+		self.__statistics = []
+		
 		# Plotting lists
 		self.max_fitness = []
 		self.min_fitness = []
@@ -159,10 +176,12 @@ class GeneticAlgorithm(object):
 		fitness = self.fitness_function(chromosome)
 		
 		# Determine the best fitness
-		self.best_fitness = max(self.best_fitness, fitness)
-		if(fitness == self.best_fitness):
-			self.best_chromosome = chromosome
-			self.best_generation = self.current_generation
+		# And when it occured the first time
+		if(fitness != self.best_fitness):
+			self.best_fitness = max(self.best_fitness, fitness)
+			if(fitness == self.best_fitness):
+				self.best_chromosome = chromosome
+				self.best_generation = self.current_generation
 			
 		return fitness
 		
@@ -186,9 +205,14 @@ class GeneticAlgorithm(object):
 		max_fitness = self.fitness_vector.max()
 		sum_fitness = np.sum(self.fitness_vector)
 		
-		statistics = [self.current_generation - 1, max_fitness, sum_fitness / self.population_size, min_fitness]
+		# Append to best chromsomes
+		self.__best_chromosomes.append(self.population[np.where(self.fitness_vector == np.amax(self.fitness_vector))][0])
 		
-		print("{: >15} {: >15} {: >15} {: >15}".format(*statistics))
+		# Append to statistics: Generation, Max Fitness, Average Fitness,
+		# Min Fitness and Best Chromosome of the generation
+		self.__statistics.append([self.current_generation, max_fitness, sum_fitness / self.population_size, min_fitness])
+		
+		print("{: >15} {: >15} {: >15} {: >15}".format(*self.__statistics[self.current_generation]))
 		
 		# Append to plots
 		self.min_fitness.append(min_fitness)
@@ -271,12 +295,13 @@ class GeneticAlgorithm(object):
 		to the probability of mutation
 		"""
 		# Iterate over all the elements
-		for row, column in np.ndindex(self.population.shape):
-			# Mutate or not
-			mutate = np.random.choice(2, 1, p = [1 - self.mutation_probability, self.mutation_probability])
-			if(mutate[0] == 1):
-				# Mutate
-				self.population[row, column] = np.random.uniform(0, 1)
+		for row in range(self.population.shape[0] - self.number_of_elites):
+			for column in range(self.population.shape[1]):
+				# Mutate or not
+				mutate = np.random.choice(2, 1, p = [1 - self.mutation_probability, self.mutation_probability])
+				if(mutate[0] == 1):
+					# Mutate
+					self.population[row, column] = np.random.uniform(0, 1)
 				
 	# Plotting Function
 	def plot_fitness(self):
@@ -285,7 +310,7 @@ class GeneticAlgorithm(object):
 		as a function of generation
 		"""
 		# Generate the range of Generations
-		generations = range(1, self.number_of_generations)
+		generations = range(1, self.number_of_generations+1)
 		
 		# Plot Max Fitness
 		plt.plot(generations, self.max_fitness, label="MAX")
@@ -305,13 +330,74 @@ class GeneticAlgorithm(object):
 		plt.legend()
 		plt.show()
 		
+	# Function to save statistics
+	def save_statistics(self, filename):
+		"""
+		Function to save the statistics of the runtime
+		of algorithm in a specified file
+		"""
+		# Save the statistics to a txt file
+		legend = ["Generation", "Maximum Fitness", "Average Fitness", "Minimum Fitness"]
+		header = "{: >15} {: >15} {: >15} {: >15}".format(*legend)
+		fmt = '%15d', '%15.10f', '%15.10f', '%15.10f'
+		np.savetxt(filename + '.txt', self.__statistics, fmt=fmt, header=header)
+		
+	# Function to save chromosomes
+	def save_chromosome(self, chromosome, filename):
+		"""
+		Function to save a chromosome to a file
+		
+		Parameters
+		----------
+		chromosome: array like
+			The chromosome array should be a 1D or 2D array
+			Either representing a single chromosome or a
+			group of chromosomes
+		
+		filename: string
+			The name of the file to which the chromosome is
+			going to be saved
+			
+		Returns
+		-------
+		None
+		
+		Raises
+		------
+		None
+		"""
+		# Convert to numpy array
+		chromosome = np.array(chromosome)
+		
+		# Save the chromosome to a txt file
+		np.savetxt(filename + '.txt', chromosome, fmt="%.10f", delimiter=' , ')
+		
+	
+	
 	# Run the complete Genetic Algorithm
 	def run(self):
 		"""
-		Simulates a complete run of the Genetic Algorithm
+		Simulate the complete run of the algorithm
+		
+		Parameters
+		----------
+		None
+		
+		Returns
+		-------
+		best_chromosome: array like
+			An array of alleles ranging from [0, 1] that has the best
+			fitness value among all the generations
+			
+		Raises
+		------
+		None
 		"""
 		# Generate a random population
 		self.generate_population()
+		
+		# Append to the Generations
+		self.__generations.append(self.population)
 		
 		# Print the legend
 		legend = ["Generation", "Maximum Fitness", "Average Fitness", "Minimum Fitness"]
@@ -319,9 +405,9 @@ class GeneticAlgorithm(object):
 		
 		# Keep going through generations with selection,
 		# crossover and mutation
-		for generation in range(1, self.number_of_generations):
+		for generation in range(1, self.number_of_generations + 1):
 			# For statistics
-			self.current_generation = generation
+			self.current_generation = generation - 1
 			
 			# Determine the fitness of all the individuals
 			self.determine_fitness()
@@ -335,6 +421,21 @@ class GeneticAlgorithm(object):
 			# Apply mutation
 			self.mutation()
 			
+			# Append to generations
+			self.__generations.append(self.population)
+			
+		# Make a directory if it does not exist
+		if not os.path.exists('./log'):
+			os.makedirs('./log')
+		
+		# Save the required values
+		self.save_statistics('./log/stats')
+		self.save_chromosome(self.__best_chromosomes, './log/best_chromosomes')
+		
+		# Save the replay fraction amount of generations
+		np.save('./log/generations' + str(int(100 * self.replay_fraction)) + "%.npy",
+				self.__generations[int(self.replay_fraction * self.number_of_generations):])
+		
 		# Print the best fitness and return the chromosome
 		print("The best fitness value acheived is: " + str(self.best_fitness))
 		print("Found in generation # " + str(self.best_generation))
@@ -414,6 +515,23 @@ class GeneticAlgorithm(object):
 			# Reduce the number of elites by 1, as the algorithm
 			# would not work otherwise
 			self._number_of_elites -= 1
+			
+	@property
+	def replay_fraction(self):
+		""" Attribute to specify the fraction of 
+			number of generations to save
+		"""
+		return self._replay_fraction
+		
+	@replay_fraction.setter
+	def replay_fraction(self, fraction):
+		# Some adjustments
+		if(abs(fraction) > 1 and abs(fraction) <= self.number_of_generations):
+			fraction = fraction / self.number_of_generations
+		elif(abs(fraction) > self.number_of_generations):
+			fraction = self.number_of_generations
+		
+		self._replay_fraction = fraction
 			
 	@property
 	def fitness_function(self):
