@@ -327,6 +327,7 @@ class GeneticAlgorithm(object):
 		
 		# Show the plots and the legend
 		plt.title("Fitness Plot")
+		plt.legend()
 		
 		# Make a directory if it does not exist
 		if not os.path.exists('./repr'):
@@ -335,7 +336,6 @@ class GeneticAlgorithm(object):
 		plt.savefig(filename + '.png')
 		
 		if(show == True):
-			plt.legend()
 			plt.show()
 		
 	# Function to save statistics
