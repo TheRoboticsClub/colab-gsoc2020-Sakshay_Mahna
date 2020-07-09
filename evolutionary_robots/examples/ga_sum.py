@@ -39,4 +39,4 @@ ga.fitness_function = fitness_function
 print(ga.run())
 
 # Plot the fitness value against the generation number
-ga.plot_fitness(True, './repr/fitness_plot')
+ga.plot_fitness('./repr/fitness_plot', True)
