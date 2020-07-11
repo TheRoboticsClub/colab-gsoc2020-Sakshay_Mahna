@@ -120,7 +120,9 @@ class GeneticAlgorithm(object):
 		of algorithm in a specified file
 		
 	"""
-	def __init__(self, population_size=100, number_of_generations=10, mutation_probability=0.01, chromosome_length=5, number_of_elites=0):
+	def __init__(self, population_size=100, number_of_generations=10, 
+				 mutation_probability=0.01, chromosome_length=5, 
+				 number_of_elites=0):
 		"""
 		Initialization function of Genetic Algorithm
 		...
@@ -164,7 +166,8 @@ class GeneticAlgorithm(object):
 		the size of population and the chromsome length
 		"""
 		# Using the range
-		self.population = np.random.uniform(0, 1, (self.population_size, self.chromosome_length))
+		self.population = np.random.uniform(0, 1, 
+						  (self.population_size, self.chromosome_length))
 		
 		# Initialize the plots and the BEST individual
 		self.best_chromosome = None
@@ -229,13 +232,18 @@ class GeneticAlgorithm(object):
 		sum_fitness = np.sum(self.fitness_vector)
 		
 		# Append to best chromsomes
-		self.__best_chromosomes.append(self.population[np.where(self.fitness_vector == np.amax(self.fitness_vector))][0])
+		self.__best_chromosomes.append(self.population[
+									   np.where(self.fitness_vector == np.amax(self.fitness_vector))
+									   ][0])
 		
 		# Append to statistics: Generation, Max Fitness, Average Fitness,
 		# Min Fitness and Best Chromosome of the generation
-		self.__statistics.append([self.current_generation, max_fitness, sum_fitness / self.population_size, min_fitness])
+		self.__statistics.append([self.current_generation, max_fitness, 
+								  sum_fitness / self.population_size, min_fitness])
 		
-		print("{: <10} {: >20} {: >20} {: >20}".format(*self.__statistics[self.current_generation - self.generation_start]))
+		print("{: <10} {: >20} {: >20} {: >20}".format(
+												*self.__statistics[self.current_generation - self.generation_start]
+												))
 		
 		# Append to plots
 		self.min_fitness.append(min_fitness)
@@ -257,7 +265,7 @@ class GeneticAlgorithm(object):
 		
 		try:
 			self.fitness_vector = (self.fitness_vector - min_fitness) / (max_fitness - min_fitness)
-		except:
+		except ZeroDivisionError:
 			pass
 			
 		# Average the fitness vector
@@ -273,10 +281,12 @@ class GeneticAlgorithm(object):
 		# The probility function is the fitness vector itself
 		try:
 			effective_population = self.population_size - self.number_of_elites
-			self.roullete_selection = np.random.choice(effective_population, effective_population, p = self.fitness_vector)
-		except:
+			self.roullete_selection = np.random.choice(effective_population, 
+														effective_population, 
+														p = self.fitness_vector)
+		except ValueError:
 			pass
-			
+				
 	# Cross over
 	def crossover(self):
 		"""
@@ -294,7 +304,8 @@ class GeneticAlgorithm(object):
 			mum = self.population[self.roullete_selection[index]]
 			dad = self.population[self.roullete_selection[index + 1]]
 			
-			cross_position = np.random.randint(self.__minimum_crossover_length, self.chromosome_length)
+			cross_position = np.random.randint(self.__minimum_crossover_length, 
+											   self.chromosome_length)
 			
 			# Cross over
 			son = np.concatenate([mum[:cross_position], dad[cross_position:]])
@@ -308,9 +319,9 @@ class GeneticAlgorithm(object):
 		self.population = np.array(new_population)
 		try:
 			self.population = np.concatenate([self.population, self.elites])
-		except:
+		except AttributeError:
 			pass
-				
+	
 	# Mutation
 	def mutation(self):
 		"""
@@ -321,7 +332,9 @@ class GeneticAlgorithm(object):
 		for row in range(self.population.shape[0] - self.number_of_elites):
 			for column in range(self.population.shape[1]):
 				# Mutate or not
-				mutate = np.random.choice(2, 1, p = [1 - self.mutation_probability, self.mutation_probability])
+				mutate = np.random.choice(2, 1, p = [1 - self.mutation_probability, 
+													 self.mutation_probability
+													])
 				if(mutate[0] == 1):
 					# Mutate
 					self.population[row, column] = np.random.uniform(0, 1)
@@ -513,7 +526,8 @@ class GeneticAlgorithm(object):
 			# Check the current fraction and save if required
 			if(generation % int(self.replay_fraction * (self.number_of_generations)) == 0):
 				fraction = float(generation) / float(self.number_of_generations)
-				self.save_chromosome(self.population, './log/generation' + str(int(100 * fraction)) + "%", "Generation #" + str(self.current_generation))
+				self.save_chromosome(self.population, './log/generation' + str(int(100 * fraction)) + "%", 
+									 "Generation #" + str(self.current_generation))
 			
 			# Determine the fitness of all the individuals
 			self.determine_fitness()
@@ -551,10 +565,13 @@ class GeneticAlgorithm(object):
 		we left off
 		"""
 		# Save the current generation chromosomes
-		self.save_chromosome(self.__generations[self.current_generation - self.generation_start], './log/generation' + str(self.current_generation - 1), header='Generation #' + str(self.current_generation - 1))
+		self.save_chromosome(self.__generations[self.current_generation - self.generation_start], 
+							 './log/generation' + str(self.current_generation - 1), 
+							 header='Generation #' + str(self.current_generation - 1))
 		
 		# Save the current best
-		self.save_chromosome(np.array([self.best_chromosome]), './log/current_best', header="Found in generation #" + str(self.best_generation))
+		self.save_chromosome(np.array([self.best_chromosome]), './log/current_best', 
+							 header="Found in generation #" + str(self.best_generation))
 
 		print("Current best fitness: " + str(self.best_fitness))
 		print("Found in generation # " + str(self.best_generation))

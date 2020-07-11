@@ -40,7 +40,8 @@ class ActivationFunction(object):
 	theta(optional) : float / array_like
 		The bias/offset of the activation function
 		
-	* An array can be used for beta and theta, if we want different activation for different neuron
+	* An array can be used for beta and theta, 
+	  if we want different activation for different neuron
 
 	Attributes
 	----------
@@ -49,7 +50,8 @@ class ActivationFunction(object):
 	theta(optional) : float / array_like
 		The bias/offset of the activation function
 		
-	* An array can be used for beta and theta, if we want different activation for different neuron
+	* An array can be used for beta and theta, 
+	  if we want different activation for different neuron
 
 	Methods
 	-------

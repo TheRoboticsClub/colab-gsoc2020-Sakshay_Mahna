@@ -386,7 +386,8 @@ class DynamicLayer(object):
 		Calculates the output based on the input_vector
 		
 	update_parameters(parameter_vector)
-		Updates the parameters of the layer according to the parameter_vector argument
+		Updates the parameters of the layer according to 
+		the parameter_vector argument
 		
 	return_parameters()
 		Return the parameters of the layer
@@ -400,7 +401,8 @@ class DynamicLayer(object):
 		Get the parameters of activation function
 		
 	"""
-	def __init__(self, input_dim, output_dim, activation_function, time_interval, time_constant, layer_name):
+	def __init__(self, input_dim, output_dim, activation_function, 
+				 time_interval, time_constant, layer_name):
 		"""
 		Initialization function of DynamicLayer class		
 		...
@@ -566,7 +568,8 @@ class DynamicLayer(object):
 			self.__weight_matrix = parameter_vector[interval_counter:interval_counter + weight_interval].reshape(self.__weight_dim)
 			interval_counter = interval_counter + weight_interval
 			
-			self.set_activation_parameters(parameter_vector[interval_counter:interval_counter + activation_interval], parameter_vector[interval_counter + activation_interval: interval_counter + 2 * activation_interval])
+			self.set_activation_parameters(parameter_vector[interval_counter:interval_counter + activation_interval], 
+											parameter_vector[interval_counter + activation_interval: interval_counter + 2 * activation_interval])
 			interval_counter = interval_counter + 2 * activation_interval
 			
 		except:

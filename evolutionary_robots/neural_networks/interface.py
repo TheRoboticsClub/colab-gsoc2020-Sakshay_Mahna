@@ -51,7 +51,8 @@ class Layer(object):
 	----------
 	The attributes are same as the parameters
 	"""
-	def __init__(self, layer_name, number_of_neurons = 1, activation_function = LinearActivation(), sensor_input = "", output_connections = []):
+	def __init__(self, layer_name, number_of_neurons = 1, activation_function = LinearActivation(), 
+				 sensor_input = "", output_connections = []):
 		""" 
 		Initialization function of Layer
 		

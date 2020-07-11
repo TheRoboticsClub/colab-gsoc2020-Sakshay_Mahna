@@ -58,7 +58,8 @@ class ArtificialNeuralNetwork(object):
 		*Useful for networks with Dynamic Layers
 		
 	output_matrix: dictionary
-		Shows the output of each layer in the previous iteration of the network
+		Shows the output of each layer in the previous iteration of 
+		the network
 		
 	Methods
 	-------
@@ -119,7 +120,9 @@ class ArtificialNeuralNetwork(object):
 		
 		# Output and State matrix dictionary
 		self.__output_matrix = {}
-		self.__state_matrix = dict((layer[0], tf.Variable(np.zeros((layer[1], )), dtype=tf.float64)) for layer in layer_vector)
+		self.__state_matrix = dict((layer[0], 
+								tf.Variable(np.zeros((layer[1], )), dtype=tf.float64)) for layer in layer_vector)
+								
 		self.__state = dict((layer[0], np.zeros((layer[1], ))) for layer in layer_vector)
 		
 		# Construct the layers and the execution graph
@@ -141,7 +144,8 @@ class ArtificialNeuralNetwork(object):
 		layer_vector: array_like
 		A list of interface.Layer objects
 		
-		The network is constructed using the parameters of the objects
+		The network is constructed using the parameters
+		of the objects
 			
 		Returns
 		-------
@@ -170,7 +174,7 @@ class ArtificialNeuralNetwork(object):
 			for output_layer in layer[4]:
 				try:
 					self.__input_connections[output_layer].append(layer[0])
-				except:
+				except KeyError:
 					self.__input_connections[output_layer] = [layer[0]] 
 		
 		
@@ -185,7 +189,7 @@ class ArtificialNeuralNetwork(object):
 				try:
 					for connection in self.__input_connections[layer[0]]:
 						input_dimension = input_dimension + self.__neuron_map[connection]
-				except:
+				except KeyError:
 					self.__input_layers.append(layer[0])
 					self.__level_vector[0].append(layer[0])
 					input_dimension = layer[1]
@@ -197,7 +201,8 @@ class ArtificialNeuralNetwork(object):
 				activation_function = layer[2]
 				
 				# Generate the layer
-				self.__layer_map[layer[0]] = StaticLayer(input_dimension, output_dimension, activation_function, layer[0])
+				self.__layer_map[layer[0]] = StaticLayer(input_dimension, output_dimension,
+														 activation_function, layer[0])
 				
 			# Dynamic Layer
 			elif(self.__type_of_network == "DYNAMIC"):
@@ -208,7 +213,7 @@ class ArtificialNeuralNetwork(object):
 				try:
 					for connection in self.__input_connections[layer[0]]:
 						input_dimension = input_dimension + self.__neuron_map[connection]		
-				except:
+				except KeyError:
 					self.__input_layers.append(layer[0])
 					self.__level_vector[0].append(layer[0])
 					input_dimension = layer[1]
@@ -221,9 +226,12 @@ class ArtificialNeuralNetwork(object):
 				
 				# Generate the layer
 				if(layer[0] in self.__input_layers):
-					self.__layer_map[layer[0]] = StaticLayer(input_dimension, output_dimension, activation_function, layer[0])
+					self.__layer_map[layer[0]] = StaticLayer(input_dimension, output_dimension, 
+															 activation_function, layer[0])
 				else:
-					self.__layer_map[layer[0]] = DynamicLayer(input_dimension, output_dimension, activation_function, self.__time_interval, np.ones((output_dimension, )), layer[0])
+					self.__layer_map[layer[0]] = DynamicLayer(input_dimension, output_dimension, 
+															  activation_function, self.__time_interval, 
+															  np.ones((output_dimension, )), layer[0])
 				
 		# Generate the output layers variable
 		layer_keys = self.__output_connections.keys()
@@ -317,7 +325,7 @@ class ArtificialNeuralNetwork(object):
 								# A try except block if we try accessing an element of output matrix that is not yet declared
 								try:
 									input_vector = tf.compat.v1.concat([input_vector, self.__output_matrix[connection]], axis=0)
-								except:
+								except IndexError:
 									new_error_queue.append(layer)
 									continue
 						
@@ -328,7 +336,8 @@ class ArtificialNeuralNetwork(object):
 									
 					# If all the above stages complete perfectly
 					# Make an entry to output matrix
-					self.__output_matrix[layer] = tf.numpy_function(self.__layer_map[layer].forward_propagate, [input_vector, self.__sensor_inputs[layer]], tf.float64)
+					self.__output_matrix[layer] = tf.numpy_function(self.__layer_map[layer].forward_propagate, 
+																	[input_vector, self.__sensor_inputs[layer]], tf.float64)
 					layers_generated = layers_generated + 1
 					
 					# Insert all the connections to the next level
@@ -337,7 +346,7 @@ class ArtificialNeuralNetwork(object):
 						if((connection not in self.__output_layers) and (layers_done[connection] == False)):
 							try:
 								self.__level_vector[current_level + 1].append(connection)
-							except:
+							except IndexError:
 								self.__level_vector.append([])
 								self.__level_vector[current_level + 1].append(connection)
 								
@@ -345,8 +354,7 @@ class ArtificialNeuralNetwork(object):
 				
 				# Check if the new error queue is the same as the error queue
 				# Then we have a problem
-				if(new_error_queue == error_queue):
-					raise Exception("The Static Neural Network seems to contain some recurrent connections")
+				assert new_error_queue != error_queue, "The Static Neural Network seems to contain some recurrent connections"
 									
 				# Error Queue is the new one
 				error_queue = new_error_queue
@@ -392,7 +400,7 @@ class ArtificialNeuralNetwork(object):
 			# Get the sensor input
 			try:
 				sensor_input[self.__sensor_inputs[layer[0]]] = input_dict[layer[3]]
-			except:
+			except KeyError:
 				sensor_input[self.__sensor_inputs[layer[0]]] = np.zeros((self.__neuron_map[layer[0]], ))
 
 		# Calculate the output
@@ -421,7 +429,7 @@ class ArtificialNeuralNetwork(object):
 					else:
 						output_vector = np.sum(output_vector, output[connection])
 				except:
-					raise Exception("There is something wrong with the configuration of " + layer)
+					raise RuntimeError("There is something wrong with the configuration of " + layer)
 					
 			output_dict[layer] = output_vector
 			
@@ -460,7 +468,8 @@ class ArtificialNeuralNetwork(object):
 		Returns
 		-------
 		output_dict: dictionary
-			Dictionary specifying the parameters of each layer, keyed according to their name.
+			Dictionary specifying the parameters of each layer, 
+			keyed according to their name.
 			The format of weights is specific to the layer.
 			
 		Raises
@@ -492,8 +501,10 @@ class ArtificialNeuralNetwork(object):
 		Parameters
 		----------
 		parameter_vector: array_like
-			The parameter_vector is a list of list, each parameter list is indexed according 
-			to the order of initialization specified by the user. 
+			The parameter_vector is a list of list, each parameter list 
+			is indexed according to the order of initialization 
+			specified by the user.
+			 
 			The parameter follows the format specific to each layer
 			
 		Returns
@@ -544,8 +555,9 @@ class ArtificialNeuralNetwork(object):
 		
 		Notes
 		-----
-		In terms of implementation, this is a simple python automation of graphviz
-		library for generating a network using clusters
+		In terms of implementation, this is a simple python 
+		automation of graphviz library for generating a 
+		network using clusters
 		
 		We generate 3 clusters: Sensor, Layers and Hardware
 		Then provide connections between them
