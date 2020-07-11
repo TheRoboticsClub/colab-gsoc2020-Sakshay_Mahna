@@ -6,6 +6,15 @@ sys.path.append('./../')
 import numpy as np
 
 from genetic_algorithm.ga import GeneticAlgorithm
+
+
+# Define the fitness function
+def fitness_function(chromosome):
+	# Sum of the genes of the chromosome
+	# Change the fitness function here to
+	# experiment
+	return np.sum(chromosome)
+
 	
 # Intialize the Genetic Algorithm object
 ga = GeneticAlgorithm()
@@ -24,12 +33,6 @@ ga.number_of_elites = 4
 
 # Set the number of generations of the algorithm
 ga.number_of_generations = 1000
-
-# Set the fitness function we defined above
-# Define the fitness function
-def fitness_function(chromosome):
-	# Sum of the alleles of the chromosome
-	return np.sum(chromosome)
 
 # Pass the fitness function as an attribute
 ga.fitness_function = fitness_function

@@ -11,6 +11,9 @@ import matplotlib.pyplot as plt
 import os
 import warnings
 
+from signal import signal, SIGINT
+from sys import exit
+
 # The Genetic Algorithm class
 class GeneticAlgorithm(object):
 	"""
@@ -99,6 +102,10 @@ class GeneticAlgorithm(object):
 	mutation()
 		Mutates the genes of the chromosomes of the indviduals
 		according to the mutation probability
+		
+	stop_handler()
+		Function that handles the execution when SIGINT signal is
+		received. It saves the files from where the user can resume
 	"""
 	def __init__(self, population_size=100, number_of_generations=10, mutation_probability=0.01, chromosome_length=5, number_of_elites=0):
 		"""
@@ -133,6 +140,9 @@ class GeneticAlgorithm(object):
 		
 		# Settings to adjust some non required warnings
 		np.seterr(divide='ignore', invalid='ignore')
+		
+		# Tell Python to run stop_handler when SIGINT received
+		signal(SIGINT, self.stop_handler)
 	
 	# Generates a population of individuals
 	def generate_population(self):
@@ -212,7 +222,7 @@ class GeneticAlgorithm(object):
 		# Min Fitness and Best Chromosome of the generation
 		self.__statistics.append([self.current_generation, max_fitness, sum_fitness / self.population_size, min_fitness])
 		
-		print("{: >15} {: >15} {: >15} {: >15}".format(*self.__statistics[self.current_generation]))
+		print("{: <10} {: >20} {: >20} {: >20}".format(*self.__statistics[self.current_generation]))
 		
 		# Append to plots
 		self.min_fitness.append(min_fitness)
@@ -346,12 +356,12 @@ class GeneticAlgorithm(object):
 		"""
 		# Save the statistics to a txt file
 		legend = ["Generation", "Maximum Fitness", "Average Fitness", "Minimum Fitness"]
-		header = "{: >15} {: >15} {: >15} {: >15}".format(*legend)
-		fmt = '%15d', '%15.10f', '%15.10f', '%15.10f'
+		header = "{: <10} {: >20} {: >20} {: >20}".format(*legend)
+		fmt = '%-10d', '%20.10f', '%20.10f', '%20.10f'
 		np.savetxt(filename + '.txt', self.__statistics, fmt=fmt, header=header)
 		
 	# Function to save chromosomes
-	def save_chromosome(self, chromosome, filename):
+	def save_chromosome(self, chromosome, filename, header=None):
 		"""
 		Function to save a chromosome to a file
 		
@@ -378,9 +388,10 @@ class GeneticAlgorithm(object):
 		chromosome = np.array(chromosome)
 		
 		# Save the chromosome to a txt file
-		np.savetxt(filename + '.txt', chromosome, fmt="%.10f", delimiter=' , ')
-		
-	
+		if(header == None):
+			np.savetxt(filename + '.txt', chromosome, fmt="%.10f", delimiter=' , ')
+		else:
+			np.savetxt(filename + '.txt', chromosome, fmt="%.10f", delimiter=' , ', header=header)
 	
 	# Run the complete Genetic Algorithm
 	def run(self):
@@ -401,6 +412,10 @@ class GeneticAlgorithm(object):
 		------
 		None
 		"""
+		# Make a directory if it does not exist
+		if not os.path.exists('./log'):
+			os.makedirs('./log')
+		
 		# Generate a random population
 		self.generate_population()
 		
@@ -409,13 +424,24 @@ class GeneticAlgorithm(object):
 		
 		# Print the legend
 		legend = ["Generation", "Maximum Fitness", "Average Fitness", "Minimum Fitness"]
-		print("{: >15} {: >15} {: >15} {: >15}".format(*legend))
+		print("{: <10} {: >20} {: >20} {: >20}".format(*legend))
+		
+		# Save the current generation
+		self.save_chromosome(self.population, './log/generation0%', header="Generation #0")
+		
+		# Keep a note of the current fraction of generation
+		current_fraction = self.replay_fraction
 		
 		# Keep going through generations with selection,
 		# crossover and mutation
 		for generation in range(1, self.number_of_generations + 1):
 			# For statistics
 			self.current_generation = generation - 1
+			
+			# Check the current fraction and save if required
+			if(int(current_fraction * (self.number_of_generations)) == generation):
+				self.save_chromosome(self.population, './log/generation' + str(int(100 * current_fraction)) + "%", "Generation #" + str(self.current_generation))
+				current_fraction = current_fraction + self.replay_fraction
 			
 			# Determine the fitness of all the individuals
 			self.determine_fitness()
@@ -432,23 +458,36 @@ class GeneticAlgorithm(object):
 			# Append to generations
 			self.__generations.append(self.population)
 			
-		# Make a directory if it does not exist
-		if not os.path.exists('./log'):
-			os.makedirs('./log')
 		
 		# Save the required values
 		self.save_statistics('./log/stats')
 		self.save_chromosome(self.__best_chromosomes, './log/best_chromosomes')
-		
-		# Save the replay fraction amount of generations
-		np.save('./log/generations' + str(int(100 * self.replay_fraction)) + "%.npy",
-				self.__generations[int(self.replay_fraction * self.number_of_generations):])
 		
 		# Print the best fitness and return the chromosome
 		print("The best fitness value acheived is: " + str(self.best_fitness))
 		print("Found in generation # " + str(self.best_generation))
 		
 		return self.best_chromosome
+	
+	# Function that is run whenever execution
+	# is stopped in between
+	def stop_handler(self, signal_received, frame):
+		"""
+		Function to handle SIGINT signal (CTRL + C)
+		Whenever the signal is received save, the
+		current information to help resume from where
+		we left off
+		"""
+		# Save the current generation chromosomes
+		self.save_chromosome(self.__generations[self.current_generation], './log/generation' + str(self.current_generation), header='Generation #' + str(self.current_generation))
+		
+		# Save the current best
+		self.save_chromosome(np.array([self.best_chromosome]), './log/current_best', header="Found in generation #" + str(self.best_generation))
+
+		print("Current best fitness: " + str(self.best_fitness))
+		print("Found in generation # " + str(self.best_generation))
+		
+		exit(0)
 		
 	# Getters and Setters
 	@property
