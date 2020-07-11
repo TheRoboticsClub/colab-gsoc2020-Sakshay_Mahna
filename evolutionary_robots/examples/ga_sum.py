@@ -43,3 +43,7 @@ print(ga.run())
 
 # Plot the fitness value against the generation number
 ga.plot_fitness('./repr/fitness_plot', True)
+
+# If we want to run the generation from 25%
+# completion again
+print(ga.run('./log/generation25%.txt'))

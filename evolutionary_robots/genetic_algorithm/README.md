@@ -93,6 +93,10 @@ ga.run()
 ga.plot_fitness()
 ```
 
-`ga.run()` function runs a simulation of the genetic algorithm for the specifed number of generations. It also prints some statistics regarding the minimum, maximum and the average fitness values. The function returns the chromosomes with the best fitness value for the whole simulation. Along with it, these statistics are saved in `stats.txt`. The best chromosomes of each generation are stored in `best_chromosomes.txt`, and all the chromosomes of each generation according to the replay fraction attribute are saved in `generations<replay_fraction%>.npy`. These 3 files are saved in a directory named as `log`.
+`ga.run()` function runs a simulation of the genetic algorithm for the specifed number of generations. It also prints some statistics regarding the minimum, maximum and the average fitness values. The function returns the chromosomes with the best fitness value for the whole simulation. Along with it, these statistics are saved in `stats.txt`. The best chromosomes of each generation are stored in `best_chromosomes.txt`, all the chromosomes of each generation according to the replay fraction attribute are saved in `generations<replay_fraction>%.txt`. These represent the populalation when the algorithm has reached certain percentage of total generations to run.
+
+If the user stops the execution via a SIGINT signal, (CTRL + C) the algorithm saves the current population and the current best chromosome in `generation<number>.txt` and `current_best.txt` files respectively.
+
+These files are saved in a directory named as `log`.
 
 `ga.plot_fitness()` generates a matplotlib plot of the fitness value as a function of the generation.

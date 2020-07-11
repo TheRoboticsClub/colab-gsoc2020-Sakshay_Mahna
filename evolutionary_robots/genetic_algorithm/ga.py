@@ -76,6 +76,14 @@ class GeneticAlgorithm(object):
 		Function to plot the max, min and average fitness v/s
 		the generation
 		
+	save_chromosome(filename)
+		Function to save a chromosome or an array of chromosomes
+		to a file
+		
+	load_chromosome(filename)
+		Function to load generation from which to resume
+		from a file
+		
 	Other Methods
 	-------------
 	generate_population()
@@ -106,6 +114,11 @@ class GeneticAlgorithm(object):
 	stop_handler()
 		Function that handles the execution when SIGINT signal is
 		received. It saves the files from where the user can resume
+		
+	save_statistics(filename)
+		Function to save the statistics of the runtime
+		of algorithm in a specified file
+		
 	"""
 	def __init__(self, population_size=100, number_of_generations=10, mutation_probability=0.01, chromosome_length=5, number_of_elites=0):
 		"""
@@ -222,7 +235,7 @@ class GeneticAlgorithm(object):
 		# Min Fitness and Best Chromosome of the generation
 		self.__statistics.append([self.current_generation, max_fitness, sum_fitness / self.population_size, min_fitness])
 		
-		print("{: <10} {: >20} {: >20} {: >20}".format(*self.__statistics[self.current_generation]))
+		print("{: <10} {: >20} {: >20} {: >20}".format(*self.__statistics[self.current_generation - self.generation_start]))
 		
 		# Append to plots
 		self.min_fitness.append(min_fitness)
@@ -320,7 +333,7 @@ class GeneticAlgorithm(object):
 		as a function of generation
 		"""
 		# Generate the range of Generations
-		generations = range(1, self.number_of_generations+1)
+		generations = range(self.generation_start, self.number_of_generations+1)
 		
 		# Plot Max Fitness
 		plt.plot(generations, self.max_fitness, label="MAX")
@@ -392,15 +405,71 @@ class GeneticAlgorithm(object):
 			np.savetxt(filename + '.txt', chromosome, fmt="%.10f", delimiter=' , ')
 		else:
 			np.savetxt(filename + '.txt', chromosome, fmt="%.10f", delimiter=' , ', header=header)
+			
+	# Function to load the chromosomes of a
+	# generation and the parameters
+	def load_chromosome(self, filename):
+		"""
+		Function to load generation from which to resume
+		from a file
+		
+		Parameters
+		----------
+		filename: string
+			The name of the file from which the generation
+			is going to be loaded
+			
+		Returns
+		-------
+		None
+		
+		Raises
+		------
+		None
+		"""
+		# Load the file
+		self.population = np.loadtxt(filename, delimiter=' , ')
+		self.__generations[0] = self.population
+		
+		# Get the filename explicitly without
+		# path. Since the path is not that big
+		# A simple for loop will suffice
+		slice_index = 0
+		for index in range(len(filename)):
+			if(filename[index] == '/'):
+				slice_index = index
+		
+		# Slice the .txt extension
+		filename = filename[slice_index+1:-4]
+		
+		# Get the generation number 
+		# It can be a percentage or an
+		# exact number
+		name_size = len(filename)
+		if(filename[name_size-1] == '%'):
+			filename = filename[:name_size-1]
+			generation_resume = int(float(filename[10:]) * self.number_of_generations / 100)
+		else:
+			generation_resume = int(filename[10:])
+			
+		# Make the parameters same
+		self.population_size = self.population.shape[0]
+		self.chromosome_length = self.population.shape[1]
+		self.generation_start = generation_resume
 	
 	# Run the complete Genetic Algorithm
-	def run(self):
+	def run(self, filename=None):
 		"""
 		Simulate the complete run of the algorithm
 		
 		Parameters
 		----------
-		None
+		filename(optional): string
+			A filename specifying from what parameters
+			or generation to start the algorithm
+			
+			The filename should be the same as generated
+			by the algorithm.
 		
 		Returns
 		-------
@@ -429,19 +498,22 @@ class GeneticAlgorithm(object):
 		# Save the current generation
 		self.save_chromosome(self.population, './log/generation0%', header="Generation #0")
 		
-		# Keep a note of the current fraction of generation
-		current_fraction = self.replay_fraction
+		# Set the start variable
+		self.generation_start = 1
+		
+		if(filename != None):
+			self.load_chromosome(filename)
 		
 		# Keep going through generations with selection,
 		# crossover and mutation
-		for generation in range(1, self.number_of_generations + 1):
+		for generation in range(self.generation_start, self.number_of_generations + 1):
 			# For statistics
 			self.current_generation = generation - 1
 			
 			# Check the current fraction and save if required
-			if(int(current_fraction * (self.number_of_generations)) == generation):
-				self.save_chromosome(self.population, './log/generation' + str(int(100 * current_fraction)) + "%", "Generation #" + str(self.current_generation))
-				current_fraction = current_fraction + self.replay_fraction
+			if(generation % int(self.replay_fraction * (self.number_of_generations)) == 0):
+				fraction = float(generation) / float(self.number_of_generations)
+				self.save_chromosome(self.population, './log/generation' + str(int(100 * fraction)) + "%", "Generation #" + str(self.current_generation))
 			
 			# Determine the fitness of all the individuals
 			self.determine_fitness()
@@ -479,7 +551,7 @@ class GeneticAlgorithm(object):
 		we left off
 		"""
 		# Save the current generation chromosomes
-		self.save_chromosome(self.__generations[self.current_generation], './log/generation' + str(self.current_generation), header='Generation #' + str(self.current_generation))
+		self.save_chromosome(self.__generations[self.current_generation - self.generation_start], './log/generation' + str(self.current_generation - 1), header='Generation #' + str(self.current_generation - 1))
 		
 		# Save the current best
 		self.save_chromosome(np.array([self.best_chromosome]), './log/current_best', header="Found in generation #" + str(self.best_generation))
