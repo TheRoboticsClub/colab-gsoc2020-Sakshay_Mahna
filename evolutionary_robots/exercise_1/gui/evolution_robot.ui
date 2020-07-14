@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>733</width>
+    <height>870</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QWidget" name="verticalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>580</x>
+      <y>680</y>
+      <width>151</width>
+      <height>141</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="logoLayout"/>
+   </widget>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>440</y>
+      <width>251</width>
+      <height>379</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="statsLayout">
+     <item>
+      <widget class="QLabel" name="generation">
+       <property name="text">
+        <string>Current Generation: </string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="individual">
+       <property name="text">
+        <string>Current Individual: </string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="timer">
+       <property name="text">
+        <string>Timer: </string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="fitness">
+       <property name="text">
+        <string>Fitness Value: </string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="best_fitness">
+       <property name="text">
+        <string>Best Fitness: </string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>19</x>
+      <y>19</y>
+      <width>691</width>
+      <height>331</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="graphLayout"/>
+   </widget>
+   <widget class="QWidget" name="layoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>360</y>
+      <width>691</width>
+      <height>70</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QPushButton" name="testButton">
+       <property name="font">
+        <font>
+         <pointsize>15</pointsize>
+         <weight>75</weight>
+         <italic>true</italic>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Test</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="trainButton">
+       <property name="font">
+        <font>
+         <pointsize>15</pointsize>
+         <weight>75</weight>
+         <italic>true</italic>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Train</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget_3">
+    <property name="geometry">
+     <rect>
+      <x>279</x>
+      <y>439</y>
+      <width>451</width>
+      <height>231</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="plotLayout"/>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>733</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources>
+  <include location="../resources/resources.qrc"/>
+ </resources>
+ <connections/>
+</ui>
