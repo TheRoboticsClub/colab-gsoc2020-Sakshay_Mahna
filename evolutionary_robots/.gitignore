@@ -1,4 +1,6 @@
-# Byte-compiled / optimized / DLL files
+catkin_ws/build
+catkin_ws/devel
+catkin_ws/.catkin_tools
 __pycache__/
 *.py[cod]
 *$py.class
