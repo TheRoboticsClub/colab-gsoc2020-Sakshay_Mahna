@@ -30,6 +30,7 @@ from gui.GUI import MainWindow
 from gui.threadGUI import ThreadGUI
 from PyQt5.QtWidgets import QApplication
 
+from MyAlgorithm import MyAlgorithm
 from interfaces.infrared import ListenerInfrared
 from interfaces.motors import PublisherMotors
 
@@ -37,11 +38,11 @@ if __name__ == "__main__":
 
     infrared = ListenerInfrared("/roombaIR/sensor/infrared")
     motors = PublisherMotors("/roombaIR/cmd_vel", 4, 0.3)
-    
-    motors.sendV(1)
+    algorithm = MyAlgorithm(infrared, motors)
 
     app = QApplication(sys.argv)
     myGUI = MainWindow()
+    myGUI.setAlgorithm(algorithm)
     myGUI.show()
 
 

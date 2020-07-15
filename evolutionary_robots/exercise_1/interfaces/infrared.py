@@ -20,8 +20,7 @@ class InfraredData:
         return s 
 
 
-def message2InfraredData(infra):
-	infrared = InfraredData()
+def message2InfraredData(infra, infrared):
 	frame_id = infra.header.frame_id
 	
 	# Generate the index from frame_id
@@ -46,7 +45,7 @@ class ListenerInfrared:
  
     def __callback (self, message):
 
-        sensor = message2InfraredData(message)
+        sensor = message2InfraredData(message, self.data)
 
         self.lock.acquire()
         self.data = sensor

@@ -55,7 +55,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         pass
         
     def trainClicked(self):
-    	pass
+    	self.algorithm.play()
 
     def setAlgorithm(self, algorithm):
         self.algorithm=algorithm
