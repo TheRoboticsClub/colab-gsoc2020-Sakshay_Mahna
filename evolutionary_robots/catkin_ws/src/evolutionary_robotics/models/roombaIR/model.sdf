@@ -137,7 +137,7 @@
           <topic>__default_topic__</topic>
         </contact>
         <plugin name='gazebo_ros_bumper_controller' filename='libgazebo_ros_bumper.so'>
-          <bumperTopicName>/mobile_base/events/bumper</bumperTopicName>
+          <bumperTopicName>roombaIR/sensor/bumper</bumperTopicName>
           <frameName>bumper_sensor</frameName>
         </plugin>
       </sensor>
@@ -401,7 +401,7 @@
           <gaussianNoise>0.005</gaussianNoise>
           <alwaysOn>1</alwaysOn>
           <updateRate>50</updateRate>
-          <topicName>sensor/ir_1</topicName>
+          <topicName>roombaIR/sensor/infrared</topicName>
           <frameName>ir_1</frameName>
           <radiation>INFRARED</radiation>
           <fov>0.2967</fov>
@@ -534,7 +534,7 @@
           <gaussianNoise>0.005</gaussianNoise>
           <alwaysOn>1</alwaysOn>
           <updateRate>50</updateRate>
-          <topicName>sensor/ir_2</topicName>
+          <topicName>roombaIR/sensor/infrared</topicName>
           <frameName>ir_2</frameName>
           <radiation>INFRARED</radiation>
           <fov>0.2967</fov>
@@ -667,7 +667,7 @@
           <gaussianNoise>0.005</gaussianNoise>
           <alwaysOn>1</alwaysOn>
           <updateRate>50</updateRate>
-          <topicName>sensor/ir_3</topicName>
+          <topicName>roombaIR/sensor/infrared</topicName>
           <frameName>ir_3</frameName>
           <radiation>INFRARED</radiation>
           <fov>0.2967</fov>
@@ -800,7 +800,7 @@
           <gaussianNoise>0.005</gaussianNoise>
           <alwaysOn>1</alwaysOn>
           <updateRate>50</updateRate>
-          <topicName>sensor/ir_4</topicName>
+          <topicName>roombaIR/sensor/infrared</topicName>
           <frameName>ir_4</frameName>
           <radiation>INFRARED</radiation>
           <fov>0.2967</fov>
@@ -933,7 +933,7 @@
           <gaussianNoise>0.005</gaussianNoise>
           <alwaysOn>1</alwaysOn>
           <updateRate>50</updateRate>
-          <topicName>sensor/ir_5</topicName>
+          <topicName>roombaIR/sensor/infrared</topicName>
           <frameName>ir_5</frameName>
           <radiation>INFRARED</radiation>
           <fov>0.2967</fov>
@@ -1066,7 +1066,7 @@
           <gaussianNoise>0.005</gaussianNoise>
           <alwaysOn>1</alwaysOn>
           <updateRate>50</updateRate>
-          <topicName>sensor/ir_6</topicName>
+          <topicName>roombaIR/sensor/infrared</topicName>
           <frameName>ir_6</frameName>
           <radiation>INFRARED</radiation>
           <fov>0.2967</fov>
@@ -1199,7 +1199,7 @@
           <gaussianNoise>0.005</gaussianNoise>
           <alwaysOn>1</alwaysOn>
           <updateRate>50</updateRate>
-          <topicName>sensor/ir_7</topicName>
+          <topicName>roombaIR/sensor/infrared</topicName>
           <frameName>ir_7</frameName>
           <radiation>INFRARED</radiation>
           <fov>0.2967</fov>
@@ -1332,7 +1332,7 @@
           <gaussianNoise>0.005</gaussianNoise>
           <alwaysOn>1</alwaysOn>
           <updateRate>50</updateRate>
-          <topicName>sensor/ir_8</topicName>
+          <topicName>roombaIR/sensor/infrared</topicName>
           <frameName>ir_8</frameName>
           <radiation>INFRARED</radiation>
           <fov>0.2967</fov>
@@ -1508,7 +1508,7 @@
       </collision>
     </link>
     <link name='right_wheel'>
-      <pose frame=''>0 -0.13 0.032 0 -0 0</pose>
+      <pose frame=''>-0 -0.13 0.032 0 -0 0</pose>
       <inertial>
         <inertia>
           <ixx>0.001</ixx>
@@ -1646,6 +1646,23 @@
         </ode>
       </physics>
     </joint>
+    <joint name='base_JOINT_3' type='fixed'>
+      <parent>base</parent>
+      <child>ir_7</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
     <joint name='base_JOINT_4' type='fixed'>
       <parent>base</parent>
       <child>ir_2</child>
@@ -1700,23 +1717,6 @@
     <joint name='base_JOINT_7' type='fixed'>
       <parent>base</parent>
       <child>ir_6</child>
-      <pose frame=''>0 0 0 0 -0 0</pose>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-          <suspension>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </suspension>
-        </ode>
-      </physics>
-    </joint>
-    <joint name='ir_7_JOINT_3' type='fixed'>
-      <parent>base</parent>
-      <child>ir_7</child>
       <pose frame=''>0 0 0 0 -0 0</pose>
       <physics>
         <ode>

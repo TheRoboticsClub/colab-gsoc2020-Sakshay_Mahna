@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 #
 #  Copyright (C) 1997-2016 JDE Developers Team
 #
@@ -15,39 +14,33 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see http://www.gnu.org/licenses/.
 #  Authors :
+#       Alberto Martin Florido <almartinflorido@gmail.com>
 #       Aitor Martinez Fernandez <aitor.martinez.fernandez@gmail.com>
-#       Francisco Miguel Rivas Montero <franciscomiguel.rivas@urjc.es>
-#  Rosified by:
-#       Francisco Perez Salgado <f.perez475@gmail.com>
 #
+import threading
+import time
+from datetime import datetime
+
+time_cycle = 80
 
 
-# General imports
-import sys
+class ThreadPublisher(threading.Thread):
 
-# Practice imports
-from gui.GUI import MainWindow
-from gui.threadGUI import ThreadGUI
-from PyQt5.QtWidgets import QApplication
+    def __init__(self, pub, kill_event):
+        self.pub = pub
+        self.kill_event = kill_event
+        threading.Thread.__init__(self, args=kill_event)
 
-from interfaces.infrared import ListenerInfrared
-from interfaces.motors import PublisherMotors
+    def run(self):
+        while (not self.kill_event.is_set()):
+            start_time = datetime.now()
 
-if __name__ == "__main__":
+            self.pub.publish()
 
-    infrared = ListenerInfrared("/roombaIR/sensor/infrared")
-    motors = PublisherMotors("/roombaIR/cmd_vel", 4, 0.3)
-    
-    motors.sendV(1)
+            finish_Time = datetime.now()
 
-    app = QApplication(sys.argv)
-    myGUI = MainWindow()
-    myGUI.show()
-
-
-    t2 = ThreadGUI(myGUI)
-    t2.daemon=True
-    t2.start()
-
-
-    sys.exit(app.exec_())
+            dt = finish_Time - start_time
+            ms = (dt.days * 24 * 60 * 60 + dt.seconds) * 1000 + dt.microseconds / 1000.0
+            #print (ms)
+            if (ms < time_cycle):
+                time.sleep((time_cycle - ms) / 1000.0)

@@ -104,14 +104,14 @@
         <inertial>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>1</ixx>
+            <ixx>1000</ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>1</iyy>
+            <iyy>1000</iyy>
             <iyz>0</iyz>
-            <izz>1</izz>
+            <izz>1000</izz>
           </inertia>
-          <mass>1</mass>
+          <mass>1000</mass>
         </inertial>
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
@@ -625,7 +625,7 @@
             <gaussianNoise>0.005</gaussianNoise>
             <alwaysOn>1</alwaysOn>
             <updateRate>50</updateRate>
-            <topicName>roombaIR/sensor/ir_1</topicName>
+            <topicName>roombaIR/sensor/infrared</topicName>
             <frameName>ir_1</frameName>
             <radiation>INFRARED</radiation>
             <fov>0.2967</fov>
@@ -758,7 +758,7 @@
             <gaussianNoise>0.005</gaussianNoise>
             <alwaysOn>1</alwaysOn>
             <updateRate>50</updateRate>
-            <topicName>roombaIR/sensor/ir_2</topicName>
+            <topicName>roombaIR/sensor/infrared</topicName>
             <frameName>ir_2</frameName>
             <radiation>INFRARED</radiation>
             <fov>0.2967</fov>
@@ -891,7 +891,7 @@
             <gaussianNoise>0.005</gaussianNoise>
             <alwaysOn>1</alwaysOn>
             <updateRate>50</updateRate>
-            <topicName>roombaIR/sensor/ir_3</topicName>
+            <topicName>roombaIR/sensor/infrared</topicName>
             <frameName>ir_3</frameName>
             <radiation>INFRARED</radiation>
             <fov>0.2967</fov>
@@ -1024,7 +1024,7 @@
             <gaussianNoise>0.005</gaussianNoise>
             <alwaysOn>1</alwaysOn>
             <updateRate>50</updateRate>
-            <topicName>roombaIR/sensor/ir_4</topicName>
+            <topicName>roombaIR/sensor/infrared</topicName>
             <frameName>ir_4</frameName>
             <radiation>INFRARED</radiation>
             <fov>0.2967</fov>
@@ -1157,7 +1157,7 @@
             <gaussianNoise>0.005</gaussianNoise>
             <alwaysOn>1</alwaysOn>
             <updateRate>50</updateRate>
-            <topicName>roombaIR/sensor/ir_5</topicName>
+            <topicName>roombaIR/sensor/infrared</topicName>
             <frameName>ir_5</frameName>
             <radiation>INFRARED</radiation>
             <fov>0.2967</fov>
@@ -1290,7 +1290,7 @@
             <gaussianNoise>0.005</gaussianNoise>
             <alwaysOn>1</alwaysOn>
             <updateRate>50</updateRate>
-            <topicName>roombaIR/sensor/ir_6</topicName>
+            <topicName>roombaIR/sensor/infrared</topicName>
             <frameName>ir_6</frameName>
             <radiation>INFRARED</radiation>
             <fov>0.2967</fov>
@@ -1423,7 +1423,7 @@
             <gaussianNoise>0.005</gaussianNoise>
             <alwaysOn>1</alwaysOn>
             <updateRate>50</updateRate>
-            <topicName>roombaIR/sensor/ir_7</topicName>
+            <topicName>roombaIR/sensor/infrared</topicName>
             <frameName>ir_7</frameName>
             <radiation>INFRARED</radiation>
             <fov>0.2967</fov>
@@ -1556,7 +1556,7 @@
             <gaussianNoise>0.005</gaussianNoise>
             <alwaysOn>1</alwaysOn>
             <updateRate>50</updateRate>
-            <topicName>roombaIR/sensor/ir_8</topicName>
+            <topicName>roombaIR/sensor/infrared</topicName>
             <frameName>ir_8</frameName>
             <radiation>INFRARED</radiation>
             <fov>0.2967</fov>
@@ -1938,7 +1938,7 @@
           </ode>
         </physics>
       </joint>
-      <joint name='ir_7_JOINT_3' type='fixed'>
+      <joint name='base_JOINT_3' type='fixed'>
         <parent>base</parent>
         <child>ir_7</child>
         <pose frame=''>0 0 0 0 -0 0</pose>
@@ -2031,7 +2031,7 @@
         <wheelSeparation>0.5380</wheelSeparation>
         <wheelDiameter>0.2410</wheelDiameter>
         <torque>20</torque>
-        <commandTopic>/cmd_vel</commandTopic>
+        <commandTopic>cmd_vel</commandTopic>
         <odometryTopic>/odom</odometryTopic>
         <odometryFrame>/odom</odometryFrame>
         <robotBaseFrame>base</robotBaseFrame>
