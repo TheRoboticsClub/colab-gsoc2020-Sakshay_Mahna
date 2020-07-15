@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+	<world name="default">
+		<include>
+			<uri>model://ground_plane_transparent</uri>
+		</include>
+		<include>
+			<uri>model://sun</uri>
+		</include>
+		
+		<include>
+			<uri>model://mapSimple</uri>
+			<pose>8.793593 -7.2892048 0.680905 0.002756 0.030399 -0.012268</pose>
+		</include>
+		
+		<include>
+			<uri>model://roombaIR</uri>
+			<pose>5.183465 -0.722335 0.000939 -0.000084 -0.000478 -3.133447</pose>
+		</include>
+	</world>
+</sdf>
