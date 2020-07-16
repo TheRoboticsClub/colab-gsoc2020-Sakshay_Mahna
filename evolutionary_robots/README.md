@@ -4,7 +4,7 @@
 Exercises on Evolutionary Robotics for JdeRobot Robotics Academy
 
 ## Prerequisites
-The libraries are developed and tested in **Python 2.7.17, ROS Melodic, Ubuntu 18.04**. These are the system requirements that JdeRobot currently specifies for users to run their Robotics-Academy software.
+The libraries and exercises are developed and tested in **Python 2.7.17, ROS Melodic, Ubuntu 18.04**. These are the system requirements that JdeRobot currently specifies for users to run their Robotics-Academy software.
 
 ### Git
 The instructions to install Git(command terminal) for Ubuntu 18.04 are:
@@ -38,6 +38,9 @@ sudo apt install python2.7
 sudo apt install python-pip
 ```
 
+### Generic Infrastructure of Robotics Academy
+Follow the Installation instructions as given on the [Robotics Academy webpage](http://jderobot.github.io/RoboticsAcademy/installation/#generic-infrastructure).
+
 ## Dependencies
 The project uses the following python modules
 
@@ -47,6 +50,9 @@ graphviz==0.14
 tensorflow==2.1.0
 matplotlib==2.1.0
 ```
+
+## Libraries
+The libraries developed for the project are available in the [libraries directory](./libraries). These libraries are useful for solving the exercises. The API reference and examples are also provided.
 
 ## Installation
 - Clone the Github Repository
@@ -61,19 +67,17 @@ git clone https://github.com/TheRoboticsClub/colab-gsoc2020-Sakshay_Mahna
 pip install -r requirements.txt
 ```
 
-- Follow the API Reference and Examples to use the library.
+- Run the installation script to configure the Gazebo Assets
 
-## API Reference
+```bash
+. installation.bash
+```
 
-API Reference for [Neural Networks](./neural_networks/README.md)
+- Specific instructions to run each of the exercises are given in their respective directories.
 
-API Reference for [Genetic Algorithm](./genetic_algorithm/README.md)
+### Obstacle Avoidance
+The code for this exercise is present in the [obstacle_avoidance directory](./obstacle_avoidance)
 
-[Examples](./examples) for the use of APIs
 
-
-## Tests
-
-All the tests can be found in the [tests directory](./tests)
 
 
