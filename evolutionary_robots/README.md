@@ -52,7 +52,7 @@ matplotlib==2.1.0
 ```
 
 ## Libraries
-The libraries developed for the project are available in the [libraries directory](./libraries). These libraries are useful for solving the exercises. The API reference and examples are also provided.
+The libraries developed for the project are available in [libraries](./libraries). These libraries are useful for solving the exercises. The API reference and examples are also provided.
 
 ## Installation
 - Clone the Github Repository
@@ -76,7 +76,7 @@ pip install -r requirements.txt
 - Specific instructions to run each of the exercises are given in their respective directories.
 
 ### Obstacle Avoidance
-The code for this exercise is present in the [obstacle_avoidance directory](./obstacle_avoidance)
+The code for this exercise is present in [obstacle_avoidance](./obstacle_avoidance)
 
 
 

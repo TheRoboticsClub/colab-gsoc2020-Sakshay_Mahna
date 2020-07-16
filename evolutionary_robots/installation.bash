@@ -11,7 +11,7 @@ source devel/setup.bash
 export GAZEBO_MODEL_PATH=${GAZEBO_MODEL_PATH}:$PWD/src/evolutionary_robotics/models/
 
 # Navigate back to where we came from
-cd ./../evolutionary_robotics
+cd ./../evolutionary_robots
 
 # The installation would be complete now
 # The user can run the exercise

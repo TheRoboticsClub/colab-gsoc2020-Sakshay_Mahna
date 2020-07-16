@@ -4,10 +4,10 @@
 This directory contains the libraries used by the Evolutionary Robotics exercises.
 
 ### Neural Networks
-The Neural Network library is present in the [neural_networks directory](./neural_networks).
+The Neural Network library is present in [neural_networks](./neural_networks).
 
 ### Genetic Algorithm
-The Genetic Algorithm library is present in the [genetic_algorithm directory](./genetic_algorithm).
+The Genetic Algorithm library is present in [genetic_algorithm](./genetic_algorithm).
 
 ## API Reference for the libraries
 
