@@ -56,6 +56,5 @@ class MyAlgorithm(threading.Thread):
         self.kill_event.set()
 
     def algorithm(self):
-        print(self.getRange())
-        self.motors.sendV(2)
+    	self.motors.sendV(2)
         
