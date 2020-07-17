@@ -55,6 +55,8 @@ matplotlib==2.1.0
 The libraries developed for the project are available in [libraries](./libraries). These libraries are useful for solving the exercises. The API reference and examples are also provided.
 
 ## Installation
+Before running the installation, make sure that all the prerequisites are already installed on the system.
+
 - Clone the Github Repository
 
 ```bash
