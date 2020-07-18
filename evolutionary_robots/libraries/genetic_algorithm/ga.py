@@ -82,6 +82,9 @@ class GeneticAlgorithm(object):
 		Function to load generation from which to resume
 		from a file
 		
+	remove_chromosome(filename)
+		Function to remove a generation file
+		
 	Other Methods
 	-------------
 	generate_population()
@@ -109,9 +112,10 @@ class GeneticAlgorithm(object):
 		Mutates the genes of the chromosomes of the indviduals
 		according to the mutation probability
 		
-	stop_handler()
-		Function that handles the execution when SIGINT signal is
-		received. It saves the files from where the user can resume
+	save_handler()
+		Function that saves generation files.
+		It saves the files from where the user can resume if
+		computer suddenly stops
 		
 	save_statistics(filename)
 		Function to save the statistics of the runtime
@@ -237,7 +241,7 @@ class GeneticAlgorithm(object):
 								  sum_fitness / self.population_size, min_fitness])
 		
 		print("{: <10} {: >20} {: >20} {: >20}".format(
-												*self.__statistics[self.current_generation - self.generation_start]
+												*self.__statistics[self.current_generation - self.generation_start + 1]
 												))
 		
 		# Append to plots
@@ -472,7 +476,10 @@ class GeneticAlgorithm(object):
 		Function to remove a generation file
 		"""
 		# Simple removal
-		os.remove(filename + '.txt')
+		try:
+			os.remove(filename + '.txt')
+		except OSError:
+			pass
 	
 	# Run the complete Genetic Algorithm
 	def run(self, filename=None):
@@ -520,6 +527,8 @@ class GeneticAlgorithm(object):
 		
 		if(filename != None):
 			self.load_chromosome(filename)
+			
+		delete_process = None
 		
 		# Keep going through generations with selection,
 		# crossover and mutation
@@ -550,12 +559,12 @@ class GeneticAlgorithm(object):
 			
 			# Save the current generation
 			self.save_handler()
+			
 			# Delete the previous one
-			if(self.current_generation > 0):
-				delete_process = multiprocessing.Process(target=self.remove_chromosome,
-													 args=('./log/generation' + str(self.current_generation-1),))
-													
-				delete_process.start()
+			# In a sepearate process
+			delete_process = multiprocessing.Process(target=self.remove_chromosome,
+												 args=('./log/generation' + str(self.current_generation-1),))			
+			delete_process.start()
 			
 		
 		# Save the required values
@@ -567,23 +576,18 @@ class GeneticAlgorithm(object):
 		print("Found in generation # " + str(self.best_generation))
 		
 		return self.best_chromosome
-		
-	# Function that actually runs the training phase
-	def evolve(self, filename=None):
-		evolve_process = multiprocessing.Process(target=self.run, args=(filename,))
-		evolve_process.start()
 	
 	# Function that is run to save
 	# the current generation
 	def save_handler(self):
 		"""
 		Function to handle the saving of the
-		generations
+		generations to files
 		"""
 		# Save the current generation chromosomes
 		self.save_chromosome(self.__generations[self.current_generation - self.generation_start], 
-							 './log/generation' + str(self.current_generation - 1), 
-							 header='Generation #' + str(self.current_generation - 1))
+							 './log/generation' + str(self.current_generation), 
+							 header='Generation #' + str(self.current_generation))
 		
 		# Save the current best
 		self.save_chromosome(np.array([self.best_chromosome]), './log/current_best', 

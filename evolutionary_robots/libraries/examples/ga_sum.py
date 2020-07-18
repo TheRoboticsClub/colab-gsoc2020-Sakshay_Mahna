@@ -39,7 +39,7 @@ ga.fitness_function = fitness_function
 
 # Run the Genetic Algorithm and print it's result
 # Which is the best chromosome in our case
-print(ga.evolve())
+print(ga.run())
 
 # Plot the fitness value against the generation number
 ga.plot_fitness('./repr/fitness_plot', True)
