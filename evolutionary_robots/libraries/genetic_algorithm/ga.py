@@ -10,9 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import warnings
-
-from signal import signal, SIGINT
-from sys import exit
+import multiprocessing
 
 # The Genetic Algorithm class
 class GeneticAlgorithm(object):
@@ -84,6 +82,9 @@ class GeneticAlgorithm(object):
 		Function to load generation from which to resume
 		from a file
 		
+	remove_chromosome(filename)
+		Function to remove a generation file
+		
 	Other Methods
 	-------------
 	generate_population()
@@ -111,9 +112,10 @@ class GeneticAlgorithm(object):
 		Mutates the genes of the chromosomes of the indviduals
 		according to the mutation probability
 		
-	stop_handler()
-		Function that handles the execution when SIGINT signal is
-		received. It saves the files from where the user can resume
+	save_handler()
+		Function that saves generation files.
+		It saves the files from where the user can resume if
+		computer suddenly stops
 		
 	save_statistics(filename)
 		Function to save the statistics of the runtime
@@ -155,9 +157,6 @@ class GeneticAlgorithm(object):
 		
 		# Settings to adjust some non required warnings
 		np.seterr(divide='ignore', invalid='ignore')
-		
-		# Tell Python to run stop_handler when SIGINT received
-		signal(SIGINT, self.stop_handler)
 	
 	# Generates a population of individuals
 	def generate_population(self):
@@ -242,7 +241,7 @@ class GeneticAlgorithm(object):
 								  sum_fitness / self.population_size, min_fitness])
 		
 		print("{: <10} {: >20} {: >20} {: >20}".format(
-												*self.__statistics[self.current_generation - self.generation_start]
+												*self.__statistics[self.current_generation - self.generation_start + 1]
 												))
 		
 		# Append to plots
@@ -469,6 +468,18 @@ class GeneticAlgorithm(object):
 		self.population_size = self.population.shape[0]
 		self.chromosome_length = self.population.shape[1]
 		self.generation_start = generation_resume
+		
+	# Function to remove a chromosome
+	# file
+	def remove_chromosome(self, filename):
+		"""
+		Function to remove a generation file
+		"""
+		# Simple removal
+		try:
+			os.remove(filename + '.txt')
+		except OSError:
+			pass
 	
 	# Run the complete Genetic Algorithm
 	def run(self, filename=None):
@@ -516,6 +527,8 @@ class GeneticAlgorithm(object):
 		
 		if(filename != None):
 			self.load_chromosome(filename)
+			
+		delete_process = None
 		
 		# Keep going through generations with selection,
 		# crossover and mutation
@@ -544,6 +557,15 @@ class GeneticAlgorithm(object):
 			# Append to generations
 			self.__generations.append(self.population)
 			
+			# Save the current generation
+			self.save_handler()
+			
+			# Delete the previous one
+			# In a sepearate process
+			delete_process = multiprocessing.Process(target=self.remove_chromosome,
+												 args=('./log/generation' + str(self.current_generation-1),))			
+			delete_process.start()
+			
 		
 		# Save the required values
 		self.save_statistics('./log/stats')
@@ -555,28 +577,21 @@ class GeneticAlgorithm(object):
 		
 		return self.best_chromosome
 	
-	# Function that is run whenever execution
-	# is stopped in between
-	def stop_handler(self, signal_received, frame):
+	# Function that is run to save
+	# the current generation
+	def save_handler(self):
 		"""
-		Function to handle SIGINT signal (CTRL + C)
-		Whenever the signal is received save, the
-		current information to help resume from where
-		we left off
+		Function to handle the saving of the
+		generations to files
 		"""
 		# Save the current generation chromosomes
 		self.save_chromosome(self.__generations[self.current_generation - self.generation_start], 
-							 './log/generation' + str(self.current_generation - 1), 
-							 header='Generation #' + str(self.current_generation - 1))
+							 './log/generation' + str(self.current_generation), 
+							 header='Generation #' + str(self.current_generation))
 		
 		# Save the current best
 		self.save_chromosome(np.array([self.best_chromosome]), './log/current_best', 
 							 header="Found in generation #" + str(self.best_generation))
-
-		print("Current best fitness: " + str(self.best_fitness))
-		print("Found in generation # " + str(self.best_generation))
-		
-		exit(0)
 		
 	# Getters and Setters
 	@property
