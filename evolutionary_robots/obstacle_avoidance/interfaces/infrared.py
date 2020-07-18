@@ -8,24 +8,52 @@ import numpy as np
 ARRAY_LENGTH = 8
 
 class InfraredData:
-
+    """
+    Class to provide the infrared sensor data
+    from the robot
+    
+    ...
+    Parameters
+    ----------
+    None
+    
+    Attributes
+    ----------
+    values: array_like
+        The array of sensor values
+        
+    Methods
+    -------
+    None
+    """
     def __init__(self):
-
+        """
+        Initialization function of the class
+        """
         self.values = [0] * ARRAY_LENGTH  # meters
         self.timeStamp = 0 # Time stamp [s] */
 
     def __str__(self):
+        """
+        Function to modify the print behaviour
+        of the class
+        """
         s = "InfraredArray: {\n   arrayLength: " + str(ARRAY_LENGTH)
         s = s + "\n   timeStamp: " + str(self.timeStamp) + "\n values: " + str(self.values) + "\n}"
         return s 
 
-
+# Function that converts the ROS message
+# to our desired class
 def message2InfraredData(infra, infrared):
+	# To distinguish between the different
+	# sensors
 	frame_id = infra.header.frame_id
 	
 	# Generate the index from frame_id
 	index = int(frame_id[3:]) - 1
 	
+	# Modify the user class according to the
+	# ROS message
 	infrared.values[index] = infra.range
 	infrared.timeStamp = infra.header.stamp.secs + (infra.header.stamp.nsecs * 1e-9)
 	
@@ -66,5 +94,6 @@ class ListenerInfrared:
         self.lock.release()
         
         return sensor
+
 
 
