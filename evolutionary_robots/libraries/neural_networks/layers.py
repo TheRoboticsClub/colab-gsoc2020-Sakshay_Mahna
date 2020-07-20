@@ -326,7 +326,13 @@ class StaticLayer(object):
 	# Function to return the activation parameters(tuple)	
 	def get_activation_parameters(self):
 		""" Function to get the parameters of activation function """
-		return np.concatenate([self.__activation_function.beta, self.__activation_function.theta])
+		try:
+			return np.concatenate([self.__activation_function.beta, self.__activation_function.theta])
+			
+		except ValueError:
+			beta = np.ones((self.weight_dim[0], )) * self.__activation_function.beta
+			theta = np.ones((self.weight_dim[0], )) * self.__activation_function.theta
+			return np.concatenate([beta, theta])
 		
 
 # Dynamic Layer ################################################################
@@ -704,4 +710,10 @@ class DynamicLayer(object):
 	# Function to return the activation parameters(tuple)	
 	def get_activation_parameters(self):
 		""" Function to get the parameters of activation function """
-		return np.concatenate([self.__activation_function.beta, self.__activation_function.theta])
+		try:
+			return np.concatenate([self.__activation_function.beta, self.__activation_function.theta])
+			
+		except ValueError:
+			beta = np.ones((self.weight_dim[0], )) * self.__activation_function.beta
+			theta = np.ones((self.weight_dim[0], )) * self.__activation_function.theta
+			return np.concatenate([beta, theta])

@@ -61,6 +61,10 @@ class ArtificialNeuralNetwork(object):
 		Shows the output of each layer in the previous iteration of 
 		the network
 		
+	number_of_parameters: integer
+		The number of trainable parameters of the Neural
+		Network
+		
 	Methods
 	-------
 	forward_propagate(input_dict)
@@ -124,6 +128,7 @@ class ArtificialNeuralNetwork(object):
 								tf.Variable(np.zeros((layer[1], )), dtype=tf.float64)) for layer in layer_vector)
 								
 		self.__state = dict((layer[0], np.zeros((layer[1], ))) for layer in layer_vector)
+		self.__assign_operation = None
 		
 		# Construct the layers and the execution graph
 		self._construct_layers(layer_vector)
@@ -405,10 +410,12 @@ class ArtificialNeuralNetwork(object):
 
 		# Calculate the output
 		init_var = tf.compat.v1.global_variables_initializer()
+		
 		with tf.compat.v1.Session() as session:
 			session.run(init_var)
 			
 			# The state matrix needs to be updated before every iteration
+			# BOTTLENECK, NEED TO MODIFY THIS FOR FASTER OPERATION!!!
 			for layer in self.__layer_map.keys():
 				session.run(self.__state_matrix[layer].assign(self.__state[layer]))
 			
@@ -485,10 +492,13 @@ class ArtificialNeuralNetwork(object):
 		# Then concatenate it with the previous output vector
 		output_dict = {}
 	
-		for index in range(self.__number_of_layers):
-			layer_key = "layer_" + str(index)
-			if(layer_key not  in self.__input_layers):
-				output_dict[layer_key] = self.__layer_map[layer_key].return_parameters()
+		for index in range(len(self._order_of_initialization)):
+			# For further use
+			layer_name = self._order_of_initialization[index][0]
+			
+			if(layer_name not  in self.__input_layers):
+				# Layer present as hidden
+				output_dict[layer_name] = self.__layer_map[layer_name].return_parameters()
 				
 		
 		return output_dict
@@ -646,6 +656,21 @@ class ArtificialNeuralNetwork(object):
 		"""
 		order = [layer[0] for layer in self._order_of_initialization]
 		return order
+		
+	@property
+	def number_of_parameters(self):
+		"""The number of trainable parameters of the network
+		"""
+		
+		length = 0
+		# Loop through the various layers and add
+		# their respective length of parameter vector
+		for index in range(len(self._order_of_initialization)):
+			layer_name = self._order_of_initialization[index][0]
+			if(layer_name not  in self.__input_layers):
+				length = length + len(self.__layer_map[layer_name].return_parameters())
+				
+		return length
 		
 	@property
 	def time_interval(self):
