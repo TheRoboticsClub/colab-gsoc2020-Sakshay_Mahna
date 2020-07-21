@@ -114,6 +114,12 @@ git clone https://github.com/TheRoboticsClub/colab-gsoc2020-Sakshay_Mahna
 cd colab-gsoc2020-Sakshay_Mahna/evolutionary_robotics
 ```
 
+- Update Pip to the latest version. Some dependencies need the latest version to install correctly.
+
+```bash
+pip install --upgrade pip
+```
+
 - Install the dependencies. All the dependencies would be installed without giving any errors.
 
 ```bash
