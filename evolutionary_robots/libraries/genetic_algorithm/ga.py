@@ -177,7 +177,7 @@ class GeneticAlgorithm(object):
 		self.best_generation = None
 		
 		# Lists to be saved
-		self.__best_chromosomes = []
+		self.best_chromosomes = []
 		self.generations = []
 		self.__statistics = []
 		
@@ -242,7 +242,7 @@ class GeneticAlgorithm(object):
 		sum_fitness = np.sum(self.fitness_vector)
 		
 		# Append to best chromsomes
-		self.__best_chromosomes.append(self.population[
+		self.best_chromosomes.append(self.population[
 									   np.where(self.fitness_vector == np.amax(self.fitness_vector))
 									   ][0])
 		
@@ -289,13 +289,16 @@ class GeneticAlgorithm(object):
 		"""
 		# Random choice, roullete selection
 		# The probility function is the fitness vector itself
+		effective_population = self.population_size - self.number_of_elites
+		
 		try:
-			effective_population = self.population_size - self.number_of_elites
 			self.roullete_selection = np.random.choice(effective_population, 
 														effective_population, 
 														p = self.fitness_vector)
+														
 		except ValueError:
-			pass
+			self.roullete_selection = np.random.choice(effective_population, 
+														effective_population)
 				
 	# Cross over
 	def crossover(self):
@@ -580,7 +583,7 @@ class GeneticAlgorithm(object):
 		
 		# Save the required values
 		self.save_statistics('./log/stats')
-		self.save_chromosome(self.__best_chromosomes, './log/best_chromosomes')
+		self.save_chromosome(self.best_chromosomes, './log/best_chromosomes')
 		
 		# Print the best fitness and return the chromosome
 		print("The best fitness value acheived is: " + str(self.best_fitness))
