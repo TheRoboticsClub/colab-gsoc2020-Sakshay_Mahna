@@ -98,6 +98,9 @@ class GeneticAlgorithm(object):
 	determine_fitness()
 		Calculates the fitness of the entire generation
 		
+	generate_statistics()
+		Generates the relevant statistics regarding the fitness
+		
 	selection()
 		Selects the individuals of a generation according to 
 		a probability distribution(list_of_fitness_value)
@@ -175,7 +178,7 @@ class GeneticAlgorithm(object):
 		
 		# Lists to be saved
 		self.__best_chromosomes = []
-		self.__generations = []
+		self.generations = []
 		self.__statistics = []
 		
 		# Plotting lists
@@ -223,8 +226,16 @@ class GeneticAlgorithm(object):
 			self.fitness_vector.append(self.calculate_fitness(individual))
 		
 		# Numpy conversion, to maintain defaut settings
-		self.fitness_vector = np.array(self.fitness_vector, np.float64)	
+		self.fitness_vector = np.array(self.fitness_vector, np.float64)
 		
+		# Work on the statistics
+		self.generate_statistics()
+		
+	# Generate the relevant statistics
+	def generate_statistics(self):
+		"""
+		Generates and prints the relevant statistics
+		"""
 		# Get some statistics and print
 		min_fitness = self.fitness_vector.min()
 		max_fitness = self.fitness_vector.max()
@@ -441,7 +452,7 @@ class GeneticAlgorithm(object):
 		"""
 		# Load the file
 		self.population = np.loadtxt(filename, delimiter=' , ')
-		self.__generations[0] = self.population
+		self.generations[0] = self.population
 		
 		# Get the filename explicitly without
 		# path. Since the path is not that big
@@ -513,7 +524,7 @@ class GeneticAlgorithm(object):
 		self.generate_population()
 		
 		# Append to the Generations
-		self.__generations.append(self.population)
+		self.generations.append(self.population)
 		
 		# Print the legend
 		legend = ["Generation", "Maximum Fitness", "Average Fitness", "Minimum Fitness"]
@@ -555,7 +566,7 @@ class GeneticAlgorithm(object):
 			self.mutation()
 			
 			# Append to generations
-			self.__generations.append(self.population)
+			self.generations.append(self.population)
 			
 			# Save the current generation
 			self.save_handler()
@@ -585,7 +596,7 @@ class GeneticAlgorithm(object):
 		generations to files
 		"""
 		# Save the current generation chromosomes
-		self.save_chromosome(self.__generations[self.current_generation - self.generation_start], 
+		self.save_chromosome(self.generations[self.current_generation - self.generation_start], 
 							 './log/generation' + str(self.current_generation), 
 							 header='Generation #' + str(self.current_generation))
 		

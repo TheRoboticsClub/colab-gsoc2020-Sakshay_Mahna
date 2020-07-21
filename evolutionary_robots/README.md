@@ -4,7 +4,7 @@
 Exercises on Evolutionary Robotics for JdeRobot Robotics Academy
 
 ## Prerequisites
-The libraries and exercises are developed and tested in **Python 2.7.17, ROS Melodic, Ubuntu 18.04**. These are the system requirements that JdeRobot currently specifies for users to run their Robotics-Academy software.
+The libraries and exercises are developed and tested in **Python 2.7.17, Pip 20.0.2, ROS Melodic, Ubuntu 18.04**.
 
 ### Git
 The instructions to install Git(command terminal) for Ubuntu 18.04 are:
