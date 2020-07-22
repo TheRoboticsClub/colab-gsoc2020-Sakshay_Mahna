@@ -52,21 +52,15 @@ class MyAlgorithm(threading.Thread):
     
     def fitness_function(self, chromosome):
     	# The fitness function
-    	linear_speed = self.motors.getV()
-    	rotation_speed = self.motors.getW()
-    	infrared = np.max(self.getRange())
-    	
-    	fitness = linear_speed * (1 - math.sqrt(abs(rotation_speed))) * (2 - infrared)
-    	
-    	return fitness 
+    	# Enter your fitness function here!
     	
     
     def define_neural_network(self):
-    	# Define the layers
-    	inputLayer = Layer("inputLayer", 8, IdentityActivation(), "INFRARED", ["outputLayer"])
-    	outputLayer = Layer("outputLayer", 2, LinearActivation(), "", ["MOTORS"])
-    	# Define the Neural Network
-    	neural_network = ArtificialNeuralNetwork([inputLayer, outputLayer], "STATIC")
+    	# Define the your layers here!
+    	inputLayer = 
+    	outputLayer = 
+    	# Define the Neural Network here!
+    	neural_network = ArtificialNeuralNetwork([inputLayer, outputLayer], "")
     	
     	return neural_network
     	
@@ -74,12 +68,12 @@ class MyAlgorithm(threading.Thread):
     	# Define the Genetic Algorithm
     	ga = GeneticAlgorithmGazebo(self.neural_network)
     
-    	# Define the genetic algorithm
-    	ga.population_size = 10
-    	ga.number_of_generations = 100   
-    	ga.mutation_probability = 0.01
-    	ga.evaluation_time = 300
-    	ga.number_of_elites = 0
+    	# Define the genetic algorithm here!
+    	ga.population_size = 
+    	ga.number_of_generations =   
+    	ga.mutation_probability = 
+    	ga.evaluation_time = 
+    	ga.number_of_elites = 
     	ga.fitness_function = self.fitness_function
     	
     	# Generate the log directory
