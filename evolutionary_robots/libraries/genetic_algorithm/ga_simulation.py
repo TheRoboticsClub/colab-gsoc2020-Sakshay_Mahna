@@ -6,7 +6,7 @@ Academy Template simulation
 """
 
 import numpy as np
-from genetic_algorithms.ga_nn import GeneticAlgorithmNN
+from genetic_algorithm.ga_nn import GeneticAlgorithmNN
 
 class GeneticAlgorithmGazebo(GeneticAlgorithmNN):
 	"""
@@ -88,26 +88,37 @@ class GeneticAlgorithmGazebo(GeneticAlgorithmNN):
 		# Return the value
 		return fitness
 		
-	def determine_fitness(self, individual_fitness):
+	def determine_fitness(self, individual_fitness, chromosome):
 		"""
 		Takes the fitness values for evaluation time steps
 		Averages the values and returns them
 		"""
 		# Average the fitness
-		average = np.sum(individual_fitness) / self.evaluation_steps
+		fitness = np.sum(individual_fitness) / self.evaluation_steps
 		
-		return average
+		# Determine the best fitness
+		# And when it occured the first time
+		if(fitness != self.best_fitness):
+			self.best_fitness = max(self.best_fitness, fitness)
+			if(fitness == self.best_fitness):
+				self.best_chromosome = chromosome
+				self.best_generation = self.current_generation
+		
+		return fitness
 		
 	def fraction_save(self, generation):
 		"""
 		Determines if the generation is a multiple of
 		the replay fraction and saves it, if it is!
 		"""
-		# Check the current fraction and save if required
-		if(generation % int(self.replay_fraction * (self.number_of_generations)) == 0):
-			fraction = float(generation) / float(self.number_of_generations)
-			self.save_chromosome(self.population, './log/generation' + str(int(100 * fraction)) + "%", 
-								 "Generation #" + str(self.current_generation))
+		try:
+			# Check the current fraction and save if required
+			if(generation % int(self.replay_fraction * (self.number_of_generations)) == 0):
+				fraction = float(generation) / float(self.number_of_generations)
+				self.save_chromosome(self.population, './log/generation' + str(int(100 * fraction)) + "%", 
+									 "Generation #" + str(self.current_generation))
+		except ZeroDivisionError:
+			pass
 		
 	@property
 	def evaluation_steps(self):

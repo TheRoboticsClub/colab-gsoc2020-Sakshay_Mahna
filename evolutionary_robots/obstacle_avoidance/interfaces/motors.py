@@ -83,6 +83,19 @@ class PublisherMotors:
     def getMaxV(self):
         return self.maxV
         
+    def getV(self):
+        self.lock.acquire()
+        data = self.data.vx
+        self.lock.release()
+        
+        return data
+        
+    def getW(self):
+        self.lock.acquire()
+        data = self.data.az
+        self.lock.release()
+        
+        return data
 
     def sendVelocities(self, vel):
 

@@ -414,11 +414,6 @@ class ArtificialNeuralNetwork(object):
 		with tf.compat.v1.Session() as session:
 			session.run(init_var)
 			
-			# The state matrix needs to be updated before every iteration
-			# BOTTLENECK, NEED TO MODIFY THIS FOR FASTER OPERATION!!!
-			for layer in self.__layer_map.keys():
-				session.run(self.__state_matrix[layer].assign(self.__state[layer]))
-			
 			# Generate the output
 			for layer in self.__layer_map.keys():
 				output[layer] = session.run(self.__output_matrix[layer], feed_dict = sensor_input)
