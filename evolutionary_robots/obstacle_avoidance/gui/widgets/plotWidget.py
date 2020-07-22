@@ -9,16 +9,19 @@ class PlotWidget(QWidget):
         super(PlotWidget, self).__init__()
         self.winParent=winParent
         
-        self.plot = cv2.imread("resources/fitness_plot.png", cv2.IMREAD_COLOR)
-        self.plot = cv2.resize(self.plot, (500, 230))
-        self.plot = cv2.cvtColor(self.plot, cv2.COLOR_BGR2RGB)
-        image = QtGui.QImage(self.plot.data, self.plot.shape[1], self.plot.shape[0], QtGui.QImage.Format_RGB888)
-        self.pixmap = QtGui.QPixmap.fromImage(image)
+    def show_plot(self):
+        self.plot = cv2.imread("./log/fitness_plot.png", cv2.IMREAD_COLOR)
+        if(self.plot is not None):
+            self.plot = cv2.resize(self.plot, (400, 391))
+            self.plot = cv2.cvtColor(self.plot, cv2.COLOR_BGR2RGB)
+            image = QtGui.QImage(self.plot.data, self.plot.shape[1], self.plot.shape[0], QtGui.QImage.Format_RGB888)
+            self.pixmap = QtGui.QPixmap.fromImage(image)
+            
+            self.height = self.pixmap.height()
+            self.width = self.pixmap.width()
+            self.plotWidget = QLabel(self)
+            self.plotWidget.setPixmap(self.pixmap)
         
-        self.height = self.pixmap.height()
-        self.width = self.pixmap.width()
-        self.plotWidget = QLabel(self)
-        self.plotWidget.setPixmap(self.pixmap)
         
 
 
