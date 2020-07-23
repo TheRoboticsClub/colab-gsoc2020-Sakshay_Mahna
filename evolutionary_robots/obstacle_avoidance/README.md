@@ -16,6 +16,14 @@ source /opt/jderobot/share/jderobot/gazebo/gazebo-setup.sh
 source /opt/jderobot/share/jderobot/gazebo/assets-setup.sh
 ```
 
+- Run the source script of this repository
+
+```bash
+cd ..
+. source.bash
+cd obstacle_avoidance
+```
+
 - Launch the Gazebo simulation in the same terminal window. A new window showing the Robot Model in an environment would appear. Ignore the yellow colored warnings that appear in the terminal.
 
 ```bash
