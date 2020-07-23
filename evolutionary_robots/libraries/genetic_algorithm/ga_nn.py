@@ -42,6 +42,10 @@ class GeneticAlgorithmNN(GeneticAlgorithm):
 		To calculate the output of the Neural Network
 		according to the chromosome and the input
 		
+	convert_chromosome(chromosome):
+		Function to make the chromosome ready for
+		use with neural network
+		
 	Rest of the methods are the same
 	"""
 	def __init__(self, neural_network, population_size=100,
@@ -142,6 +146,18 @@ class GeneticAlgorithmNN(GeneticAlgorithm):
 		------
 		None
 		"""
+		
+		chromosome_list = self.convert_chromosome(chromosome)
+		self.neural_network.load_parameters_from_vector(chromosome_list)
+		output = self.neural_network.forward_propagate(input_dictionary)
+		
+		return output
+		
+	def convert_chromosome(self, chromosome):
+		"""
+		Function to make the chromosome ready for
+		use with neural network
+		"""
 		# Load the parameters and calculate the output
 		chromosome = self._interpolate_range(chromosome)
 		
@@ -151,11 +167,9 @@ class GeneticAlgorithmNN(GeneticAlgorithm):
 		for dimension in self.dimension_vector:
 			chromosome_list.append(chromosome[dimension_index : dimension_index + dimension])
 			dimension_index = dimension_index + dimension
+			
+		return chromosome_list
 		
-		self.neural_network.load_parameters_from_vector(chromosome_list)
-		output = self.neural_network.forward_propagate(input_dictionary)
-		
-		return output
 	
 	# Getters and Setters
 	@property

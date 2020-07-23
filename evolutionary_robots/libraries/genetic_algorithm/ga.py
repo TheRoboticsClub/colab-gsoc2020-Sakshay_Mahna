@@ -604,8 +604,12 @@ class GeneticAlgorithm(object):
 							 header='Generation #' + str(self.current_generation))
 		
 		# Save the current best
-		self.save_chromosome(np.array([self.best_chromosome]), './log/current_best', 
-							 header="Found in generation #" + str(self.best_generation))
+		try:
+			self.save_chromosome(np.array([self.best_chromosome]), './log/current_best', 
+							 	header="Found in generation #" + str(self.best_generation))
+							 	
+		except TypeError:
+			pass
 		
 	# Getters and Setters
 	@property

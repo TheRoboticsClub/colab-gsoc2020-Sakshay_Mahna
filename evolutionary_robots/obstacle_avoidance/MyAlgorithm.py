@@ -33,7 +33,13 @@ class MyAlgorithm(threading.Thread):
     
     def fitness_function(self, chromosome):
     	# The fitness function
-    	# Enter the fitness function here
+    	linear_speed = self.motors.getV()
+    	rotation_speed = self.motors.getW()
+    	infrared = np.max(self.getRange())
+    	
+    	fitness = linear_speed * (1 - math.sqrt(abs(rotation_speed))) * (2 - infrared)
+    	
+    	return fitness 
     	
     
     def define_neural_network(self):
@@ -52,11 +58,11 @@ class MyAlgorithm(threading.Thread):
     
     	# Define the genetic algorithm
     	log_folder = './log'
-    	ga.population_size = 
-    	ga.number_of_generations =    
-    	ga.mutation_probability = 
-    	ga.evaluation_time = 
-    	ga.number_of_elites = 
+    	ga.population_size = 4
+    	ga.number_of_generations = 4   
+    	ga.mutation_probability = 0.01
+    	ga.evaluation_steps = 100
+    	ga.number_of_elites = 0
     	ga.fitness_function = self.fitness_function
     	
     	genetic_algorithm = GA(ga, log_folder)
@@ -105,7 +111,10 @@ class MyAlgorithm(threading.Thread):
         self.kill_event.set()
 
     def algorithm(self):
-    	if(self.GA.state == "FITNESS"):
+        if(self.GA.state == "SAVE"):
+            self.GA.save_state()
+              
+    	elif(self.GA.state == "FITNESS"):
     		output = self.GA.calculate_output({"INFRARED": self.getRange()})["MOTORS"]
     		self.motors.sendV(4 * (output[0] + output[1]))
     		self.motors.sendW((output[0] - output[1]))
@@ -136,7 +145,7 @@ class MyAlgorithm(threading.Thread):
 			self.stop()
 			
         elif(self.GA.state == "TEST"):
-            output = self.GA.calculate_output({"INFRARED": self.getRange()})
+            output = self.GA.calculate_output({"INFRARED": self.getRange()})["MOTORS"]
             self.motors.sendV(4 * (output[0] + output[1]))
             self.motors.sendW((output[0] - output[1]))
     		
