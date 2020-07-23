@@ -61,6 +61,7 @@ class GA(object):
 		Initialization function of the class
 		"""
 		self.run_state = "TRAIN"
+		self.start = True
 		self.log_folder = log_folder
 		self.genetic_algorithm = genetic_algorithm
 		self.reset_simulation = rospy.ServiceProxy('/gazebo/reset_simulation', Empty)
@@ -84,11 +85,13 @@ class GA(object):
 			files = glob.glob(self.log_folder + '/generation*[0-9].txt')
 			self.genetic_algorithm.load_chromosome(files[-1])
 			self.generation = self.genetic_algorithm.generation_start
+			self.genetic_algorithm.test_network = self.genetic_algorithm.population[0]
 			self.state = "FITNESS"
 			
 		elif(self.run_state == "TRAIN"):
 			self.generation = 1
-			self.state = "FITNESS"
+			self.state = "SAVE"
+			self.genetic_algorithm.test_network = self.genetic_algorithm.population[0]
 			self.genetic_algorithm.save_chromosome(self.genetic_algorithm.population, self.log_folder + "/generation0%", header="Generation #0")
 		
 		elif(self.run_state == "TEST"):
@@ -98,6 +101,8 @@ class GA(object):
 				self.test_individual = np.loadtxt(self.log_folder + '/current_best.txt', delimiter=' , ')
 			except IOError:
 				print("File not found!")
+				
+			self.genetic_algorithm.test_network = self.test_individual
 			
 		elif(self.run_state[:6] == "RESUME"):
 			percent = int(self.run_state[7:])
@@ -108,6 +113,7 @@ class GA(object):
 				print("File not found!")
 				
 			self.generation = self.genetic_algorithm.generation_start
+			self.genetic_algorithm.test_network = self.genetic_algorithm.population[0]
 			self.state = "FITNESS"
 			
 		# Print the legend
@@ -125,6 +131,8 @@ class GA(object):
 		self.genetic_algorithm.current_generation = self.generation - 1
 		self.genetic_algorithm.generation_start = self.generation
 		self.delete_process = None
+		
+		self.reset_simulation()
 		
 	def return_stats(self):
 		"""
@@ -155,17 +163,27 @@ class GA(object):
 		"""
 		Function to calculate output from neural network
 		"""
-		if(self.run_state == "TEST"):
-			output = self.genetic_algorithm.calculate_output(input_dictionary, self.test_individual)
-			
-		else:
-			output = self.genetic_algorithm.calculate_output(input_dictionary, self.individual)
+		output = self.genetic_algorithm.test_output(input_dictionary)
 		
 		return output
 		
+	def save_state(self):
+		"""
+		Operations to perform in SAVE state
+		"""
+		self.genetic_algorithm.save_handler()
+		
+		# Delete the previous one
+		# In a seperate process
+		delete_process = multiprocessing.Process(target=self.genetic_algorithm.remove_chromosome, args=(self.log_folder + '/generation' + str(self.genetic_algorithm.current_generation - 1),))
+						
+		delete_process.start()
+		
+		self.state = "FITNESS"
+		
 	def fitness_state(self):
 		"""
-		Operations to perform in FITNESS run_state
+		Operations to perform in FITNESS state
 		"""
 		self.individual_fitness.append(self.genetic_algorithm.calculate_fitness(self.individual))
 		self.fitness_iterations = self.fitness_iterations + 1
@@ -174,6 +192,7 @@ class GA(object):
 			self.individual_index = self.individual_index + 1
 			if(self.individual_index < self.genetic_algorithm.population_size):
 				self.individual = self.genetic_algorithm.population[self.individual_index]
+				self.test_network = self.individual
 			self.fitness_vector.append(self.genetic_algorithm.determine_fitness(self.individual_fitness, self.individual))
 			self.individual_fitness = []
 			self.reset_simulation()
@@ -181,13 +200,13 @@ class GA(object):
 			
 		if(self.individual_index == self.genetic_algorithm.population_size):
 			self.state = "PRINT"
-			self.ga.fitness_vector = np.array(self.fitness_vector)
+			self.genetic_algorithm.fitness_vector = np.array(self.fitness_vector)
 			self.fitness_vector = []
 			self.individual_index = 0
 			
 	def print_state(self):
 		"""
-		Operations to perform in PRINT run_state
+		Operations to perform in PRINT state
 		"""
 		self.genetic_algorithm.generate_statistics()
 		self.best_fitness = self.genetic_algorithm.best_fitness
@@ -196,36 +215,30 @@ class GA(object):
 		
 	def selection_state(self):
 		"""
-		Operations to perform in SELECTION run_state
+		Operations to perform in SELECTION state
 		"""
 		self.genetic_algorithm.selection()
 		self.state = "CROSSOVER"
 		
 	def crossover_state(self):
 		"""
-		Operations to perform in CROSSOVER run_state
+		Operations to perform in CROSSOVER state
 		"""
 		self.genetic_algorithm.crossover()
 		self.state = "MUTATION"
 		
 	def mutation_state(self):
 		"""
-		Operations to perform in MUTATION run_state
+		Operations to perform in MUTATION state
 		"""
 		self.genetic_algorithm.mutation()
 		self.state = "NEXT"
 		
 	def next_state(self):
 		"""
-		Operations to perform in NEXT run_state
+		Operations to perform in NEXT state
 		"""
-		self.generations.append(self.genetic_algorithm.population)
-		self.genetic_algorithm.save_handler()
-		
-		# Delete the previous one
-		# In a seperate process
-		delete_process = multiprocessing.Process(self.genetic_algorithm.remove_chromosome, args=(self.log_folder + '/generation' + str(self.genetic_algorithm.current_generation - 1),))
-		delete_process.start()
+		self.genetic_algorithm.generations.append(self.genetic_algorithm.population)
 		
 		self.generation = self.generation + 1
 		if(self.generation == self.genetic_algorithm.number_of_generations + 1):
@@ -233,11 +246,11 @@ class GA(object):
 		else:
 			self.individual = self.genetic_algorithm.population[self.individual_index]
 			self.genetic_algorithm.current_generation = self.generation - 1
-			self.state = "FITNESS"
+			self.state = "SAVE"
 			
 	def end_state(self):
 		"""
-		Operations to perform in END run_state
+		Operations to perform in END state
 		"""
 		self.genetic_algorithm.save_statistics(self.log_folder + '/stats')
 		self.genetic_algorithm.save_chromosome(self.genetic_algorithm.best_chromosomes, self.log_folder + '/best_chromosomes')

@@ -128,7 +128,6 @@ class ArtificialNeuralNetwork(object):
 								tf.Variable(np.zeros((layer[1], )), dtype=tf.float64)) for layer in layer_vector)
 								
 		self.__state = dict((layer[0], np.zeros((layer[1], ))) for layer in layer_vector)
-		self.__assign_operation = None
 		
 		# Construct the layers and the execution graph
 		self._construct_layers(layer_vector)
@@ -413,6 +412,10 @@ class ArtificialNeuralNetwork(object):
 		
 		with tf.compat.v1.Session() as session:
 			session.run(init_var)
+			
+			# The state matrix needs to be updated before every iteration
+			for layer in self.__layer_map.keys():
+				self.__state_matrix[layer].load(self.__state[layer], session)
 			
 			# Generate the output
 			for layer in self.__layer_map.keys():

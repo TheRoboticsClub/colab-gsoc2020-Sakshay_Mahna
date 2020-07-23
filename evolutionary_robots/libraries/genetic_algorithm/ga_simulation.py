@@ -34,6 +34,13 @@ class GeneticAlgorithmGazebo(GeneticAlgorithmNN):
 		The number of time steps for which
 		to evaluate the simulation
 		
+	test_network: array_like
+		Sets a network whose parameters we don't
+		require to change too much.
+		
+		Takes in a list of paramters and converts
+		it to the required neural network
+		
 	Rest of the attributes are the same
 	
 	Methods
@@ -46,6 +53,8 @@ class GeneticAlgorithmGazebo(GeneticAlgorithmNN):
 		Takes the fitness values for evaluation time steps
 		Averages the values and returns them
 		
+	test_output(input_dict)
+		Calculates the output of the test network
 		
 	Rest of the methods are the same
 	"""
@@ -119,6 +128,30 @@ class GeneticAlgorithmGazebo(GeneticAlgorithmNN):
 									 "Generation #" + str(self.current_generation))
 		except ZeroDivisionError:
 			pass
+			
+	def test_output(self, input_dict):
+		"""
+		Function used to work with test network
+		It calculates the output for a given input_dict
+		"""
+		output = self.test_network.forward_propagate(input_dict)
+		
+		return output
+			
+	@property
+	def test_network(self):
+		"""
+		Used to save the network with parameters,
+		so we don't have to change again and again
+		"""
+		return self._test_network
+		
+	@test_network.setter
+	def test_network(self, individual):
+		ready_individual = self.convert_chromosome(individual)
+		self.neural_network.load_parameters_from_vector(ready_individual)
+		
+		self._test_network = self.neural_network
 		
 	@property
 	def evaluation_steps(self):
