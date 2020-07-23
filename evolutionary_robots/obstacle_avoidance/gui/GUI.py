@@ -29,7 +29,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.updGUI.connect(self.updateGUI)
 
     def updateGUI(self):
-    	if(self.display_stats == True):
+    	if(self.display_stats == True and self.algorithm.start_state == False):
         	self.update_stats()
         
     def trainClicked(self):
@@ -96,7 +96,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.display_stats = False
             
     def update_stats(self):
-        stats_array = self.algorithm.return_stats()
+        stats_array = self.algorithm.GA.return_stats()
         
         if(len(stats_array) == 5):
         	_translate = QCoreApplication.translate
