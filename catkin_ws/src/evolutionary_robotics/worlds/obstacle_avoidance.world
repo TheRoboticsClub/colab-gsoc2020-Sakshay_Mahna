@@ -9,8 +9,8 @@
 		</include>
 		
 		<include>
-			<uri>model://mapSimple</uri>
-			<pose>8.793593 -7.2892048 0.680905 0.002756 0.030399 -0.012268</pose>
+			<uri>model://simpleWorld</uri>
+			<pose>0 0 0 0 0 0</pose>
 		</include>
 		
 		<include>

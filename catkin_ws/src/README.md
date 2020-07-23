@@ -16,10 +16,8 @@ The following headings describe the summary of changes and additions to the `Jde
 
 ### Worlds
 
-- `obstacle_avoidance.world` contains the world representation of the obstacle avoidance exercise. The file includes `sun`, `ground_plane_transparent`, `roombaIR` and `mapSimple` models.
+- `obstacle_avoidance.world` contains the world representation of the obstacle avoidance exercise. The file includes `sun`, `ground_plane_transparent`, `roombaIR` and `simpleWorld` models.
 
 ### Models
 
 - `roombaIR` contains the Roomba robot with 8 IR sensors fitted accross it. The file is an edited version of `roombaROS` where the Hokuyo Laser sensor is removed and Sonar sensors are added.
-
-- `mapSimple` contains a wall based boundary. The file is an edited version of `mapaSimple`. The previous file has a very small mass, which the robot pushes along with it when it collides. The edited version has increased mass to avoid that problem.

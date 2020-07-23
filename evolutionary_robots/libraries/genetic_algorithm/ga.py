@@ -359,7 +359,7 @@ class GeneticAlgorithm(object):
 		as a function of generation
 		"""
 		# Generate the range of Generations
-		generations = range(self.generation_start, self.number_of_generations+1)
+		generations = range(self.generation_start, self.current_generation + 2)
 		
 		# Plot Max Fitness
 		plt.plot(generations, self.max_fitness, label="MAX")
@@ -481,7 +481,7 @@ class GeneticAlgorithm(object):
 		# Make the parameters same
 		self.population_size = self.population.shape[0]
 		self.chromosome_length = self.population.shape[1]
-		self.generation_start = generation_resume
+		self.generation_start = generation_resume + 1
 		
 	# Function to remove a chromosome
 	# file

@@ -4,20 +4,18 @@ import threading
 import time
 import sys
 import os
-import rospy
-import multiprocessing
-from std_srvs.srv import Empty
 from datetime import datetime
 
 import math
 import cv2
 import numpy as np
 
-sys.path.append('./../libraries/')
-from genetic_algorithm.ga_simulation import GeneticAlgorithmGazebo
+sys.path.append('./../libraries')
 from neural_networks.ann import ArtificialNeuralNetwork
 from neural_networks.interface import Layer
 from neural_networks.activation_functions import *
+from genetic_algorithm.ga_simulation import GeneticAlgorithmGazebo
+from GA import GA
 
 time_cycle = 80
 
@@ -26,84 +24,59 @@ class MyAlgorithm(threading.Thread):
         # Initializing the Algorithm object
         self.sensor = sensor
         self.motors = motors
+        self.start_state = True
         self.stop_event = threading.Event()
         self.kill_event = threading.Event()
         self.lock = threading.Lock()
         self.threshold_sensor_lock = threading.Lock()
         threading.Thread.__init__(self, args=self.stop_event)
-        
-    def initialize(self):
-        # Initializing the Neural Network
-        self.neural_network = self.define_neural_network()
-        self.ga = self.define_genetic_algorithm()
-        
-        # Genetic Algorithm variables
-        self.state = "FITNESS"
-        self.fitness_iterations = 0
-        self.fitness_vector = []
-        self.individual_fitness = []
-        self.individual_index = 0
-        self.individual = self.ga.population[self.individual_index]
-        self.generation = 1
-        self.ga.current_generation = self.generation - 1
-        self.ga.generation_start = self.generation
-        self.delete_process = None
-        
     
     def fitness_function(self, chromosome):
     	# The fitness function
-    	# Enter your fitness function here!
+    	# Enter the fitness function here
     	
     
     def define_neural_network(self):
-    	# Define the your layers here!
-    	inputLayer = 
-    	outputLayer = 
-    	# Define the Neural Network here!
-    	neural_network = ArtificialNeuralNetwork([inputLayer, outputLayer], "")
+    	# Define the layers
+    	inputLayer = Layer("inputLayer", 8, IdentityActivation(), "INFRARED", ["outputLayer"])
+    	outputLayer = Layer("outputLayer", 2, SigmoidActivation(), "", ["MOTORS"])
+    	# Define the Neural Network
+    	neural_network = ArtificialNeuralNetwork([inputLayer, outputLayer], "STATIC")
     	
     	return neural_network
     	
     def define_genetic_algorithm(self):
     	# Define the Genetic Algorithm
-    	ga = GeneticAlgorithmGazebo(self.neural_network)
+    	neural_network = self.define_neural_network()
+    	ga = GeneticAlgorithmGazebo(neural_network)
     
-    	# Define the genetic algorithm here!
+    	# Define the genetic algorithm
+    	log_folder = './log'
     	ga.population_size = 
-    	ga.number_of_generations =   
+    	ga.number_of_generations =    
     	ga.mutation_probability = 
     	ga.evaluation_time = 
     	ga.number_of_elites = 
     	ga.fitness_function = self.fitness_function
     	
-    	# Generate the log directory
-    	if not os.path.exists('./log'):
-    		os.makedirs('./log')
+    	genetic_algorithm = GA(ga, log_folder)
     	
-    	# Generate a random population
-    	ga.generate_population()
-    	ga.generations.append(ga.population)
-    	ga.save_chromosome(ga.population, './log/generation0%', header="Generation #0")
-    	
-        # Print the legend
-        legend = ["Generation", "Maximum Fitness", "Average Fitness", "Minimum Fitness"]
-        print("{: <10} {: >20} {: >20} {: >20}".format(*legend))
-    	
-    	return ga
-    	
+    	return genetic_algorithm
     
     def getRange(self):
         self.lock.acquire()
         values = self.sensor.data.values
         self.lock.release()
         return values
-        
-    def reset_simulation(self):
-        reset = rospy.ServiceProxy('/gazebo/reset_simulation', Empty)
-        reset()
 
     def run (self):
-        self.initialize()
+    	if(self.start_state == True):
+			self.GA = self.define_genetic_algorithm()
+			self.start_state = False
+
+        self.GA.run_state = self.run_state
+        self.GA.initialize()
+    		
     	while(not self.kill_event.is_set()):
     		start_time = datetime.now()
     		
@@ -118,6 +91,8 @@ class MyAlgorithm(threading.Thread):
     			time.sleep((time_cycle - ms) / 1000.0)
 
     def stop (self):
+    	self.motors.sendV(0)
+    	self.motors.sendW(0)
         self.stop_event.set()
 
     def play (self):
@@ -130,74 +105,39 @@ class MyAlgorithm(threading.Thread):
         self.kill_event.set()
 
     def algorithm(self):
-    	if(self.state == "FITNESS"):
-    		output = self.ga.calculate_output({"INFRARED": self.getRange()}, self.individual)["MOTORS"]
-    		self.motors.sendV(0.01 * (output[0] + output[1]))
-    		self.motors.sendW(0.01 * (output[0] - output[1]))
-    		self.individual_fitness.append(self.ga.calculate_fitness(self.individual))
-    		self.fitness_iterations = self.fitness_iterations + 1
+    	if(self.GA.state == "FITNESS"):
+    		output = self.GA.calculate_output({"INFRARED": self.getRange()})["MOTORS"]
+    		self.motors.sendV(4 * (output[0] + output[1]))
+    		self.motors.sendW((output[0] - output[1]))
     		
-    		if(self.fitness_iterations == self.ga.evaluation_steps):
-    			self.individual_index = self.individual_index + 1
-    			if(self.individual_index < self.ga.population_size):
-    			    self.individual = self.ga.population[self.individual_index]
-    			self.fitness_vector.append(self.ga.determine_fitness(self.individual_fitness, self.individual))
-    			self.individual_fitness = []
-    			self.reset_simulation()
-    			self.fitness_iterations = 0
+    		self.GA.fitness_state()
     			
-    		if(self.individual_index == self.ga.population_size):
-    			self.state = "PRINT"
-    			self.ga.fitness_vector = np.array(self.fitness_vector)
-    			self.fitness_vector = []
-    			self.individual_index = 0
-    			
-    	elif(self.state == "PRINT"):
+    	elif(self.GA.state == "PRINT"):
             self.motors.sendV(0)
             self.motors.sendW(0)
-            self.ga.generate_statistics()
-            self.ga.fraction_save(self.generation)
-            self.state = "SELECTION"
+            self.GA.print_state()
     	
-    	elif(self.state == "SELECTION"):
-    		self.ga.selection()
-    		self.state = "CROSSOVER"
+    	elif(self.GA.state == "SELECTION"):
+    		self.GA.selection_state()
     		
-    	elif(self.state == "CROSSOVER"):
-    		self.ga.crossover()
-    		self.state = "MUTATION"
+    	elif(self.GA.state == "CROSSOVER"):
+    		self.GA.crossover_state()
     		
-    	elif(self.state == "MUTATION"):
-    		self.ga.mutation()
-    		self.state = "NEXT"
+    	elif(self.GA.state == "MUTATION"):
+    		self.GA.mutation_state()
     		
-    	elif(self.state == "NEXT"):
-    	    self.ga.generations.append(self.ga.population)
-            self.ga.save_handler()
-
-            # Delete the previous one
-            # In a sepearate process
-            delete_process = multiprocessing.Process(target=self.ga.remove_chromosome,
-									             args=('./log/generation' + str(self.ga.current_generation-1),))			
-            delete_process.start()
-
-            self.generation = self.generation + 1
-            if(self.generation == self.ga.number_of_generations + 1):
-	            self.state = "END"
-            else:
-	            self.individual = self.ga.population[self.individual_index]
-	            self.ga.current_generation = self.generation - 1
-	            self.state = "FITNESS"
+    	elif(self.GA.state == "NEXT"):
+    	    self.GA.next_state()
 				
-        elif(self.state == "END"):
-			self.ga.save_statistics('./log/stats')
-			self.ga.save_chromosome(self.ga.best_chromosomes, './log/best_chromosomes')
-			
-			# Print the best fitness and return the chromosome
-			print("The best fitness value acheived is: " + str(self.ga.best_fitness))
-			print("Found in generation # " + str(self.ga.best_generation))
+        elif(self.GA.state == "END"):
+			self.GA.end_state()
 			
 			# Done
 			self.stop()
+			
+        elif(self.GA.state == "TEST"):
+            output = self.GA.calculate_output({"INFRARED": self.getRange()})
+            self.motors.sendV(4 * (output[0] + output[1]))
+            self.motors.sendW((output[0] - output[1]))
     		
         
