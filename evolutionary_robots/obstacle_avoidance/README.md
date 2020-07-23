@@ -24,10 +24,14 @@ cd ..
 cd obstacle_avoidance
 ```
 
-- Launch the Gazebo simulation in the same terminal window. A new window showing the Robot Model in an environment would appear. Ignore the yellow colored warnings that appear in the terminal.
+- Launch the Gazebo simulation in the same terminal window. A new window showing the Robot Model in an environment would appear. Ignore the yellow colored warnings that appear in the terminal. **However, we should run the headless version of the simulator, to decrease the time the algorithm takes to train**
 
 ```bash
+# Complete Simulation
 roslaunch ./launch/obstacle_avoidance.launch
+
+# Headless version
+roslaunch ./launch/obstacle_avoidance_headless.launch
 ```
 
 - In a new terminal window, execute the academic application that will incorporate your code. This would open a GUI application through which the user can execute the code.
