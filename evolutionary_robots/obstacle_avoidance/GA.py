@@ -88,6 +88,14 @@ class GA(object):
 			self.genetic_algorithm.test_network = self.genetic_algorithm.population[0]
 			self.state = "FITNESS"
 			
+			try:
+				best_individual = np.loadtxt(self.log_folder + '/current_best.txt', delimiter=' , ')
+				self.genetic_algorithm.best_chromosome = best_individual
+				best_fitness = np.loadtxt(self.log_folder + '/best_fitness.txt')
+				self.genetic_algorithm.best_fitness = best_fitness
+			except IOError:
+				pass
+			
 		elif(self.run_state == "TRAIN"):
 			self.generation = 1
 			self.state = "SAVE"
@@ -141,7 +149,6 @@ class GA(object):
 		# Gather the stats and return them for
 		# display in the GUI
 		
-		# OPTIMIZATION REQUIRED !!!!!!!	
 		stats_array = []
 		
 		try:
@@ -192,7 +199,7 @@ class GA(object):
 			self.individual_index = self.individual_index + 1
 			if(self.individual_index < self.genetic_algorithm.population_size):
 				self.individual = self.genetic_algorithm.population[self.individual_index]
-				self.test_network = self.individual
+				self.genetic_algorithm.test_network = self.individual
 			self.fitness_vector.append(self.genetic_algorithm.determine_fitness(self.individual_fitness, self.individual))
 			self.individual_fitness = []
 			self.reset_simulation()

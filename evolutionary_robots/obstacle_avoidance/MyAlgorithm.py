@@ -35,15 +35,21 @@ class MyAlgorithm(threading.Thread):
     	# The fitness function
     	linear_speed = self.motors.getV()
     	rotation_speed = self.motors.getW()
-    	infrared = np.max(self.getRange())
+    	infrared = np.min(self.getRange())
     	
-    	fitness = linear_speed * (1 - math.sqrt(abs(rotation_speed))) * (2 - infrared)
+    	# Individual motor speeds are not available in ROS
+    	# Just a trick,
+    	# Linear speed is proportional to sum of velocities
+    	# Angular speed is proportional to difference of velocities
+    	
+    	fitness = linear_speed * (1 - math.sqrt(abs(rotation_speed))) * infrared
     	
     	return fitness 
     	
     
     def define_neural_network(self):
     	# Define the layers
+    	# Layer(name_of_layer, number_of_neurons, activation_function, sensor_inputs, list_of_output_layer_names)
     	inputLayer = Layer("inputLayer", 8, IdentityActivation(), "INFRARED", ["outputLayer"])
     	outputLayer = Layer("outputLayer", 2, SigmoidActivation(), "", ["MOTORS"])
     	# Define the Neural Network
@@ -58,8 +64,8 @@ class MyAlgorithm(threading.Thread):
     
     	# Define the genetic algorithm
     	log_folder = './log'
-    	ga.population_size = 4
-    	ga.number_of_generations = 4   
+    	ga.population_size = 10
+    	ga.number_of_generations = 100   
     	ga.mutation_probability = 0.01
     	ga.evaluation_steps = 100
     	ga.number_of_elites = 0

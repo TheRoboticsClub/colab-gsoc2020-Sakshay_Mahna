@@ -608,6 +608,9 @@ class GeneticAlgorithm(object):
 			self.save_chromosome(np.array([self.best_chromosome]), './log/current_best', 
 							 	header="Found in generation #" + str(self.best_generation))
 							 	
+			self.save_chromosome(np.array([self.best_fitness]), './log/best_fitness',
+								header="Found in generation #" + str(self.best_generation))
+							 	
 		except TypeError:
 			pass
 		
