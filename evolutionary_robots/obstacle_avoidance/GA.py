@@ -62,9 +62,20 @@ class GA(object):
 		"""
 		self.run_state = "TRAIN"
 		self.start = True
+		self.pause = False
 		self.log_folder = log_folder
 		self.genetic_algorithm = genetic_algorithm
 		self.reset_simulation = rospy.ServiceProxy('/gazebo/reset_simulation', Empty)
+		self.pause_simulation = rospy.ServiceProxy('/gazebo/pause_physics', Empty)
+		self.unpause_simulation = rospy.ServiceProxy('/gazebo/unpause_physics', Empty)
+		
+	def synchronize(self):
+		if(self.pause == True):
+			self.unpause_simulation()
+		else:
+			self.pause_simulation()
+			
+		self.pause = not self.pause
 		
 	def initialize(self):
 		"""

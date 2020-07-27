@@ -11,7 +11,7 @@ import numpy as np
 import pickle
 from graphviz import Digraph
 from layers import StaticLayer, DynamicLayer
-import tensorflow as tf
+from datetime import datetime
 
 # Library used to genrate warnings
 import warnings
@@ -110,26 +110,16 @@ class ArtificialNeuralNetwork(object):
 		# Internal Attributes
 		self.__input_connections = {}		# To store the input connections of various layers
 		self.__output_connections = {}		# To store the output connections of various layers
-		self.__sensor_inputs = {}			# To store the sensor inputs
 		
 		self.__output_layers = []			# To store the layers that are used as output(majorly hardware layers)
 		self.__input_layers = []			# To store the layers that are used as input
 		
-		# Storing layers according to levels (* Useful for BFS)
-		self.__level_vector = [[]]
-		
-		# Disable eager execution
-		# Default setting for tensorflow 2
-		tf.compat.v1.disable_eager_execution()
-		
 		# Output and State matrix dictionary
 		self.__output_matrix = {}
-		self.__state_matrix = dict((layer[0], 
-								tf.Variable(np.zeros((layer[1], )), dtype=tf.float64)) for layer in layer_vector)
-								
-		self.__state = dict((layer[0], np.zeros((layer[1], ))) for layer in layer_vector)
+		self.__state_matrix = dict((layer[0], np.zeros((layer[1], ))) for layer in layer_vector)
 		
 		# Construct the layers and the execution graph
+		self._order_of_execution = []
 		self._construct_layers(layer_vector)
 		self._construct_graph()
 			
@@ -195,7 +185,6 @@ class ArtificialNeuralNetwork(object):
 						input_dimension = input_dimension + self.__neuron_map[connection]
 				except KeyError:
 					self.__input_layers.append(layer[0])
-					self.__level_vector[0].append(layer[0])
 					input_dimension = layer[1]
 				
 				# Output dimensions
@@ -219,7 +208,6 @@ class ArtificialNeuralNetwork(object):
 						input_dimension = input_dimension + self.__neuron_map[connection]		
 				except KeyError:
 					self.__input_layers.append(layer[0])
-					self.__level_vector[0].append(layer[0])
 					input_dimension = layer[1]
 						
 				# Output dimensions
@@ -269,101 +257,78 @@ class ArtificialNeuralNetwork(object):
 		
 		Notes
 		-----
-		The computational graph is constructed using Tensorflow
-		
 		Algorithm:
-		1. Iterate in a Breadth First Manner from input to output
+		1. Iterate the layers through order of initialization
 		2. For input layers the input is taken from sensor input only, 
 		   input_vector is taken as zero
 		3. For other layers the input is taken as a concatenation of 
 		   vectors from output matrix(if static) or state matrix(if dynamic)
 		4. If the output matrix gives a key error, we keep the current layer 
 		   in an error queue
-		5. The error queue is iterated again and again to reduce it's size to 0,
-		   so we can move to next level
+		5. The error queue is iterated again and again to reduce it's size to 0
 		6. If the error queue is not reducing in size, then the network is not
-		   correct(only in case of Static)
+		   correct(only in case of Static, Dynamic will not give any such problem)
 		"""
-		# Iterate the layer names according to Breadth First Search
-		current_level = 0			# Depicts the level of search we are currently at
-		error_queue = []			# Saves the objects of current layer which are to be generated
-		layers_generated = 0		# Keeps track of the number of layers generated till now
+		error_queue = []			# Saves the objects of which are yet to be generated
+		error_index = 0				# To store the index of layer that is currently to be generated
 		self.__output_matrix = {}
 		
-		# Keep a track of the layers that are already checked
-		layers_done = dict((layer[0], False) for layer in self._order_of_initialization)
+		# Initialization
+		error_queue = [layer[0] for layer in self._order_of_initialization]
+		prev_length = len(error_queue)
 		
-		# Keep iterating till we have generated all the layers
-		while layers_generated != self.__number_of_layers:
-			# To start
-			new_error_queue = []	# To store the elements that are going to be present in the next iteration
-			error_queue = self.__level_vector[current_level]
+		while(len(error_queue) != 0):
+			# The layer to work on
+			layer = error_queue[error_index]
+		
+			# Generate the input vector
+			input_vector = np.array([])
 			
-			# Tick the layers already done
-			for layer in error_queue:
-				layers_done[layer] = True
-			
-			while(len(error_queue) != 0):
-				new_error_queue = []
-				# Iterate over the layers
-				for layer in error_queue:
-					# Get the sensor input externally
-					self.__sensor_inputs[layer] = tf.compat.v1.placeholder(tf.float64)
-					# Generate the input vector
-					input_vector = tf.constant(np.array([]))
-					
-					# Get the input from other layers
-					# If the layer is an input layer, then we have to pass a constant tensor of zero
-					if(layer in self.__input_layers):
-						input_vector = tf.constant(np.zeros((self.__neuron_map[layer], )))
-						
-					# If the layer is not an input layer, then it needs to concatenate it's inputs
-					else:
-						for connection in self.__input_connections[layer]:
-							# An additional check for delay
-							if(self.__type_of_network == "DYNAMIC"):
-								# If the network is DYNAMIC then the input is taken from state matrix
-								input_vector = tf.compat.v1.concat([input_vector, self.__state_matrix[connection]], axis=0)
-							else:
-								# If the network is STATIC then the input is taken from output matrix
-								# A try except block if we try accessing an element of output matrix that is not yet declared
-								try:
-									input_vector = tf.compat.v1.concat([input_vector, self.__output_matrix[connection]], axis=0)
-								except IndexError:
-									new_error_queue.append(layer)
-									continue
-						
-						# The procedding steps can only be performed if, the new error queue is empty
-						# Especially for STATIC			
-						if(len(new_error_queue) != 0):
-							continue
-									
-					# If all the above stages complete perfectly
-					# Make an entry to output matrix
-					self.__output_matrix[layer] = tf.numpy_function(self.__layer_map[layer].forward_propagate, 
-																	[input_vector, self.__sensor_inputs[layer]], tf.float64)
-					layers_generated = layers_generated + 1
-					
-					# Insert all the connections to the next level
-					for connection in self.__output_connections[layer]:
-						# We don't want to pick up the hardware
-						if((connection not in self.__output_layers) and (layers_done[connection] == False)):
-							try:
-								self.__level_vector[current_level + 1].append(connection)
-							except IndexError:
-								self.__level_vector.append([])
-								self.__level_vector[current_level + 1].append(connection)
-								
-							layers_done[connection] = True
+			# Get the input from other layers
+			# If the layer is an input layer, then we have to pass a
+			# constant vector of zero
+			if(layer in self.__input_layers):
+				input_vector = np.zeros((self.__neuron_map[layer],))
 				
-				# Check if the new error queue is the same as the error queue
-				# Then we have a problem
-				assert new_error_queue != error_queue, "The Static Neural Network seems to contain some recurrent connections"
-									
-				# Error Queue is the new one
-				error_queue = new_error_queue
+			# If the layer is not an input layer, then it needs to concatenate it's inputs
+			else:
+				# An error flag
+				error_flag = False
+				
+				for connection in self.__input_connections[layer]:
+					# An additional check for delay
+					if(self.__type_of_network == "DYNAMIC"):
+						# If the network is DYNAMIC then the input is taken from state matrix
+						input_vector = np.concatenate([input_vector, self.__state_matrix[connection]], axis=0)
+					else:
+						# If the network is STATIC then the input is taken from output matrix
+						# A try except block if we try accessing an element of output matrix that is
+						# not yet declared
+						try:
+							input_vector = np.concatenate([input_vector, self.__output_matrix[connection]], axis=0)
+						except KeyError:
+							error_flag = True
+							break
+							
+				# The proceeding steps can only be performed if
+				# the flag has not been raised
+				if(error_flag == True):
+					error_index = (error_index + 1) % len(self.error_queue)
+					if(error_index == 0):
+						# The error_index has completed one round
+						exception_string = "The Static Neural Network seems to contain some recurrent connections"
+						assert prev_length != len(self.error_queue), exception_string
+						prev_length = len(self.error_queue)
 					
-			current_level = current_level + 1
+					continue
+					
+			# If all the above steps complete perfectly,
+			# make an entry to output matrix
+			self.__output_matrix[layer] = np.zeros((self.__neuron_map[layer],))
+			self._order_of_execution.append(layer)
+			error_queue.pop(0)
+			error_index = 0
+				
 							
 	# The function to calculate the output
 	def forward_propagate(self, input_dict):
@@ -400,28 +365,52 @@ class ArtificialNeuralNetwork(object):
 
 		sensor_input = {}
 		output = {}
+		
 		for layer in self._order_of_initialization:
 			# Get the sensor input
 			try:
-				sensor_input[self.__sensor_inputs[layer[0]]] = input_dict[layer[3]]
+				sensor_input[layer[0]] = input_dict[layer[3]]
 			except KeyError:
-				sensor_input[self.__sensor_inputs[layer[0]]] = np.zeros((self.__neuron_map[layer[0]], ))
+				sensor_input[layer[0]] = np.zeros((self.__neuron_map[layer[0]], ))
 
-		# Calculate the output
-		init_var = tf.compat.v1.global_variables_initializer()
+		# Calculate the output according to order of execution
+		if(self.__type_of_network == "STATIC"):
+			for layer in self._order_of_execution:
+				input_vector = np.array([])
+				
+				if(layer in self.__input_layers):
+					input_vector = np.zeros((self.__neuron_map[layer]))
+					self.__output_matrix[layer] = self.__layer_map[layer].forward_propagate(
+												  input_vector, sensor_input[layer])
+				else:
+					# A small bottleneck
+					for connection in self.__input_connections[layer]:
+						input_vector = np.concatenate([input_vector, self.__output_matrix[connection]])
+					self.__output_matrix[layer] = self.__layer_map[layer].forward_propagate(
+												  input_vector, sensor_input[layer])
+												  
+			output = self.__output_matrix
+												  
+		else:
+			for layer in self._order_of_execution:
+				input_vector = np.array([])
+				
+				if(layer in self.__input_layers):
+					input_vector = np.zeros((self.__neuron_map[layer]))
+					self.__output_matrix[layer] = self.__layer_map[layer].forward_propagate(
+												  input_vector, sensor_input[layer])
+				else:
+					# A small bottleneck
+					for connection in self.__input_connections[layer]:
+						input_vector = np.concatenate([input_vector, self.__state_matrix[connection]])
+						
+					print(self.__state_matrix)
+					self.__output_matrix[layer] = self.__layer_map[layer].forward_propagate(
+												  input_vector, sensor_input[layer])
+												  
+			output = self.__state_matrix
+			self.__state_matrix = self.__output_matrix
 		
-		with tf.compat.v1.Session() as session:
-			session.run(init_var)
-			
-			# The state matrix needs to be updated before every iteration
-			for layer in self.__layer_map.keys():
-				self.__state_matrix[layer].load(self.__state[layer], session)
-			
-			# Generate the output
-			for layer in self.__layer_map.keys():
-				output[layer] = session.run(self.__output_matrix[layer], feed_dict = sensor_input)
-			
-		self.__state = output
 		# Return the output_dict
 		output_dict = {}
 		for layer in self.__output_layers:

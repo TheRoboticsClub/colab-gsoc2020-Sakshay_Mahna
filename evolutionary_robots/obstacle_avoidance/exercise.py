@@ -14,7 +14,7 @@ from interfaces.motors import PublisherMotors
 if __name__ == "__main__":
 
     infrared = ListenerInfrared("/roombaIR/sensor/infrared")
-    motors = PublisherMotors("/roombaIR/cmd_vel", 4, 0.3)
+    motors = PublisherMotors("/roombaIR/cmd_vel", 10, 5)
     algorithm = MyAlgorithm(infrared, motors)
 
     app = QApplication(sys.argv)
