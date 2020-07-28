@@ -46,4 +46,4 @@ ga.plot_fitness('./repr/fitness_plot', True)
 
 # If we want to run the generation from 25%
 # completion again
-print(ga.run('./log/generation25%.txt'))
+print(ga.run(25))

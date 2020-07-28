@@ -61,7 +61,7 @@ class GeneticAlgorithm(object):
 	number_of_elites: integer
 		The number of elites in each generation
 		
-	replay_fraction: float
+	replay_number: float
 		A float between 0 to 1 that specifies the fraction
 		of generations the algorithm should save
 		
@@ -152,7 +152,8 @@ class GeneticAlgorithm(object):
 		self.number_of_elites = number_of_elites
 		
 		# Other adjustable constants
-		self.replay_fraction = 0.25
+		self.replay_number = 25
+		self.log_folder = './log'
 		
 		# Some constants
 		self.__minimum_crossover_length = 1		# Always 1
@@ -453,35 +454,44 @@ class GeneticAlgorithm(object):
 		------
 		None
 		"""
+		chromosome = np.loadtxt(filename + '.txt', delimiter=' , ')
+		return chromosome
+		
+	# Helper function to continue training		
+	def load_generation(self, start):
+		"""
+		Helper function to help continue the
+		training
+		
+		Parameters
+		----------
+		start: integer
+			Number to tell from where to start
+			
+		Returns
+		-------
+		None
+		
+		Raises
+		------
+		None
+		"""
+		filename = self.log_folder + '/generation' + str(start)
+		
 		# Load the file
-		self.population = np.loadtxt(filename, delimiter=' , ')
+		self.population = self.load_chromosome(filename)
 		self.generations[0] = self.population
 		
-		# Get the filename explicitly without
-		# path. Since the path is not that big
-		# A simple for loop will suffice
-		slice_index = 0
-		for index in range(len(filename)):
-			if(filename[index] == '/'):
-				slice_index = index
-		
-		# Slice the .txt extension
-		filename = filename[slice_index+1:-4]
-		
-		# Get the generation number 
-		# It can be a percentage or an
-		# exact number
-		name_size = len(filename)
-		if(filename[name_size-1] == '%'):
-			filename = filename[:name_size-1]
-			generation_resume = int(float(filename[10:]) * self.number_of_generations / 100)
-		else:
-			generation_resume = int(filename[10:])
-			
 		# Make the parameters same
 		self.population_size = self.population.shape[0]
 		self.chromosome_length = self.population.shape[1]
-		self.generation_start = generation_resume + 1
+		self.generation_start = start + 1
+		
+		# Load the best chromosome and fitness as well!
+		# self.best_chromosomes = self.load_chromosome(self.log_folder + '/best_chromosomes')
+		# self.best_chromosome = self.load_chromosome(self.log_folder + '/current_best')
+		# self.best_fitness = self.load_chromosome(self.log_folder + '/best_fitness')
+		
 		
 	# Function to remove a chromosome
 	# file
@@ -496,7 +506,7 @@ class GeneticAlgorithm(object):
 			pass
 	
 	# Run the complete Genetic Algorithm
-	def run(self, filename=None):
+	def run(self, start=0):
 		"""
 		Simulate the complete run of the algorithm
 		
@@ -520,8 +530,8 @@ class GeneticAlgorithm(object):
 		None
 		"""
 		# Make a directory if it does not exist
-		if not os.path.exists('./log'):
-			os.makedirs('./log')
+		if not os.path.exists(self.log_folder):
+			os.makedirs(self.log_folder)
 		
 		# Generate a random population
 		self.generate_population()
@@ -533,14 +543,11 @@ class GeneticAlgorithm(object):
 		legend = ["Generation", "Maximum Fitness", "Average Fitness", "Minimum Fitness"]
 		print("{: <10} {: >20} {: >20} {: >20}".format(*legend))
 		
-		# Save the current generation
-		self.save_chromosome(self.population, './log/generation0%', header="Generation #0")
-		
 		# Set the start variable
 		self.generation_start = 1
 		
-		if(filename != None):
-			self.load_chromosome(filename)
+		if(start != 0):
+			self.load_generation(start)
 			
 		delete_process = None
 		
@@ -549,12 +556,6 @@ class GeneticAlgorithm(object):
 		for generation in range(self.generation_start, self.number_of_generations + 1):
 			# For statistics
 			self.current_generation = generation - 1
-			
-			# Check the current fraction and save if required
-			if(generation % int(self.replay_fraction * (self.number_of_generations)) == 0):
-				fraction = float(generation) / float(self.number_of_generations)
-				self.save_chromosome(self.population, './log/generation' + str(int(100 * fraction)) + "%", 
-									 "Generation #" + str(self.current_generation))
 			
 			# Determine the fitness of all the individuals
 			self.determine_fitness()
@@ -576,14 +577,11 @@ class GeneticAlgorithm(object):
 			
 			# Delete the previous one
 			# In a sepearate process
-			delete_process = multiprocessing.Process(target=self.remove_chromosome,
-												 args=('./log/generation' + str(self.current_generation-1),))			
-			delete_process.start()
-			
-		
-		# Save the required values
-		self.save_statistics('./log/stats')
-		self.save_chromosome(self.best_chromosomes, './log/best_chromosomes')
+			if(generation % self.replay_number != 2):
+				delete_process = multiprocessing.Process(target=self.remove_chromosome,
+								 args=(self.log_folder + '/generation' + str(self.current_generation-1),))
+								 			
+				delete_process.start()
 		
 		# Print the best fitness and return the chromosome
 		print("The best fitness value acheived is: " + str(self.best_fitness))
@@ -598,21 +596,28 @@ class GeneticAlgorithm(object):
 		Function to handle the saving of the
 		generations to files
 		"""
+		try:
+			# Save the required values
+			self.save_statistics(self.log_folder + '/stats')
+			self.save_chromosome(self.best_chromosomes, self.log_folder + '/best_chromosomes')
+		except AttributeError:
+			pass
+		
 		# Save the current generation chromosomes
 		self.save_chromosome(self.generations[self.current_generation - self.generation_start], 
-							 './log/generation' + str(self.current_generation), 
+							 self.log_folder + '/generation' + str(self.current_generation), 
 							 header='Generation #' + str(self.current_generation))
 		
-		# Save the current best
 		try:
-			self.save_chromosome(np.array([self.best_chromosome]), './log/current_best', 
+			# Save the current best
+			self.save_chromosome(np.array([self.best_chromosome]), self.log_folder + '/current_best', 
 							 	header="Found in generation #" + str(self.best_generation))
 							 	
-			self.save_chromosome(np.array([self.best_fitness]), './log/best_fitness',
+			self.save_chromosome(np.array([self.best_fitness, self.best_generation]), self.log_folder + '/best_fitness',
 								header="Found in generation #" + str(self.best_generation))
-							 	
 		except TypeError:
 			pass
+							 	
 		
 	# Getters and Setters
 	@property
@@ -689,21 +694,30 @@ class GeneticAlgorithm(object):
 			self._number_of_elites -= 1
 			
 	@property
-	def replay_fraction(self):
+	def replay_number(self):
 		""" Attribute to specify the fraction of 
 			number of generations to save
 		"""
-		return self._replay_fraction
+		return self._replay_number
 		
-	@replay_fraction.setter
-	def replay_fraction(self, fraction):
+	@replay_number.setter
+	def replay_number(self, number):
 		# Some adjustments
-		if(abs(fraction) > 1 and abs(fraction) <= self.number_of_generations):
-			fraction = fraction / self.number_of_generations
-		elif(abs(fraction) > self.number_of_generations):
-			fraction = self.number_of_generations
+		if(number < 0):
+			number = 25
 		
-		self._replay_fraction = fraction
+		self._replay_number = int(number)
+		
+	@property
+	def log_folder(self):
+		"""
+		Attribute to specify the logging folder
+		""" 
+		return self._log_folder
+		
+	@log_folder.setter
+	def log_folder(self, path):
+		self._log_folder = path
 			
 	@property
 	def fitness_function(self):

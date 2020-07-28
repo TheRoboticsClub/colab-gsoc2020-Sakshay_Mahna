@@ -94,16 +94,24 @@ class GA(object):
 		# Initializing the Variables
 		if(self.run_state == "CONTINUE"):
 			files = glob.glob(self.log_folder + '/generation*[0-9].txt')
-			self.genetic_algorithm.load_chromosome(files[-1])
+			files.sort()
+			generation_number = int(files[-1][(len(self.log_folder) + 11):-4])
+			self.genetic_algorithm.load_generation(generation_number)
 			self.generation = self.genetic_algorithm.generation_start
 			self.genetic_algorithm.test_network = self.genetic_algorithm.population[0]
 			self.state = "FITNESS"
 			
 			try:
-				best_individual = np.loadtxt(self.log_folder + '/current_best.txt', delimiter=' , ')
+				best_individual = self.genetic_algorithm.load_chromosome(self.log_folder + '/current_best')
 				self.genetic_algorithm.best_chromosome = best_individual
-				best_fitness = np.loadtxt(self.log_folder + '/best_fitness.txt')
-				self.genetic_algorithm.best_fitness = best_fitness
+				best_fitness = self.genetic_algorithm.load_chromosome(self.log_folder + '/best_fitness')
+				self.genetic_algorithm.best_fitness = best_fitness[0]
+				self.genetic_algorithm.best_generation = int(best_fitness[1])
+				best_chromosomes = self.genetic_algorithm.load_chromosome(self.log_folder + '/best_chromosomes')
+				if(generation_number == 1):
+					self.genetic_algorithm.best_chromosomes.append(best_chromosomes.tolist())
+				else:
+					self.genetic_algorithm.best_chromosomes = best_chromosomes.tolist()
 			except IOError:
 				pass
 			
@@ -111,13 +119,13 @@ class GA(object):
 			self.generation = 1
 			self.state = "SAVE"
 			self.genetic_algorithm.test_network = self.genetic_algorithm.population[0]
-			self.genetic_algorithm.save_chromosome(self.genetic_algorithm.population, self.log_folder + "/generation0%", header="Generation #0")
+			self.genetic_algorithm.save_chromosome(self.genetic_algorithm.population, self.log_folder + "/generation0", header="Generation #0")
 		
 		elif(self.run_state == "TEST"):
 			self.state = "TEST"
 			self.generation = 0
 			try:
-				self.test_individual = np.loadtxt(self.log_folder + '/current_best.txt', delimiter=' , ')
+				self.test_individual = self.genetic_algorithm.load_chromosome(self.log_folder + '/current_best')
 			except IOError:
 				print("File not found!")
 				
@@ -193,9 +201,12 @@ class GA(object):
 		
 		# Delete the previous one
 		# In a seperate process
-		delete_process = multiprocessing.Process(target=self.genetic_algorithm.remove_chromosome, args=(self.log_folder + '/generation' + str(self.genetic_algorithm.current_generation - 1),))
-						
-		delete_process.start()
+		if(self.generation % self.genetic_algorithm.replay_number != 2):
+			delete_process = multiprocessing.Process(
+							 target=self.genetic_algorithm.remove_chromosome, 
+							 args=(self.log_folder + '/generation' + str(self.genetic_algorithm.current_generation - 1),))
+							
+			delete_process.start()
 		
 		self.state = "FITNESS"
 		
@@ -228,7 +239,6 @@ class GA(object):
 		"""
 		self.genetic_algorithm.generate_statistics()
 		self.best_fitness = self.genetic_algorithm.best_fitness
-		self.genetic_algorithm.fraction_save(self.generation)
 		self.state = "SELECTION"
 		
 	def selection_state(self):
@@ -270,8 +280,6 @@ class GA(object):
 		"""
 		Operations to perform in END state
 		"""
-		self.genetic_algorithm.save_statistics(self.log_folder + '/stats')
-		self.genetic_algorithm.save_chromosome(self.genetic_algorithm.best_chromosomes, self.log_folder + '/best_chromosomes')
 		
 		# Print the best fitness and return the chromosome
 		print("The best fitness value acheived is: " + str(self.genetic_algorithm.best_fitness))
