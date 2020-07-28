@@ -12,6 +12,7 @@ import pickle
 from graphviz import Digraph
 from layers import StaticLayer, DynamicLayer
 from datetime import datetime
+from copy import deepcopy
 
 # Library used to genrate warnings
 import warnings
@@ -299,13 +300,13 @@ class ArtificialNeuralNetwork(object):
 					# An additional check for delay
 					if(self.__type_of_network == "DYNAMIC"):
 						# If the network is DYNAMIC then the input is taken from state matrix
-						input_vector = np.concatenate([input_vector, self.__state_matrix[connection]], axis=0)
+						input_vector = self.__state_matrix[connection]
 					else:
 						# If the network is STATIC then the input is taken from output matrix
 						# A try except block if we try accessing an element of output matrix that is
 						# not yet declared
 						try:
-							input_vector = np.concatenate([input_vector, self.__output_matrix[connection]], axis=0)
+							input_vector = self.__output_matrix[connection]
 						except KeyError:
 							error_flag = True
 							break
@@ -313,7 +314,7 @@ class ArtificialNeuralNetwork(object):
 				# The proceeding steps can only be performed if
 				# the flag has not been raised
 				if(error_flag == True):
-					error_index = (error_index + 1) % len(self.error_queue)
+					error_index = (error_index + 1) % len(error_queue)
 					if(error_index == 0):
 						# The error_index has completed one round
 						exception_string = "The Static Neural Network seems to contain some recurrent connections"
@@ -326,7 +327,7 @@ class ArtificialNeuralNetwork(object):
 			# make an entry to output matrix
 			self.__output_matrix[layer] = np.zeros((self.__neuron_map[layer],))
 			self._order_of_execution.append(layer)
-			error_queue.pop(0)
+			error_queue.pop(error_index)
 			error_index = 0
 				
 							
@@ -389,7 +390,6 @@ class ArtificialNeuralNetwork(object):
 					self.__output_matrix[layer] = self.__layer_map[layer].forward_propagate(
 												  input_vector, sensor_input[layer])
 												  
-			output = self.__output_matrix
 												  
 		else:
 			for layer in self._order_of_execution:
@@ -404,12 +404,13 @@ class ArtificialNeuralNetwork(object):
 					for connection in self.__input_connections[layer]:
 						input_vector = np.concatenate([input_vector, self.__state_matrix[connection]])
 						
-					print(self.__state_matrix)
 					self.__output_matrix[layer] = self.__layer_map[layer].forward_propagate(
 												  input_vector, sensor_input[layer])
 												  
-			output = self.__state_matrix
-			self.__state_matrix = self.__output_matrix
+		
+		output = self.__output_matrix
+		for layer in self.__output_matrix.keys():
+			self.__state_matrix[layer] = self.__output_matrix[layer]
 		
 		# Return the output_dict
 		output_dict = {}

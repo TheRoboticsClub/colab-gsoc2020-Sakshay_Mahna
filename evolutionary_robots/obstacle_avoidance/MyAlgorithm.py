@@ -121,7 +121,7 @@ class MyAlgorithm(threading.Thread):
     	elif(self.GA.state == "FITNESS"):
     	    self.GA.synchronize()
             output = self.GA.calculate_output({"INFRARED": self.getRange()})["MOTORS"]
-            self.motors.sendV(10 * (output[0] + output[1]))
+            self.motors.sendV(5 * (output[0] + output[1]))
             self.motors.sendW(5 * (output[0] - output[1]))
             self.GA.synchronize()
 

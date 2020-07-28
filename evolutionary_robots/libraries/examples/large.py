@@ -8,7 +8,7 @@ from neural_networks.interface import Layer
 import numpy as np
 from neural_networks.activation_functions import LinearActivation, IdentityActivation
 
-print("Large Recurrent Example")
+print("Large Static Example")
 # There are 30 layers in this network
 # There are 28 hidden layers and 2 input and output respectively
 # All the Layers have a single neuron each
