@@ -244,17 +244,17 @@ class GeneticAlgorithm(object):
 		
 		# Append to best chromsomes
 		self.best_chromosomes.append(self.population[
-									   np.where(self.fitness_vector == np.amax(self.fitness_vector))
-									   ][0])
+		                      np.where(self.fitness_vector == np.amax(self.fitness_vector))
+		                      ][0])
 		
 		# Append to statistics: Generation, Max Fitness, Average Fitness,
 		# Min Fitness and Best Chromosome of the generation
 		self.__statistics.append([self.current_generation, max_fitness, 
 								  sum_fitness / self.population_size, min_fitness])
 		
-		print("{: <10} {: >20} {: >20} {: >20}".format(
-												*self.__statistics[self.current_generation - self.generation_start + 1]
-												))
+		print("{: <10} {: >20} {: >20} {: >20}".format(*self.__statistics[
+		 										self.current_generation - self.generation_start + 1
+		 										]))
 		
 		# Append to plots
 		self.min_fitness.append(min_fitness)
@@ -610,10 +610,12 @@ class GeneticAlgorithm(object):
 		
 		try:
 			# Save the current best
-			self.save_chromosome(np.array([self.best_chromosome]), self.log_folder + '/current_best', 
+			self.save_chromosome(np.array([self.best_chromosome]), 
+								self.log_folder + '/current_best', 
 							 	header="Found in generation #" + str(self.best_generation))
 							 	
-			self.save_chromosome(np.array([self.best_fitness, self.best_generation]), self.log_folder + '/best_fitness',
+			self.save_chromosome(np.array([self.best_fitness, self.best_generation]), 
+								self.log_folder + '/best_fitness', 
 								header="Found in generation #" + str(self.best_generation))
 		except TypeError:
 			pass

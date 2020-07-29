@@ -29,6 +29,9 @@ class GA(object):
 	initialize()
 		This function is run when any button on is clicked
 		
+	synchronize()
+		Play and pause simulation to synchronize with the code
+		
 	return_stats()
 		Function to return stats to the GUI
 		
@@ -70,6 +73,9 @@ class GA(object):
 		self.unpause_simulation = rospy.ServiceProxy('/gazebo/unpause_physics', Empty)
 		
 	def synchronize(self):
+		"""
+		Play and pause simulation to synchronize with the code
+		"""
 		if(self.pause == True):
 			self.unpause_simulation()
 		else:
@@ -117,7 +123,8 @@ class GA(object):
 			self.generation = 1
 			self.state = "SAVE"
 			self.genetic_algorithm.test_network = self.genetic_algorithm.population[0]
-			self.genetic_algorithm.save_chromosome(self.genetic_algorithm.population, self.log_folder + "/generation0", header="Generation #0")
+			self.genetic_algorithm.save_chromosome(self.genetic_algorithm.population, 
+								   self.log_folder + "/generation0", header="Generation #0")
 		
 		elif(self.run_state == "TEST"):
 			self.state = "TEST"
