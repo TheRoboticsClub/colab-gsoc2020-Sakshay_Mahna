@@ -1,2 +1,0 @@
-# Generation      Maximum Fitness      Average Fitness      Minimum Fitness
-1                  9.9867756999        -0.4693908822        -6.1873374599
