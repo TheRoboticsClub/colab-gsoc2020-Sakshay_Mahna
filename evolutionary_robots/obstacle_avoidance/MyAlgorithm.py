@@ -76,11 +76,11 @@ class MyAlgorithm(threading.Thread):
     	ga = GeneticAlgorithmGazebo(neural_network)
     
     	# Define the genetic algorithm
-    	ga.population_size = 10
+    	ga.population_size = 50
     	ga.number_of_generations = 100   
     	ga.mutation_probability = 0.01
-    	ga.evaluation_steps = 300
-    	ga.number_of_elites = 0
+    	ga.evaluation_steps = 100
+    	ga.number_of_elites = 2
     	ga.fitness_function = self.fitness_function
     	
     	genetic_algorithm = GA(ga, self.log_folder)

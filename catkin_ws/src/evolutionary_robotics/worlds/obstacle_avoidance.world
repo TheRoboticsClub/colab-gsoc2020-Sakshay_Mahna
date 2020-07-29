@@ -8,10 +8,22 @@
 			<uri>model://sun</uri>
 		</include>
 		
-		<include>
-			<uri>model://simpleWorld</uri>
-			<pose>0 0 0 0 0 0</pose>
-		</include>
+		<population name="barrel_population">
+			<model name="construction_barrel">
+				<include>
+					<static>true</static>
+					<uri>model://construction_barrel</uri>
+				</include>
+			</model>
+			<pose> 0 0 0 0 0 0 </pose>
+			<box>
+				<size> 10 10 0.2 </size>
+			</box>
+			<model_count>10</model_count>
+			<distribution>
+				<type>uniform</type>
+			</distribution>
+		</population>
 		
 		<include>
 			<uri>model://roombaIR</uri>

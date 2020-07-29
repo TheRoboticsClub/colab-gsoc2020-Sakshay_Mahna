@@ -166,11 +166,6 @@ class GA(object):
 		try:
 			stats_array.append(self.generation - 1)
 			stats_array.append(self.individual_index + 1)
-			if(len(self.individual_fitness) == 0):
-				stats_array.append(0)
-			else:
-				stats_array.append(self.individual_fitness[-1])
-			stats_array.append(self.evaluation_steps - self.fitness_iterations)
 			stats_array.append(self.best_fitness)
 		
 		except AttributeError:
