@@ -4,6 +4,7 @@ import threading
 import time
 import sys
 import os
+import glob
 from datetime import datetime
 
 import math
@@ -30,6 +31,18 @@ class MyAlgorithm(threading.Thread):
         self.lock = threading.Lock()
         self.threshold_sensor_lock = threading.Lock()
         threading.Thread.__init__(self, args=self.stop_event)
+        
+        self.log_folder = './log'
+        self.get_latest_file()
+        
+    def get_latest_file(self):
+        files = glob.glob(self.log_folder + '/generation*[0-9].txt')
+        files.sort()
+        
+        try:
+            self.latest_generation = int(files[-1][(len(self.log_folder) + 11):-4])
+        except IndexError:
+            self.latest_generation = 0
     
     def fitness_function(self, chromosome):
     	# The fitness function
@@ -63,7 +76,6 @@ class MyAlgorithm(threading.Thread):
     	ga = GeneticAlgorithmGazebo(neural_network)
     
     	# Define the genetic algorithm
-    	log_folder = './log'
     	ga.population_size = 10
     	ga.number_of_generations = 100   
     	ga.mutation_probability = 0.01
@@ -71,7 +83,7 @@ class MyAlgorithm(threading.Thread):
     	ga.number_of_elites = 0
     	ga.fitness_function = self.fitness_function
     	
-    	genetic_algorithm = GA(ga, log_folder)
+    	genetic_algorithm = GA(ga, self.log_folder)
     	
     	return genetic_algorithm
     

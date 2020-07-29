@@ -16,9 +16,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.trainButton.clicked.connect(self.trainClicked)
         self.trainButton.setCheckable(True)
-		
-        self.continueButton.clicked.connect(self.continueClicked)
-        self.continueButton.setCheckable(True)
 
         self.bestButton.clicked.connect(self.bestClicked)
         self.bestButton.setCheckable(True)
@@ -45,19 +42,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.algorithm.stop()
             self.display_stats = False
             
-    def continueClicked(self):
-    	if self.continueButton.isChecked():
-            self.continueButton.setText('Stop Training')
-            self.continueButton.setStyleSheet("background-color: #7dcea0")
-            self.algorithm.run_state="CONTINUE"
-            self.algorithm.play()
-            self.display_stats = True
-    	else:
-            self.continueButton.setText('Continue Training')
-            self.continueButton.setStyleSheet("background-color: #ec7063")
-            self.algorithm.stop()
-            self.display_stats = False
-            
     def bestClicked(self):
     	if self.bestButton.isChecked():
             self.bestButton.setText('Stop Testing')
@@ -75,18 +59,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     	if self.generationButton.isChecked():
             self.generationButton.setText('Stop Testing')
             self.generationButton.setStyleSheet("background-color: #7dcea0")
-            if(self.button_0.isChecked()):
-            	self.algorithm.run_state = "RESUME_0"
-            elif(self.button_25.isChecked()):
-            	self.algorithm.run_state = "RESUME_25"
-            elif(self.button_50.isChecked()):
-            	self.algorithm.run_state = "RESUME_50"
-            elif(self.button_75.isChecked()):
-            	self.algorithm.run_state = "RESUME_75"
-            elif(self.button_100.isChecked()):
-            	self.algorithm.run_state = "RESUME_100"
-            else:
-            	self.algorithm.run_state = "RESUME_0"
+            generation = int(self.input_generation.value())
+            self.algorithm.run_state = "CONTINUE" + str(generation)
             self.algorithm.play()
             self.display_stats = True
     	else:
@@ -111,6 +85,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def setAlgorithm(self, algorithm):
         self.algorithm=algorithm
+        _translate = QCoreApplication.translate
+        self.input_generation.setMaximum(self.algorithm.latest_generation)
+        self.out_of_generation.setText(_translate("MainWindow", " / " + str(self.algorithm.latest_generation)))
+        self.last_generation.setText(_translate("MainWindow", str(self.algorithm.latest_generation)))
 
     def getAlgorithm(self):
         return self.algorithm

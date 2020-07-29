@@ -92,10 +92,8 @@ class GA(object):
 		self.genetic_algorithm.generations.append(self.genetic_algorithm.population)
 		
 		# Initializing the Variables
-		if(self.run_state == "CONTINUE"):
-			files = glob.glob(self.log_folder + '/generation*[0-9].txt')
-			files.sort()
-			generation_number = int(files[-1][(len(self.log_folder) + 11):-4])
+		if(self.run_state[:8] == "CONTINUE"):
+			generation_number = int(self.run_state[8:])
 			self.genetic_algorithm.load_generation(generation_number)
 			self.generation = self.genetic_algorithm.generation_start
 			self.genetic_algorithm.test_network = self.genetic_algorithm.population[0]
@@ -130,18 +128,6 @@ class GA(object):
 				print("File not found!")
 				
 			self.genetic_algorithm.test_network = self.test_individual
-			
-		elif(self.run_state[:6] == "RESUME"):
-			percent = int(self.run_state[7:])
-			
-			try:
-				self.genetic_algorithm.load_chromosome(self.log_folder + '/generation' + str(percent) + '%.txt')
-			except IOError:
-				print("File not found!")
-				
-			self.generation = self.genetic_algorithm.generation_start
-			self.genetic_algorithm.test_network = self.genetic_algorithm.population[0]
-			self.state = "FITNESS"
 			
 		# Print the legend
 		legend = ["Generation", "Maximum Fitness", "Average Fitness", "Minimum Fitness"]
