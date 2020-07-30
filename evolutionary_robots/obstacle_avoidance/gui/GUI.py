@@ -46,7 +46,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     	if self.bestButton.isChecked():
             self.bestButton.setText('Stop Testing')
             self.bestButton.setStyleSheet("background-color: #7dcea0")
-            self.algorithm.run_state = "TEST"
+            generation = int(self.input_generation_2.value())
+            self.algorithm.run_state = "TEST" + str(generation)
             self.algorithm.play()
             self.display_stats = True
     	else:
@@ -86,6 +87,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         _translate = QCoreApplication.translate
         self.input_generation.setMaximum(self.algorithm.latest_generation)
         self.out_of_generation.setText(_translate("MainWindow", " / " + str(self.algorithm.latest_generation)))
+        self.out_of_generation_2.setText(_translate("MainWindow", " / " + str(self.algorithm.latest_generation)))
         self.last_generation.setText(_translate("MainWindow", str(self.algorithm.latest_generation)))
 
     def getAlgorithm(self):

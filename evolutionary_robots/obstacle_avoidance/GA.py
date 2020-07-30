@@ -123,11 +123,13 @@ class GA(object):
 			self.genetic_algorithm.save_chromosome(self.genetic_algorithm.population, 
 								   self.log_folder + "/generation0", header="Generation #0")
 		
-		elif(self.run_state == "TEST"):
+		elif(self.run_state[:4] == "TEST"):
 			self.state = "TEST"
+			test_number = int(self.run_state[4:])
 			self.generation = 0
 			try:
-				self.test_individual = self.genetic_algorithm.load_chromosome(self.log_folder + '/current_best')
+				test_population = self.genetic_algorithm.load_chromosome(self.log_folder + "/best_chromosomes")
+				self.test_individual = test_population[test_number]
 			except IOError:
 				print("File not found!")
 				
@@ -153,7 +155,7 @@ class GA(object):
 		self.genetic_algorithm.generation_start = self.generation
 		self.delete_process = None
 		
-		if(self.run_state == "TEST"):
+		if(self.state == "TEST"):
 			self.reset_simulation[0]()
 		else:
 			self.reset_simulation[0]()

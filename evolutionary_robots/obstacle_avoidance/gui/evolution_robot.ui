@@ -63,7 +63,7 @@
      <rect>
       <x>10</x>
       <y>20</y>
-      <width>222</width>
+      <width>221</width>
       <height>144</height>
      </rect>
     </property>
@@ -152,9 +152,9 @@
     <property name="geometry">
      <rect>
       <x>240</x>
-      <y>30</y>
+      <y>20</y>
       <width>228</width>
-      <height>111</height>
+      <height>71</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="generationLayout">
@@ -171,7 +171,7 @@
      <item row="1" column="0">
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>The last generation is: </string>
+        <string>The last generation was: </string>
        </property>
       </widget>
      </item>
@@ -179,6 +179,35 @@
       <widget class="QLabel" name="last_generation">
        <property name="text">
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;0&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="gridLayoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>90</y>
+      <width>221</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="bestLayout">
+     <item row="2" column="0">
+      <widget class="QSpinBox" name="input_generation_2"/>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLabel" name="out_of_generation_2">
+       <property name="text">
+        <string>/ 0</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0" colspan="2">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Select the generation to play </string>
        </property>
       </widget>
      </item>
