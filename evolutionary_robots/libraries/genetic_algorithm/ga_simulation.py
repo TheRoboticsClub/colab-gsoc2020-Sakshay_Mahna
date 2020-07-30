@@ -6,6 +6,7 @@ Academy Template simulation
 """
 
 import numpy as np
+from copy import deepcopy
 from genetic_algorithm.ga_nn import GeneticAlgorithmNN
 
 class GeneticAlgorithmGazebo(GeneticAlgorithmNN):
@@ -85,14 +86,16 @@ class GeneticAlgorithmGazebo(GeneticAlgorithmNN):
 									number_of_generations, mutation_probability,
 									number_of_elites)
 									
-	def calculate_fitness(self, chromosome):
+		self._test_network = [None] * 5
+									
+	def calculate_fitness(self, index):
 		"""
 		Takes the chromosome and generates it's
 		fitness for one time step
 		"""
 		# Fitness calculated according to
 		# fitness function
-		fitness = self.fitness_function(chromosome)
+		fitness = self.fitness_function(index)
 			
 		# Return the value
 		return fitness
@@ -115,12 +118,12 @@ class GeneticAlgorithmGazebo(GeneticAlgorithmNN):
 		
 		return fitness
 			
-	def test_output(self, input_dict):
+	def test_output(self, input_dict, index):
 		"""
 		Function used to work with test network
 		It calculates the output for a given input_dict
 		"""
-		output = self.test_network.forward_propagate(input_dict)
+		output = self.test_network[index].forward_propagate(input_dict)
 		
 		return output
 			
@@ -134,10 +137,14 @@ class GeneticAlgorithmGazebo(GeneticAlgorithmNN):
 		
 	@test_network.setter
 	def test_network(self, individual):
+		try:
+			index, individual = individual
+		except ValueError:
+			raise ValueError("Pass individual and index")
+			
 		ready_individual = self.convert_chromosome(individual)
 		self.neural_network.load_parameters_from_vector(ready_individual)
-		
-		self._test_network = self.neural_network
+		self._test_network[index] = deepcopy(self.neural_network)
 		
 	@property
 	def evaluation_steps(self):

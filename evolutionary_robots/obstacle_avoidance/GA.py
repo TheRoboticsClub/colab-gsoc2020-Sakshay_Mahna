@@ -29,9 +29,6 @@ class GA(object):
 	initialize()
 		This function is run when any button on is clicked
 		
-	synchronize()
-		Play and pause simulation to synchronize with the code
-		
 	return_stats()
 		Function to return stats to the GUI
 		
@@ -68,21 +65,12 @@ class GA(object):
 		self.pause = False
 		self.log_folder = log_folder
 		self.genetic_algorithm = genetic_algorithm
-		self.reset_simulation = rospy.ServiceProxy('/gazebo/reset_simulation', Empty)
-		self.pause_simulation = rospy.ServiceProxy('/gazebo/pause_physics', Empty)
-		self.unpause_simulation = rospy.ServiceProxy('/gazebo/unpause_physics', Empty)
-		
-	def synchronize(self):
-		"""
-		Play and pause simulation to synchronize with the code
-		"""
-		if(self.pause == True):
-			self.unpause_simulation()
-		else:
-			self.pause_simulation()
-			
-		self.pause = not self.pause
-		
+		self.reset_simulation = (rospy.ServiceProxy('ga1/gazebo/reset_simulation', Empty),
+								 rospy.ServiceProxy('ga2/gazebo/reset_simulation', Empty),
+								 rospy.ServiceProxy('ga3/gazebo/reset_simulation', Empty),
+								 rospy.ServiceProxy('ga4/gazebo/reset_simulation', Empty),
+								 rospy.ServiceProxy('ga5/gazebo/reset_simulation', Empty))	
+	
 	def initialize(self):
 		"""
 		This function is run when any button on 
@@ -102,7 +90,11 @@ class GA(object):
 			generation_number = int(self.run_state[8:])
 			self.genetic_algorithm.load_generation(generation_number)
 			self.generation = self.genetic_algorithm.generation_start
-			self.genetic_algorithm.test_network = self.genetic_algorithm.population[0]
+			self.genetic_algorithm.test_network = (0, self.genetic_algorithm.population[0])
+			self.genetic_algorithm.test_network = (1, self.genetic_algorithm.population[1])
+			self.genetic_algorithm.test_network = (2, self.genetic_algorithm.population[2])
+			self.genetic_algorithm.test_network = (3, self.genetic_algorithm.population[3])
+			self.genetic_algorithm.test_network = (4, self.genetic_algorithm.population[4])
 			self.state = "FITNESS"
 			
 			try:
@@ -122,7 +114,12 @@ class GA(object):
 		elif(self.run_state == "TRAIN"):
 			self.generation = 1
 			self.state = "SAVE"
-			self.genetic_algorithm.test_network = self.genetic_algorithm.population[0]
+			self.genetic_algorithm.test_network = (0, self.genetic_algorithm.population[0])
+			self.genetic_algorithm.test_network = (1, self.genetic_algorithm.population[1])
+			self.genetic_algorithm.test_network = (2, self.genetic_algorithm.population[2])
+			self.genetic_algorithm.test_network = (3, self.genetic_algorithm.population[3])
+			self.genetic_algorithm.test_network = (4, self.genetic_algorithm.population[4])
+			
 			self.genetic_algorithm.save_chromosome(self.genetic_algorithm.population, 
 								   self.log_folder + "/generation0", header="Generation #0")
 		
@@ -134,7 +131,7 @@ class GA(object):
 			except IOError:
 				print("File not found!")
 				
-			self.genetic_algorithm.test_network = self.test_individual
+			self.genetic_algorithm.test_network = (0, self.test_individual)
 			
 		# Print the legend
 		legend = ["Generation", "Maximum Fitness", "Average Fitness", "Minimum Fitness"]
@@ -143,16 +140,28 @@ class GA(object):
 		# Genetic Algorithm variables	
 		self.fitness_iterations = 0
 		self.fitness_vector = []
-		self.individual_fitness = []
+		self.individual_fitness = [[]] * 5
 		self.individual_index = 0
 		self.best_fitness = self.genetic_algorithm.best_fitness
-		self.individual = self.genetic_algorithm.population[self.individual_index]
+		self.individual = [self.genetic_algorithm.population[self.individual_index],
+						   self.genetic_algorithm.population[self.individual_index + 1],
+						   self.genetic_algorithm.population[self.individual_index + 2],
+						   self.genetic_algorithm.population[self.individual_index + 3],
+						   self.genetic_algorithm.population[self.individual_index + 4]]
 		self.evaluation_steps = self.genetic_algorithm.evaluation_steps
 		self.genetic_algorithm.current_generation = self.generation - 1
 		self.genetic_algorithm.generation_start = self.generation
 		self.delete_process = None
 		
-		self.reset_simulation()
+		if(self.run_state == "TEST"):
+			self.reset_simulation[0]()
+		else:
+			self.reset_simulation[0]()
+			self.reset_simulation[1]()
+			self.reset_simulation[2]()
+			self.reset_simulation[3]()
+			self.reset_simulation[4]()
+			
 		
 	def return_stats(self):
 		"""
@@ -173,11 +182,12 @@ class GA(object):
 			
 		return stats_array
 			
-	def calculate_output(self, input_dictionary):
+	def calculate_output(self, input_dictionary, index):
 		"""
 		Function to calculate output from neural network
 		"""
-		output = self.genetic_algorithm.test_output(input_dictionary)
+		
+		output = self.genetic_algorithm.test_output(input_dictionary, index)
 		
 		return output
 		
@@ -202,17 +212,38 @@ class GA(object):
 		"""
 		Operations to perform in FITNESS state
 		"""
-		self.individual_fitness.append(self.genetic_algorithm.calculate_fitness(self.individual))
+		self.individual_fitness[0].append(self.genetic_algorithm.calculate_fitness(0))
+		self.individual_fitness[1].append(self.genetic_algorithm.calculate_fitness(1))
+		self.individual_fitness[2].append(self.genetic_algorithm.calculate_fitness(2))
+		self.individual_fitness[3].append(self.genetic_algorithm.calculate_fitness(3))
+		self.individual_fitness[4].append(self.genetic_algorithm.calculate_fitness(4))
 		self.fitness_iterations = self.fitness_iterations + 1
 	
 		if(self.fitness_iterations == self.evaluation_steps):
-			self.individual_index = self.individual_index + 1
+			self.individual_index = self.individual_index + 5
 			if(self.individual_index < self.genetic_algorithm.population_size):
-				self.individual = self.genetic_algorithm.population[self.individual_index]
-				self.genetic_algorithm.test_network = self.individual
-			self.fitness_vector.append(self.genetic_algorithm.determine_fitness(self.individual_fitness, self.individual))
-			self.individual_fitness = []
-			self.reset_simulation()
+				self.individual = [[]] * 5
+				self.individual[0] = self.genetic_algorithm.population[self.individual_index]
+				self.individual[1] = self.genetic_algorithm.population[self.individual_index + 1]
+				self.individual[2] = self.genetic_algorithm.population[self.individual_index + 2]
+				self.individual[3] = self.genetic_algorithm.population[self.individual_index + 3]
+				self.individual[4] = self.genetic_algorithm.population[self.individual_index + 4]
+				self.genetic_algorithm.test_network = (0, self.individual[0])
+				self.genetic_algorithm.test_network = (1, self.individual[1])
+				self.genetic_algorithm.test_network = (2, self.individual[2])
+				self.genetic_algorithm.test_network = (3, self.individual[3])
+				self.genetic_algorithm.test_network = (4, self.individual[4])
+			self.fitness_vector.append(self.genetic_algorithm.determine_fitness(self.individual_fitness[0], self.individual[0]))
+			self.fitness_vector.append(self.genetic_algorithm.determine_fitness(self.individual_fitness[1], self.individual[1]))
+			self.fitness_vector.append(self.genetic_algorithm.determine_fitness(self.individual_fitness[2], self.individual[2]))
+			self.fitness_vector.append(self.genetic_algorithm.determine_fitness(self.individual_fitness[3], self.individual[3]))
+			self.fitness_vector.append(self.genetic_algorithm.determine_fitness(self.individual_fitness[4], self.individual[4]))
+			self.individual_fitness = [[]] * 5
+			self.reset_simulation[0]()
+			self.reset_simulation[1]()
+			self.reset_simulation[2]()
+			self.reset_simulation[3]()
+			self.reset_simulation[4]()
 			self.fitness_iterations = 0
 			
 		if(self.individual_index == self.genetic_algorithm.population_size):

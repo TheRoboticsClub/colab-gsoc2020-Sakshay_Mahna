@@ -28,5 +28,6 @@
 			<uri>model://roombaIR</uri>
 			<pose>0 0 0 -0.000084 -0.000478 -3.133447</pose>
 		</include>
+		
 	</world>
 </sdf>

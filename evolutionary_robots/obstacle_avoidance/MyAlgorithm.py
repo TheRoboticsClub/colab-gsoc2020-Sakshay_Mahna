@@ -18,7 +18,7 @@ from neural_networks.activation_functions import *
 from genetic_algorithm.ga_simulation import GeneticAlgorithmGazebo
 from GA import GA
 
-time_cycle = 1
+time_cycle = 5
 
 class MyAlgorithm(threading.Thread):
     def __init__(self, sensor, motors):
@@ -44,11 +44,11 @@ class MyAlgorithm(threading.Thread):
         except IndexError:
             self.latest_generation = 0
     
-    def fitness_function(self, chromosome):
+    def fitness_function(self, index):
     	# The fitness function
-    	linear_speed = self.motors.getV()
-    	rotation_speed = self.motors.getW()
-    	infrared = np.min(self.getRange())
+    	linear_speed = self.motors[index].getV()
+    	rotation_speed = self.motors[index].getW()
+    	infrared = np.min(self.getRange(index))
     	
     	# Individual motor speeds are not available in ROS
     	# Just a trick,
@@ -87,9 +87,9 @@ class MyAlgorithm(threading.Thread):
     	
     	return genetic_algorithm
     
-    def getRange(self):
+    def getRange(self, index):
         self.lock.acquire()
-        values = self.sensor.data.values
+        values = self.sensor[index].data.values
         self.lock.release()
         return values
 
@@ -116,8 +116,6 @@ class MyAlgorithm(threading.Thread):
     		    time.sleep((time_cycle - ms) / 1000.0)
 
     def stop (self):
-    	self.motors.sendV(0)
-    	self.motors.sendW(0)
         self.stop_event.set()
 
     def play (self):
@@ -135,16 +133,18 @@ class MyAlgorithm(threading.Thread):
               
     	elif(self.GA.state == "FITNESS"):
     	    #self.GA.synchronize()
-            output = self.GA.calculate_output({"INFRARED": self.getRange()})["MOTORS"]
-            self.motors.sendV(5 * (output[0] + output[1]))
-            self.motors.sendW(5 * (output[0] - output[1]))
-            #self.GA.synchronize()
+    	    for index in range(5):
+		        output = self.GA.calculate_output({"INFRARED": self.getRange(index)}, index)["MOTORS"]
+		        self.motors[index].sendV(5 * (output[0] + output[1]))
+		        self.motors[index].sendW(5 * (output[0] - output[1]))
+		        #self.GA.synchronize()
 
             self.GA.fitness_state()
     			
     	elif(self.GA.state == "PRINT"):
-            self.motors.sendV(0)
-            self.motors.sendW(0)
+    	    for index in range(5):
+    	        self.motors[index].sendV(0)
+    	        self.motors[index].sendW(0)
             self.GA.print_state()
     	
     	elif(self.GA.state == "SELECTION"):
@@ -166,10 +166,8 @@ class MyAlgorithm(threading.Thread):
 			self.stop()
 			
         elif(self.GA.state == "TEST"):
-            output = self.GA.calculate_output({"INFRARED": self.getRange()})["MOTORS"]
-            self.GA.synchronize()
-            self.motors.sendV(10 * (output[0] + output[1]))
-            self.motors.sendW(5 * (output[0] - output[1]))
-            self.GA.synchronize()
+            output = self.GA.calculate_output({"INFRARED": self.getRange(0)}, 0)["MOTORS"]
+            self.motors[0].sendV(5 * (output[0] + output[1]))
+            self.motors[0].sendW(5 * (output[0] - output[1]))
     		
         

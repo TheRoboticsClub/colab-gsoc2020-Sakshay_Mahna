@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
-  <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
-  <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="world_name" value="$(find evolutionary_robotics)/worlds/obstacle_avoidance.world"/> <!-- Note: the world_name is with respect to GAZEBO_RESOURCE_PATH environmental variable -->
-    <arg name="paused" value="false"/>
-    <arg name="use_sim_time" value="true"/>
-    <arg name="gui" value="true"/>
-    <arg name="headless" value="false"/>
-    <arg name="debug" value="false"/>
-    <arg name="verbose" default="true"/>
-  </include>
+  <arg name="world_name" value="$(find evolutionary_robotics)/worlds/obstacle_avoidance.world"/>
+  <group ns="ga1">
+  	<env name="GAZEBO_MASTER_URI" value="http://localhost:11345"/>
+  	<node name="gazebo" pkg="gazebo_ros" type="gzserver" respawn="false" output="screen"
+	args=" -e ode $(arg world_name)" />
+	
+	<node name="gazebo_gui" pkg="gazebo_ros" type="gzclient" respawn="false" 
+	output="screen"/>
+  </group>
 </launch>
