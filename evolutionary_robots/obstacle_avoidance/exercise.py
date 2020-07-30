@@ -20,11 +20,11 @@ if __name__ == "__main__":
                 ListenerInfrared("ga4/roombaIR/sensor/infrared"),
                 ListenerInfrared("ga3/roombaIR/sensor/infrared"),
                 ListenerInfrared("ga5/roombaIR/sensor/infrared")]
-    motors = [PublisherMotors("ga1/roombaIR/cmd_vel", 10, 5),
-              PublisherMotors("ga2/roombaIR/cmd_vel", 10, 5),
-              PublisherMotors("ga3/roombaIR/cmd_vel", 10, 5),
-              PublisherMotors("ga4/roombaIR/cmd_vel", 10, 5),
-              PublisherMotors("ga5/roombaIR/cmd_vel", 10, 5)]
+    motors = [PublisherMotors("ga1/roombaIR/cmd_vel", 10, 10),
+              PublisherMotors("ga2/roombaIR/cmd_vel", 10, 10),
+              PublisherMotors("ga3/roombaIR/cmd_vel", 10, 10),
+              PublisherMotors("ga4/roombaIR/cmd_vel", 10, 10),
+              PublisherMotors("ga5/roombaIR/cmd_vel", 10, 10)]
     algorithm = MyAlgorithm(infrared, motors)
 
     app = QApplication(sys.argv)

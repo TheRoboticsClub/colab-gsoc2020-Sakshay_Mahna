@@ -55,7 +55,7 @@ class MyAlgorithm(threading.Thread):
     	# Linear speed is proportional to sum of velocities
     	# Angular speed is proportional to difference of velocities
     	
-    	fitness = linear_speed * (1 - math.sqrt(abs(rotation_speed))) * infrared
+    	fitness = linear_speed * (1 - abs(rotation_speed)) * infrared
     	
     	return fitness 
     	
@@ -76,11 +76,11 @@ class MyAlgorithm(threading.Thread):
     	ga = GeneticAlgorithmGazebo(neural_network)
     
     	# Define the genetic algorithm
-    	ga.population_size = 50
+    	ga.population_size = 30
     	ga.number_of_generations = 100   
     	ga.mutation_probability = 0.01
-    	ga.evaluation_steps = 300
-    	ga.number_of_elites = 2
+    	ga.evaluation_steps = 1000
+    	ga.number_of_elites = 4
     	ga.fitness_function = self.fitness_function
     	
     	genetic_algorithm = GA(ga, self.log_folder)
@@ -135,8 +135,8 @@ class MyAlgorithm(threading.Thread):
     	    #self.GA.synchronize()
     	    for index in range(5):
 		        output = self.GA.calculate_output({"INFRARED": self.getRange(index)}, index)["MOTORS"]
-		        self.motors[index].sendV(5 * (output[0] + output[1]))
-		        self.motors[index].sendW(5 * (output[0] - output[1]))
+		        self.motors[index].sendV(10 * (output[0] + output[1]))
+		        self.motors[index].sendW(10 * (output[0] - output[1]))
 		        #self.GA.synchronize()
 
             self.GA.fitness_state()
@@ -167,7 +167,7 @@ class MyAlgorithm(threading.Thread):
 			
         elif(self.GA.state == "TEST"):
             output = self.GA.calculate_output({"INFRARED": self.getRange(0)}, 0)["MOTORS"]
-            self.motors[0].sendV(5 * (output[0] + output[1]))
-            self.motors[0].sendW(5 * (output[0] - output[1]))
+            self.motors[0].sendV(10 * (output[0] + output[1]))
+            self.motors[0].sendW(10 * (output[0] - output[1]))
     		
         

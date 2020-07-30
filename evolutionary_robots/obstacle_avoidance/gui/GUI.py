@@ -86,8 +86,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.algorithm=algorithm
         _translate = QCoreApplication.translate
         self.input_generation.setMaximum(self.algorithm.latest_generation)
+        self.input_generation_2.setMaximum(self.algorithm.latest_generation - 1)
         self.out_of_generation.setText(_translate("MainWindow", " / " + str(self.algorithm.latest_generation)))
-        self.out_of_generation_2.setText(_translate("MainWindow", " / " + str(self.algorithm.latest_generation)))
+        self.out_of_generation_2.setText(_translate("MainWindow", " / " + str(self.algorithm.latest_generation - 1)))
         self.last_generation.setText(_translate("MainWindow", str(self.algorithm.latest_generation)))
 
     def getAlgorithm(self):

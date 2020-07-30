@@ -3,18 +3,18 @@
   <model name='cage'>
     <link name='wall_4'>
       <inertial>
-        <mass>15.0074</mass>
+        <mass>50.4512</mass>
         <inertia>
-          <ixx>9.99039</ixx>
+          <ixx>33.5852</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>35.8028</iyy>
+          <iyy>247.661</iyy>
           <iyz>0</iyz>
-          <izz>26.7137</izz>
+          <izz>217.106</izz>
         </inertia>
         <pose frame=''>0 0 0 0 -0 0</pose>
       </inertial>
-      <pose frame=''>-3.14439 -0.066573 0.031249 0 -0 -1.54575</pose>
+      <pose frame=''>-5.10436 -0.115673 0.031249 0 0 -1.54575</pose>
       <gravity>1</gravity>
       <self_collide>0</self_collide>
       <kinematic>0</kinematic>
@@ -23,7 +23,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
-            <size>4.58259 0.600284 2.76189</size>
+            <size>7.16094 0.600284 2.76189</size>
           </box>
         </geometry>
         <material>
@@ -49,7 +49,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
-            <size>4.58259 0.600284 2.76189</size>
+            <size>7.16094 0.600284 2.76189</size>
           </box>
         </geometry>
         <surface>
@@ -101,18 +101,18 @@
     </link>
     <link name='wall_4_clone'>
       <inertial>
-        <mass>15.0074</mass>
+        <mass>50.5624</mass>
         <inertia>
-          <ixx>9.99038</ixx>
+          <ixx>33.6593</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>35.8028</iyy>
+          <iyy>250.263</iyy>
           <iyz>0</iyz>
-          <izz>26.7137</izz>
+          <izz>219.64</izz>
         </inertia>
         <pose frame=''>0 0 0 0 -0 0</pose>
       </inertial>
-      <pose frame=''>0.803228 -0.009626 0.031216 -4.1e-05 1.4e-05 -1.55537</pose>
+      <pose frame=''>2.79519 -0.11245 0.031133 -4.1e-05 1.4e-05 -1.55537</pose>
       <gravity>1</gravity>
       <self_collide>0</self_collide>
       <kinematic>0</kinematic>
@@ -121,7 +121,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
-            <size>4.58259 0.600284 2.76189</size>
+            <size>7.19492 0.600284 2.76189</size>
           </box>
         </geometry>
         <material>
@@ -143,7 +143,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
-            <size>4.58259 0.600284 2.76189</size>
+            <size>7.19492 0.600284 2.76189</size>
           </box>
         </geometry>
         <surface>
@@ -195,18 +195,18 @@
     </link>
     <link name='wall_4_clone_0'>
       <inertial>
-        <mass>15.0074</mass>
+        <mass>50.4732</mass>
         <inertia>
-          <ixx>9.99038</ixx>
+          <ixx>33.5999</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>35.8028</iyy>
+          <iyy>328.097</iyy>
           <iyz>0</iyz>
-          <izz>26.7137</izz>
+          <izz>297.528</izz>
         </inertia>
         <pose frame=''>0 0 0 0 -0 0</pose>
       </inertial>
-      <pose frame=''>-1.1314 -2.64451 0.031261 -1.4e-05 -4.1e-05 -3.12879</pose>
+      <pose frame=''>-1.11143 -4.04431 0.031241 -1.3e-05 -4.1e-05 3.13636</pose>
       <gravity>1</gravity>
       <self_collide>0</self_collide>
       <kinematic>0</kinematic>
@@ -215,7 +215,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
-            <size>4.58259 0.600284 2.76189</size>
+            <size>8.38909 0.600284 2.76189</size>
           </box>
         </geometry>
         <material>
@@ -241,7 +241,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
-            <size>4.58259 0.600284 2.76189</size>
+            <size>8.38909 0.600284 2.76189</size>
           </box>
         </geometry>
         <surface>
@@ -293,18 +293,18 @@
     </link>
     <link name='wall_4_clone_1'>
       <inertial>
-        <mass>15.0074</mass>
+        <mass>50.9603</mass>
         <inertia>
-          <ixx>9.99038</ixx>
+          <ixx>33.9242</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>35.8028</iyy>
+          <iyy>341.954</iyy>
           <iyz>0</iyz>
-          <izz>26.7137</izz>
+          <izz>311.09</izz>
         </inertia>
         <pose frame=''>0 0 0 0 -0 0</pose>
       </inertial>
-      <pose frame=''>-1.18104 2.55909 0.031331 1.3e-05 4.1e-05 0.006116</pose>
+      <pose frame=''>-1.18868 3.80872 0.031347 1.3e-05 4.1e-05 0.006116</pose>
       <gravity>1</gravity>
       <self_collide>0</self_collide>
       <kinematic>0</kinematic>
@@ -313,7 +313,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
-            <size>4.58259 0.600284 2.76189</size>
+            <size>8.53782 0.600284 2.76189</size>
           </box>
         </geometry>
         <material>
@@ -335,7 +335,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
-            <size>4.58259 0.600284 2.76189</size>
+            <size>8.53782 0.600284 2.76189</size>
           </box>
         </geometry>
         <surface>
