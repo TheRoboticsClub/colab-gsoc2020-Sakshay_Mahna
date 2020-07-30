@@ -11,7 +11,6 @@
 		<population name="barrel_population">
 			<model name="construction_barrel">
 				<include>
-					<static>true</static>
 					<uri>model://construction_barrel</uri>
 				</include>
 			</model>
@@ -19,7 +18,7 @@
 			<box>
 				<size> 10 10 0.2 </size>
 			</box>
-			<model_count>10</model_count>
+			<model_count>11</model_count>
 			<distribution>
 				<type>uniform</type>
 			</distribution>

@@ -18,7 +18,7 @@ from neural_networks.activation_functions import *
 from genetic_algorithm.ga_simulation import GeneticAlgorithmGazebo
 from GA import GA
 
-time_cycle = 0
+time_cycle = 1
 
 class MyAlgorithm(threading.Thread):
     def __init__(self, sensor, motors):
@@ -79,7 +79,7 @@ class MyAlgorithm(threading.Thread):
     	ga.population_size = 50
     	ga.number_of_generations = 100   
     	ga.mutation_probability = 0.01
-    	ga.evaluation_steps = 100
+    	ga.evaluation_steps = 300
     	ga.number_of_elites = 2
     	ga.fitness_function = self.fitness_function
     	
@@ -111,6 +111,9 @@ class MyAlgorithm(threading.Thread):
     		
     		dt = finish_time - start_time
     		ms = (dt.days * 24 * 60 * 60 + dt.seconds) * 1000 + dt.microseconds / 1000.0
+    		
+    		if(ms < time_cycle):
+    		    time.sleep((time_cycle - ms) / 1000.0)
 
     def stop (self):
     	self.motors.sendV(0)
@@ -131,11 +134,11 @@ class MyAlgorithm(threading.Thread):
             self.GA.save_state()
               
     	elif(self.GA.state == "FITNESS"):
-    	    self.GA.synchronize()
+    	    #self.GA.synchronize()
             output = self.GA.calculate_output({"INFRARED": self.getRange()})["MOTORS"]
             self.motors.sendV(5 * (output[0] + output[1]))
             self.motors.sendW(5 * (output[0] - output[1]))
-            self.GA.synchronize()
+            #self.GA.synchronize()
 
             self.GA.fitness_state()
     			
