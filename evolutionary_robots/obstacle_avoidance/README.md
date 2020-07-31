@@ -14,13 +14,13 @@ Follow the instruction in this [README](./../README.md)
 . souce.bash
 ```
 
-- Launch the Gazebo simulation in the same terminal window. A new window showing the Robot Model in an environment would appear. Ignore the yellow colored warnings that appear in the terminal. **However, we should run the headless version of the simulator, to decrease the time the algorithm takes to train**. Launch any one version of the two given below.
+- Launch the Gazebo simulation in the same terminal window. A new window showing the Robot Model in an environment would appear. Ignore the yellow colored warnings that appear in the terminal. **However, we should run the headless version of the simulator, when we want to train the algorithm and simple version when we want to test**.
 
 ```bash
-# Complete Simulation
+# Complete Simulation, only during testing
 roslaunch ./launch/obstacle_avoidance.launch
 
-# Headless version
+# Headless version, only during training
 roslaunch ./launch/obstacle_avoidance_headless.launch
 ```
 
