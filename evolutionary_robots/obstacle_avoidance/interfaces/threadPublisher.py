@@ -21,7 +21,7 @@ import threading
 import time
 from datetime import datetime
 
-time_cycle = 5
+time_cycle = 0
 
 
 class ThreadPublisher(threading.Thread):

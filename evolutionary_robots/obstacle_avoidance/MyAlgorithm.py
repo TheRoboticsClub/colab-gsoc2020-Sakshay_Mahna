@@ -18,7 +18,7 @@ from neural_networks.activation_functions import *
 from genetic_algorithm.ga_simulation import GeneticAlgorithmGazebo
 from GA import GA
 
-time_cycle = 5
+time_cycle = 0
 
 class MyAlgorithm(threading.Thread):
     def __init__(self, sensor, motors):
@@ -76,10 +76,10 @@ class MyAlgorithm(threading.Thread):
     	ga = GeneticAlgorithmGazebo(neural_network)
     
     	# Define the genetic algorithm
-    	ga.population_size = 30
+    	ga.population_size = 50
     	ga.number_of_generations = 100   
     	ga.mutation_probability = 0.01
-    	ga.evaluation_steps = 1000
+    	ga.evaluation_steps = 100
     	ga.number_of_elites = 4
     	ga.fitness_function = self.fitness_function
     	
