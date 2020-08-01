@@ -18,7 +18,7 @@ from neural_networks.activation_functions import *
 from genetic_algorithm.ga_simulation import GeneticAlgorithmGazebo
 from GA import GA
 
-time_cycle = 0
+time_cycle = 5
 
 class MyAlgorithm(threading.Thread):
     def __init__(self, sensor, motors):
@@ -46,16 +46,15 @@ class MyAlgorithm(threading.Thread):
     
     def fitness_function(self, index):
     	# The fitness function
-    	linear_speed = self.motors[index].getV()
-    	rotation_speed = self.motors[index].getW()
-    	infrared = np.min(self.getRange(index))
+    	left_motor_speed = self.motors[index].left_motor_speed
+    	right_motor_speed = self.motors[index].right_motor_speed
+    	infrared = self.getRange(index)
     	
-    	# Individual motor speeds are not available in ROS
-    	# Just a trick,
-    	# Linear speed is proportional to sum of velocities
-    	# Angular speed is proportional to difference of velocities
+    	V = abs(left_motor_speed) + abs(right_motor_speed)
+    	delta_v = abs(right_motor_speed - left_motor_speed)
+    	i = np.max(infrared)
     	
-    	fitness = linear_speed * (1 - abs(rotation_speed)) * infrared
+    	fitness = 10 * V * (1 - math.sqrt(delta_v)) * (1 - i)
     	
     	return fitness 
     	
@@ -64,7 +63,7 @@ class MyAlgorithm(threading.Thread):
     	# Define the layers
     	# Layer(name_of_layer, number_of_neurons, activation_function, sensor_inputs, list_of_output_layer_names)
     	inputLayer = Layer("inputLayer", 8, IdentityActivation(), "INFRARED", ["outputLayer"])
-    	outputLayer = Layer("outputLayer", 2, SigmoidActivation(), "", ["MOTORS"])
+    	outputLayer = Layer("outputLayer", 2, TanhActivation(), "", ["MOTORS"])
     	# Define the Neural Network
     	neural_network = ArtificialNeuralNetwork([inputLayer, outputLayer], "STATIC")
     	
@@ -79,7 +78,7 @@ class MyAlgorithm(threading.Thread):
     	ga.population_size = 50
     	ga.number_of_generations = 100   
     	ga.mutation_probability = 0.01
-    	ga.evaluation_steps = 100
+    	ga.evaluation_steps = 300
     	ga.number_of_elites = 4
     	ga.fitness_function = self.fitness_function
     	
@@ -135,8 +134,8 @@ class MyAlgorithm(threading.Thread):
     	    #self.GA.synchronize()
     	    for index in range(5):
 		        output = self.GA.calculate_output({"INFRARED": self.getRange(index)}, index)["MOTORS"]
-		        self.motors[index].sendV(10 * (output[0] + output[1]))
-		        self.motors[index].sendW(10 * (output[0] - output[1]))
+		        self.motors[index].sendV(3 * (output[0] + output[1]))
+		        self.motors[index].sendW(4 * (output[0] - output[1]))
 		        #self.GA.synchronize()
 
             self.GA.fitness_state()
@@ -167,7 +166,7 @@ class MyAlgorithm(threading.Thread):
 			
         elif(self.GA.state == "TEST"):
             output = self.GA.calculate_output({"INFRARED": self.getRange(0)}, 0)["MOTORS"]
-            self.motors[0].sendV(10 * (output[0] + output[1]))
-            self.motors[0].sendW(10 * (output[0] - output[1]))
+            self.motors[0].sendV(3 * (output[0] + output[1]))
+            self.motors[0].sendW(4 * (output[0] - output[1]))
     		
         

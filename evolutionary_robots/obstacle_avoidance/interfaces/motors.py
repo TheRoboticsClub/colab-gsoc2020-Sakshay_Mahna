@@ -39,7 +39,7 @@ class CMDVel ():
         s = s + "\n   timeStamp: " + str(self.timeStamp)  + "\n}"
         return s 
 
-class PublisherMotors:
+class PublisherMotors(object):
  
     def __init__(self, topic, maxV, maxW):
 
@@ -73,8 +73,6 @@ class PublisherMotors:
 
         self.kill_event.clear()
         self.thread.start()
-        
-
 
     def getMaxW(self):
         return self.maxW
@@ -127,9 +125,24 @@ class PublisherMotors:
         self.lock.release()
 
     def sendAZ(self, az):
-
         self.lock.acquire()
         self.data.az = az
         self.lock.release()
+        
+    @property
+    def left_motor_speed(self):
+    	v = self.getV() / 3
+    	w = self.getW() / 4
+    	
+    	left_motor_speed = (v + w) / 4
+    	return left_motor_speed
+    	
+    @property
+    def right_motor_speed(self):
+    	v = self.getV() / 3
+    	w = self.getW() / 4
+    	
+    	right_motor_speed = (v - w) / 4
+    	return right_motor_speed
 
 

@@ -106,7 +106,7 @@ class GeneticAlgorithmGazebo(GeneticAlgorithmNN):
 		Averages the values and returns them
 		"""
 		# Average the fitness
-		fitness = np.sum(individual_fitness) / self.evaluation_steps
+		fitness = 10 * np.sum(individual_fitness) / self.evaluation_steps
 		
 		# Determine the best fitness
 		# And when it occured the first time
