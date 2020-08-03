@@ -6,4 +6,4 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-evolutionary_robots/obstacle_avoidance/logs/*.txt
+evolutionary_robots/obstacle_avoidance/log/*.txt
