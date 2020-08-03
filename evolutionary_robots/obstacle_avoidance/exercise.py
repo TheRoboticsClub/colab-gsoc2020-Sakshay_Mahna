@@ -8,7 +8,7 @@ from gui.GUI import MainWindow
 from gui.threadGUI import ThreadGUI
 from PyQt5.QtWidgets import QApplication
 
-from MyAlgorithm import MyAlgorithm
+from base import MyAlgorithm
 from interfaces.infrared import ListenerInfrared
 from interfaces.motors import PublisherMotors
 
