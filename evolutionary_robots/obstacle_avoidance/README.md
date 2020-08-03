@@ -35,59 +35,51 @@ python2 ./exercise.py
 **Due to a bug, a button when clicked cannot be deselected. In order to select any other button, please close the GUI application, open it again and then select the button**.
 
 ## How to perform the exercise?
-The student has to edit 3 different functions in `MyAlgorithm.py` file:
+The student has to edit 3 different sections in `MyAlgorithm.py` file:
+
+- Enter the various parameters for the Genetic Algorithm
+
+```python
+# Fill Parameters for Genetic Algorithm
+POPULATION_SIZE = 
+NUMBER_OF_GENERATIONS = 
+MUTATION_PROBABILITY = 
+EVALUATION_STEPS = 
+NUMBER_OF_ELITES = 
+```
 
 - Enter the fitness function in the function `fitness_function`
 
 ```python
-def fitness_function(self, chromosome):
-  # The fitness function
-  # Enter the fitness function here
+def fitness_function(left_motor_speed, right_motor_speed, infrared):
+	# Code the fitness function here
+	
 ```
 
 - Enter the neural network specifications in the function `define_neural_network`. The input and output layers have to be defined with the given parameters. The student may add additional hidden layers. 
 
 ```python
-def define_neural_network(self):
-  # Define the layers
-  # Layer(name_of_layer, number_of_neurons, activation_function, sensor_inputs, list_of_output_layer_names)
-  inputLayer = Layer("inputLayer", 8, IdentityActivation(), "INFRARED", ["outputLayer"])
-  outputLayer = Layer("outputLayer", 2, SigmoidActivation(), "", ["MOTORS"])
-  # Define the Neural Network
-  neural_network = ArtificialNeuralNetwork([inputLayer, outputLayer], "STATIC")
-
-  return neural_network
-```
-
-- Enter the genetic algorithm specifications in the function `define_genetic_algorithm`.  The student mainly has to change the values of the parameters
-
-```python
-def define_genetic_algorithm(self):
-  # Define the Genetic Algorithm
-  neural_network = self.define_neural_network()
-  ga = GeneticAlgorithmGazebo(neural_network)
-
-  # Define the genetic algorithm
-  log_folder = './log'
-  ga.population_size = 
-  ga.number_of_generations = 
-  ga.mutation_probability = 
-  ga.evaluation_time = 
-  ga.number_of_elites = 
-  ga.fitness_function = self.fitness_function
-
-  genetic_algorithm = GA(ga, log_folder)
+def define_neural_network():
+	# Define the layers
+	# Layer(name_of_layer, number_of_neurons, activation_function, sensor_inputs, list_of_output_layer_names)
+	inputLayer = Layer("inputLayer", 8, IdentityActivation(), "INFRARED", ["outputLayer"])
+	outputLayer = Layer("outputLayer", 2, TanhActivation(), "", ["MOTORS"])
+	
+	# Define the neural network
+	neural_network = ArtificialNeuralNetwork([inputLayer, outputLayer], "STATIC")
+	
+	return neural_network
 ```
 
 ### Application Programming Interface
 
-- For the specifics of setting the Neural Network, refer to this [API reference](./../libraries/neural_networks/README.md)
+- For the specifics of setting the Neural Network, refer to this [API reference](./../libraries/neural_networks/README.md), the API required to code the fitness function is discussed ahead
 
-- `self.getRange()` to get an array of 8 sensor values
+- `left_motor_speed`: The speed of the left motor wheel of robot
 
-- `self.motors.sendV()` to set the linear speed
+- `right_motor_speed`: The speed of the right motor wheel of robot
 
-- `self.motors.sendW()` to set the angular speed 
+- `infrared`: List of 8 infrared sensor values 
 
 ## Theory
 Coming Soon!
