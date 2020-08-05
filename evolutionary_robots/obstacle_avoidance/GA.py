@@ -69,7 +69,8 @@ class GA(object):
 								 rospy.ServiceProxy('ga2/gazebo/reset_simulation', Empty),
 								 rospy.ServiceProxy('ga3/gazebo/reset_simulation', Empty),
 								 rospy.ServiceProxy('ga4/gazebo/reset_simulation', Empty),
-								 rospy.ServiceProxy('ga5/gazebo/reset_simulation', Empty))	
+								 rospy.ServiceProxy('ga5/gazebo/reset_simulation', Empty))
+		
 	
 	def initialize(self):
 		"""

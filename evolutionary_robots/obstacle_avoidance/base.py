@@ -125,7 +125,7 @@ class MyAlgorithm(threading.Thread):
 		        output = output / 2
 		        self.motors[index].sendV(3 * (output[0] + output[1]))
 		        self.motors[index].sendW(4 * (output[0] - output[1]))
-		        #self.GA.synchronize()
+		     #self.GA.synchronize()
 
             self.GA.fitness_state()
     			
