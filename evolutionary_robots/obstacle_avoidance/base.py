@@ -35,6 +35,9 @@ class MyAlgorithm(threading.Thread):
         self.get_latest_file()
         self.define_neural_network = algorithm.define_neural_network
         
+        self.WHEEL_RADIUS = self.motors[0].WHEEL_RADIUS
+        self.WHEEL_DISTANCE = self.motors[0].WHEEL_DISTANCE
+        
     def get_latest_file(self):
         files = glob.glob(self.log_folder + '/generation*[0-9].txt')
         files.sort()
@@ -119,6 +122,7 @@ class MyAlgorithm(threading.Thread):
     	    #self.GA.synchronize()
     	    for index in range(5):
 		        output = self.GA.calculate_output({"INFRARED": self.getRange(index)}, index)["MOTORS"]
+		        output = output / 2
 		        self.motors[index].sendV(3 * (output[0] + output[1]))
 		        self.motors[index].sendW(4 * (output[0] - output[1]))
 		        #self.GA.synchronize()
@@ -151,6 +155,7 @@ class MyAlgorithm(threading.Thread):
 			
         elif(self.GA.state == "TEST"):
             output = self.GA.calculate_output({"INFRARED": self.getRange(0)}, 0)["MOTORS"]
+            output = output / 2
             self.motors[0].sendV(3 * (output[0] + output[1]))
             self.motors[0].sendW(4 * (output[0] - output[1]))
     		

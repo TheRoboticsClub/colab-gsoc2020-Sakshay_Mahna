@@ -54,7 +54,7 @@ def message2InfraredData(infra, infrared):
 	
 	# Modify the user class according to the
 	# ROS message
-	infrared.values[index] = infra.range
+	infrared.values[index] = 1 - infra.range
 	infrared.timeStamp = infra.header.stamp.secs + (infra.header.stamp.nsecs * 1e-9)
 	
 	return infrared

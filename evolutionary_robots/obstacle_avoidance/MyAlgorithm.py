@@ -22,7 +22,7 @@ def fitness_function(left_motor_speed, right_motor_speed, infrared):
 	delta_v = abs(right_motor_speed - left_motor_speed)
 	i = np.max(infrared)
 	
-	fitness = 10 * V * (1 - math.sqrt(delta_v)) * (1 - i)
+	fitness = V * (1 - math.sqrt(delta_v)) * (1 - i) * (left_motor_speed + 0.5) * (right_motor_speed + 0.5)
 	return fitness
 	
 def define_neural_network():

@@ -142,7 +142,7 @@ class GA(object):
 		# Genetic Algorithm variables	
 		self.fitness_iterations = 0
 		self.fitness_vector = []
-		self.individual_fitness = [[]] * 5
+		self.individual_fitness = [[] for _ in range(5)] 	# Good lesson: This is different than [[]] * 5
 		self.individual_index = 0
 		self.best_fitness = self.genetic_algorithm.best_fitness
 		self.individual = [self.genetic_algorithm.population[self.individual_index],
@@ -219,6 +219,7 @@ class GA(object):
 		self.individual_fitness[2].append(self.genetic_algorithm.calculate_fitness(2))
 		self.individual_fitness[3].append(self.genetic_algorithm.calculate_fitness(3))
 		self.individual_fitness[4].append(self.genetic_algorithm.calculate_fitness(4))
+		
 		self.fitness_iterations = self.fitness_iterations + 1
 	
 		if(self.fitness_iterations == self.evaluation_steps):
@@ -240,7 +241,7 @@ class GA(object):
 			self.fitness_vector.append(self.genetic_algorithm.determine_fitness(self.individual_fitness[2], self.individual[2]))
 			self.fitness_vector.append(self.genetic_algorithm.determine_fitness(self.individual_fitness[3], self.individual[3]))
 			self.fitness_vector.append(self.genetic_algorithm.determine_fitness(self.individual_fitness[4], self.individual[4]))
-			self.individual_fitness = [[]] * 5
+			self.individual_fitness = [[] for _ in range(5)]
 			self.reset_simulation[0]()
 			self.reset_simulation[1]()
 			self.reset_simulation[2]()
