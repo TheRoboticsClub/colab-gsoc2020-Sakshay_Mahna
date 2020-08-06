@@ -3,7 +3,7 @@
 	<world name="default">
 		<physics type="ode">
 			<real_time_update_rate>0</real_time_update_rate>
-			<min_step_size>0.09</min_step_size>
+			<min_step_size>0.9</min_step_size>
 		</physics>
 		<include>
 			<uri>model://ground_plane_transparent</uri>

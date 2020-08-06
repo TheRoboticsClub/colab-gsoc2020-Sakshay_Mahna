@@ -12,7 +12,7 @@ LOG_FOLDER = './log'
 POPULATION_SIZE = 50
 NUMBER_OF_GENERATIONS = 100
 MUTATION_PROBABILITY = 0.01
-EVALUATION_STEPS = 50
+EVALUATION_STEPS = 10
 NUMBER_OF_ELITES = 4
 
 def fitness_function(left_motor_speed, right_motor_speed, infrared):
