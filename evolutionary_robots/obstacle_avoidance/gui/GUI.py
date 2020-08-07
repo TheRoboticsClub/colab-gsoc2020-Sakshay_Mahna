@@ -13,15 +13,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.logoLayout.addWidget(self.logo)
         self.logo.setVisible(True)
         self.display_stats = False
+        
+        self.clickedButton = False
 
         self.trainButton.clicked.connect(self.trainClicked)
-        self.trainButton.setCheckable(True)
-
         self.bestButton.clicked.connect(self.bestClicked)
-        self.bestButton.setCheckable(True)
-
         self.generationButton.clicked.connect(self.generationClicked)
-        self.generationButton.setCheckable(True)
 
         self.updGUI.connect(self.updateGUI)
 
@@ -30,45 +27,33 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         	self.update_stats()
         
     def trainClicked(self):
-        if self.trainButton.isChecked():
-            self.trainButton.setText('Stop Training')
-            self.trainButton.setStyleSheet("background-color: #7dcea0")
-            self.algorithm.run_state = "TRAIN"
-            self.algorithm.play()
-            self.display_stats = True
+        self.display_stats = True
+        self.algorithm.run_state = "TRAIN"
+        if(self.clickedButton == False):
+        	self.algorithm.play()
+        	self.clickedButton = True
         else:
-            self.trainButton.setText('Start Training')
-            self.trainButton.setStyleSheet("background-color: #ec7063")
-            self.algorithm.stop()
-            self.display_stats = False
+        	self.algorithm.GA.initialize()
             
     def bestClicked(self):
-    	if self.bestButton.isChecked():
-            self.bestButton.setText('Stop Testing')
-            self.bestButton.setStyleSheet("background-color: #7dcea0")
-            generation = int(self.input_generation_2.value())
-            self.algorithm.run_state = "TEST" + str(generation)
-            self.algorithm.play()
-            self.display_stats = True
-    	else:
-            self.bestButton.setText('Test Best Generation')
-            self.bestButton.setStyleSheet("background-color: #ec7063")
-            self.algorithm.stop()
-            self.display_stats = False
+        generation = int(self.input_generation_2.value())
+        self.algorithm.run_state = "TEST" + str(generation)
+        self.display_stats = True
+        if(self.clickedButton == False):
+        	self.algorithm.play()
+        	self.clickedButton = True
+        else:
+        	self.algorithm.GA.initialize()
             
     def generationClicked(self):
-    	if self.generationButton.isChecked():
-            self.generationButton.setText('Stop Testing')
-            self.generationButton.setStyleSheet("background-color: #7dcea0")
-            generation = int(self.input_generation.value())
-            self.algorithm.run_state = "CONTINUE" + str(generation)
-            self.algorithm.play()
-            self.display_stats = True
-    	else:
-            self.generationButton.setText('Test Generation')
-            self.generationButton.setStyleSheet("background-color: #ec7063")
-            self.algorithm.stop()
-            self.display_stats = False
+        generation = int(self.input_generation.value())
+        self.algorithm.run_state = "CONTINUE" + str(generation)
+        self.display_stats = True
+        if(self.clickedButton == False):
+        	self.algorithm.play()
+        	self.clickedButton = True
+        else:
+        	self.algorithm.GA.initialize()
             
     def update_stats(self):
         stats_array = self.algorithm.GA.return_stats()

@@ -96,9 +96,6 @@ class GeneticAlgorithmGazebo(GeneticAlgorithmNN):
 		# Fitness calculated according to
 		# fitness function
 		fitness = self.fitness_function(index)
-		
-		if(fitness < 0):
-			fitness = 0
 			
 		# Return the value
 		return fitness

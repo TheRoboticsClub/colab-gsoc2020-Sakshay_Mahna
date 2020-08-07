@@ -40,7 +40,7 @@ class MyAlgorithm(threading.Thread):
         
     def get_latest_file(self):
         files = glob.glob(self.log_folder + '/generation*[0-9].txt')
-        files.sort()
+        files = sorted(files, key = lambda x: (len(x), x))
         
         try:
             self.latest_generation = int(files[-1][(len(self.log_folder) + 11):-4])
@@ -54,6 +54,9 @@ class MyAlgorithm(threading.Thread):
     	infrared = self.getRange(index)
     	
     	fitness = algorithm.fitness_function(left_motor_speed, right_motor_speed, infrared)
+    	
+    	if(fitness < 0 or max(self.getRange(index)) > 0.60):
+    	    fitness = 0
     	
     	return fitness 
     	
@@ -121,10 +124,10 @@ class MyAlgorithm(threading.Thread):
     	elif(self.GA.state == "FITNESS"):
     	    #self.GA.synchronize()
     	    for index in range(5):
-		        output = self.GA.calculate_output({"INFRARED": self.getRange(index)}, index)["MOTORS"]
-		        output = output / 2
-		        self.motors[index].sendV(3 * (output[0] + output[1]))
-		        self.motors[index].sendW(4 * (output[0] - output[1]))
+	            output = self.GA.calculate_output({"INFRARED": self.getRange(index)}, index)["MOTORS"]
+	            output = output / 2
+	            self.motors[index].sendV(4 * (output[0] + output[1]))
+	            self.motors[index].sendW(4 * (output[0] - output[1]))
 		     #self.GA.synchronize()
 
             self.GA.fitness_state()
@@ -156,7 +159,7 @@ class MyAlgorithm(threading.Thread):
         elif(self.GA.state == "TEST"):
             output = self.GA.calculate_output({"INFRARED": self.getRange(0)}, 0)["MOTORS"]
             output = output / 2
-            self.motors[0].sendV(3 * (output[0] + output[1]))
+            self.motors[0].sendV(4 * (output[0] + output[1]))
             self.motors[0].sendW(4 * (output[0] - output[1]))
     		
         

@@ -31,7 +31,7 @@
 		
 		<include>
 			<uri>model://cage</uri>
-			<pose>0 0 0 0 0 0</pose>
+			<pose>1 0 0 0 0 0</pose>
 		</include>
 		
 		<include>

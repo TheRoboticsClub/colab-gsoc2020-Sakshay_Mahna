@@ -25,6 +25,8 @@ if __name__ == "__main__":
               PublisherMotors("ga3/roombaIR/cmd_vel", 10, 10),
               PublisherMotors("ga4/roombaIR/cmd_vel", 10, 10),
               PublisherMotors("ga5/roombaIR/cmd_vel", 10, 10)]
+    
+    
     algorithm = MyAlgorithm(infrared, motors)
 
     app = QApplication(sys.argv)

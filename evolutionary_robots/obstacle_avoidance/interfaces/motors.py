@@ -45,8 +45,8 @@ class PublisherMotors(object):
 
         self.maxW = maxW
         self.maxV = maxV
-        self.WHEEL_DISTANCE = 0.26
-        self.WHEEL_RADIUS = 0.032
+        self.WHEEL_DISTANCE = 0.28
+        self.WHEEL_RADIUS = 0.033
 
         self.topic = topic
         self.data = CMDVel()
@@ -133,15 +133,15 @@ class PublisherMotors(object):
         
     @property
     def left_motor_speed(self):
-    	v = self.getV() / 3
+    	v = self.getV() / 4
     	w = self.getW() / 4
     	
-    	left_motor_speed = (v - w) / 2
+    	left_motor_speed = (v - w) / 2 
     	return left_motor_speed
     	
     @property
     def right_motor_speed(self):
-    	v = self.getV() / 3
+    	v = self.getV() / 4
     	w = self.getW() / 4
     	
     	right_motor_speed = (v + w) / 2

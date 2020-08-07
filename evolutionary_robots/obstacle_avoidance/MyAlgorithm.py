@@ -12,17 +12,18 @@ LOG_FOLDER = './log'
 POPULATION_SIZE = 50
 NUMBER_OF_GENERATIONS = 100
 MUTATION_PROBABILITY = 0.01
-EVALUATION_STEPS = 10
+EVALUATION_STEPS = 50
 NUMBER_OF_ELITES = 4
 
 def fitness_function(left_motor_speed, right_motor_speed, infrared):
 	# Code the fitness function here
-	
+	left_motor_speed = (left_motor_speed + 0.5) / 2
+	right_motor_speed = (right_motor_speed + 0.5) / 2
 	V = abs(left_motor_speed) + abs(right_motor_speed)
 	delta_v = abs(right_motor_speed - left_motor_speed)
 	i = np.max(infrared)
 	
-	fitness = V * (1 - math.sqrt(delta_v)) * (1 - i) * (left_motor_speed + 0.5) * (right_motor_speed + 0.5)
+	fitness = V * (1 - math.sqrt(delta_v)) * (1 - i)
 	return fitness
 	
 def define_neural_network():
