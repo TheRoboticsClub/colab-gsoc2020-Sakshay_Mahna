@@ -55,7 +55,7 @@ class MyAlgorithm(threading.Thread):
     	
     	fitness = algorithm.fitness_function(left_motor_speed, right_motor_speed, infrared)
     	
-    	if(fitness < 0 or max(self.getRange(index)) > 0.60):
+    	if(fitness < 0 or max(self.getRange(index)) > 0.50):
     	    fitness = 0
     	
     	return fitness 
