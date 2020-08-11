@@ -47,6 +47,8 @@ ga.number_of_elites = 0
 # Set the number of generations of the algorithm
 ga.number_of_generations = 1000
 
+ga.random_seed = 1
+
 # Pass the fitness function as an attribute
 # The fitness function for the algorithm
 def fitness_function(chromosome):

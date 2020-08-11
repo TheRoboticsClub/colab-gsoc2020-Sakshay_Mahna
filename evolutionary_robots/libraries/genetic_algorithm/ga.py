@@ -61,6 +61,9 @@ class GeneticAlgorithm(object):
 	number_of_elites: integer
 		The number of elites in each generation
 		
+	random_seed: integer
+		Seed value for numpy random
+		
 	replay_number: float
 		A float between 0 to 1 that specifies the fraction
 		of generations the algorithm should save
@@ -720,6 +723,18 @@ class GeneticAlgorithm(object):
 	@log_folder.setter
 	def log_folder(self, path):
 		self._log_folder = path
+		
+	@property
+	def random_seed(self):
+		"""
+		Seed value for numpy random
+		"""
+		return self._random_seed
+		
+	@random_seed.setter
+	def random_seed(self, seed):
+		self._random_seed = seed
+		np.random.seed(self._random_seed)
 			
 	@property
 	def fitness_function(self):

@@ -9,21 +9,20 @@ from neural_networks.activation_functions import *
 LOG_FOLDER = './log'
 
 # Fill Parameters for Genetic Algorithm
-POPULATION_SIZE = 50
+POPULATION_SIZE = 20
 NUMBER_OF_GENERATIONS = 100
 MUTATION_PROBABILITY = 0.01
-EVALUATION_STEPS = 50
+EVALUATION_STEPS = 500
 NUMBER_OF_ELITES = 2
+RANDOM_SEED = 1
 
 def fitness_function(left_motor_speed, right_motor_speed, infrared):
 	# Code the fitness function here
-	left_motor_speed = (left_motor_speed + 0.5) / 2
-	right_motor_speed = (right_motor_speed + 0.5) / 2
 	V = abs(left_motor_speed) + abs(right_motor_speed)
 	delta_v = abs(right_motor_speed - left_motor_speed)
 	i = np.max(infrared)
 	
-	fitness = V * (1 - delta_v) * (1 - i)
+	fitness = V * (1 - math.sqrt(delta_v)) * (1 - i)
 	return fitness
 	
 def define_neural_network():

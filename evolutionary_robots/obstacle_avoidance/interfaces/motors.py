@@ -41,7 +41,7 @@ class CMDVel ():
 
 class PublisherMotors(object):
  
-    def __init__(self, topic, maxV, maxW):
+    def __init__(self, topic, maxV, maxW, sensor_lock):
 
         self.maxW = maxW
         self.maxV = maxV
@@ -54,7 +54,7 @@ class PublisherMotors(object):
         self.lock = threading.Lock()
 
         self.kill_event = threading.Event()
-        self.thread = ThreadPublisher(self, self.kill_event)
+        self.thread = ThreadPublisher(self, self.kill_event, sensor_lock)
 
         self.thread.daemon = True
         self.start()

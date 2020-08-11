@@ -20,10 +20,11 @@ from GA import GA
 time_cycle = 5
 
 class MyAlgorithm(threading.Thread):
-    def __init__(self, sensor, motors):
+    def __init__(self, sensor, motors, sensor_lock):
         # Initializing the Algorithm object
         self.sensor = sensor
         self.motors = motors
+        self.sensor_lock = sensor_lock
         self.start_state = True
         self.stop_event = threading.Event()
         self.kill_event = threading.Event()
@@ -55,7 +56,7 @@ class MyAlgorithm(threading.Thread):
     	
     	fitness = algorithm.fitness_function(left_motor_speed, right_motor_speed, infrared)
     	
-    	if(fitness < 0 or max(self.getRange(index)) > 0.50):
+    	if(fitness < 0):
     	    fitness = 0
     	
     	return fitness 
@@ -71,6 +72,7 @@ class MyAlgorithm(threading.Thread):
     	ga.mutation_probability = algorithm.MUTATION_PROBABILITY
     	ga.evaluation_steps = algorithm.EVALUATION_STEPS
     	ga.number_of_elites = algorithm.NUMBER_OF_ELITES
+    	ga.random_seed = algorithm.RANDOM_SEED
     	ga.fitness_function = self.fitness_function
     	
     	genetic_algorithm = GA(ga, self.log_folder)
@@ -124,10 +126,11 @@ class MyAlgorithm(threading.Thread):
     	elif(self.GA.state == "FITNESS"):
     	    #self.GA.synchronize()
     	    for index in range(5):
-	            output = self.GA.calculate_output({"INFRARED": self.getRange(index)}, index)["MOTORS"]
-	            output = output / 2
-	            self.motors[index].sendV(4 * (output[0] + output[1]))
-	            self.motors[index].sendW(4 * (output[0] - output[1]))
+    	        self.sensor_lock[index].acquire()
+                output = self.GA.calculate_output({"INFRARED": self.getRange(index)}, index)["MOTORS"]
+                output = output / 2
+                self.motors[index].sendV(4 * (output[0] + output[1]))
+                self.motors[index].sendW(4 * (output[0] - output[1]))
 		     #self.GA.synchronize()
 
             self.GA.fitness_state()

@@ -2,8 +2,7 @@
 <sdf version="1.5">
 	<world name="default">
 		<physics type="ode">
-			<real_time_update_rate>0</real_time_update_rate>
-			<min_step_size>0.5</min_step_size>
+			<real_time_update_rate>1000</real_time_update_rate>
 		</physics>
 		<include>
 			<uri>model://ground_plane_transparent</uri>
@@ -39,5 +38,6 @@
 			<pose>-0.5 0 0 -0.000084 -0.000478 -3.133447</pose>
 		</include>
 		
+		<plugin name="step_world" filename="libstep_world.so"/>
 	</world>
 </sdf>

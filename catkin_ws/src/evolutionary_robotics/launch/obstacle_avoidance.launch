@@ -2,9 +2,10 @@
 <launch>
   <arg name="world_name" value="$(find evolutionary_robotics)/worlds/obstacle_avoidance.world"/>
   <group ns="ga1">
+  	<remap from="/clock" to="/ga1_clock"/>
   	<env name="GAZEBO_MASTER_URI" value="http://localhost:11345"/>
   	<node name="gazebo" pkg="gazebo_ros" type="gzserver" respawn="false" output="screen"
-	args=" -e ode $(arg world_name)" />
+	args=" -e ode $(arg world_name) --seed 1" />
 	
 	<node name="gazebo_gui" pkg="gazebo_ros" type="gzclient" respawn="false" 
 	output="screen"/>

@@ -9,7 +9,6 @@ import numpy as np
 import shutil
 import multiprocessing
 
-
 class GA(object):
 	"""
 	Helper class to interface GeneticAlgorithmGazebo
@@ -70,7 +69,6 @@ class GA(object):
 								 rospy.ServiceProxy('ga3/gazebo/reset_simulation', Empty),
 								 rospy.ServiceProxy('ga4/gazebo/reset_simulation', Empty),
 								 rospy.ServiceProxy('ga5/gazebo/reset_simulation', Empty))
-		
 	
 	def initialize(self):
 		"""
@@ -158,13 +156,6 @@ class GA(object):
 		
 		if(self.state == "TEST"):
 			self.reset_simulation[0]()
-		else:
-			self.reset_simulation[0]()
-			self.reset_simulation[1]()
-			self.reset_simulation[2]()
-			self.reset_simulation[3]()
-			self.reset_simulation[4]()
-			
 		
 	def return_stats(self):
 		"""
@@ -215,6 +206,13 @@ class GA(object):
 		"""
 		Operations to perform in FITNESS state
 		"""
+		if(self.fitness_iterations == 0):
+			self.reset_simulation[0]()
+			self.reset_simulation[1]()
+			self.reset_simulation[2]()
+			self.reset_simulation[3]()
+			self.reset_simulation[4]()
+		
 		self.individual_fitness[0].append(self.genetic_algorithm.calculate_fitness(0))
 		self.individual_fitness[1].append(self.genetic_algorithm.calculate_fitness(1))
 		self.individual_fitness[2].append(self.genetic_algorithm.calculate_fitness(2))
@@ -243,11 +241,6 @@ class GA(object):
 			self.fitness_vector.append(self.genetic_algorithm.determine_fitness(self.individual_fitness[3], self.individual[3]))
 			self.fitness_vector.append(self.genetic_algorithm.determine_fitness(self.individual_fitness[4], self.individual[4]))
 			self.individual_fitness = [[] for _ in range(5)]
-			self.reset_simulation[0]()
-			self.reset_simulation[1]()
-			self.reset_simulation[2]()
-			self.reset_simulation[3]()
-			self.reset_simulation[4]()
 			self.fitness_iterations = 0
 			
 		if(self.individual_index == self.genetic_algorithm.population_size):
