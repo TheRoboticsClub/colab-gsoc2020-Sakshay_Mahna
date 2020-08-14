@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Week #9: Tuning Parameters"
-date:   2020-07-31 13:30:00 +0530
+date:   2020-08-07 13:30:00 +0530
 categories: exercises
 comments: true
 ---
