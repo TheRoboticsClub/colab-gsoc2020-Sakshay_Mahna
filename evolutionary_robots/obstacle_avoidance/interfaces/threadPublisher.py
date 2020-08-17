@@ -26,21 +26,22 @@ time_cycle = 5
 
 class ThreadPublisher(threading.Thread):
 
-    def __init__(self, pub, kill_event):
+    def __init__(self, pub, kill_event, clock):
         self.pub = pub
         self.kill_event = kill_event
         threading.Thread.__init__(self, args=kill_event)
+        self.clock = clock
 
     def run(self):
         while (not self.kill_event.is_set()):
-            start_time = datetime.now()
+            start_time = self.clock.getTimeData()
 
             self.pub.publish()
 
-            finish_Time = datetime.now()
+            finish_Time = self.clock.getTimeData()
 
             dt = finish_Time - start_time
-            ms = (dt.days * 24 * 60 * 60 + dt.seconds) * 1000 + dt.microseconds / 1000.0
+            ms = dt
             #print (ms)
             if (ms < time_cycle):
                 time.sleep((time_cycle - ms) / 1000.0)

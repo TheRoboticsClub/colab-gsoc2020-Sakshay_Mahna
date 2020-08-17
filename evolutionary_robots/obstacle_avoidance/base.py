@@ -10,6 +10,9 @@ from datetime import datetime
 import math
 import cv2
 import numpy as np
+import logging
+
+logging.basicConfig(filename="./fitness.log", level=logging.INFO)
 
 import MyAlgorithm as algorithm
 
@@ -17,7 +20,7 @@ sys.path.append('./../libraries')
 from genetic_algorithm.ga_simulation import GeneticAlgorithmGazebo
 from GA import GA
 
-time_cycle = 5
+time_cycle = 20
 
 class MyAlgorithm(threading.Thread):
     def __init__(self, sensor, motors):
@@ -55,7 +58,7 @@ class MyAlgorithm(threading.Thread):
     	
     	fitness = algorithm.fitness_function(left_motor_speed, right_motor_speed, infrared)
     	
-    	if(fitness < 0 or max(self.getRange(index)) > 0.50):
+    	if(fitness < 0):
     	    fitness = 0
     	
     	return fitness 
@@ -70,7 +73,7 @@ class MyAlgorithm(threading.Thread):
     	ga.number_of_generations = algorithm.NUMBER_OF_GENERATIONS   
     	ga.mutation_probability = algorithm.MUTATION_PROBABILITY
     	ga.evaluation_steps = algorithm.EVALUATION_STEPS
-    	ga.number_of_elites = algorithm.NUMBER_OF_ELITES
+    	#ga.number_of_elites = algorithm.NUMBER_OF_ELITES
     	ga.fitness_function = self.fitness_function
     	
     	genetic_algorithm = GA(ga, self.log_folder)
@@ -124,10 +127,14 @@ class MyAlgorithm(threading.Thread):
     	elif(self.GA.state == "FITNESS"):
     	    #self.GA.synchronize()
     	    for index in range(5):
-	            output = self.GA.calculate_output({"INFRARED": self.getRange(index)}, index)["MOTORS"]
-	            output = output / 2
-	            self.motors[index].sendV(4 * (output[0] + output[1]))
-	            self.motors[index].sendW(4 * (output[0] - output[1]))
+    	        infrared = self.getRange(index)
+    	        output = self.GA.calculate_output({"INFRARED": infrared}, index)["MOTORS"]
+                output = output / 2
+                if(max(infrared) > 0.80):
+                    self.motors[index].sendV(0)
+                else:
+                    self.motors[index].sendV(4 * (output[0] + output[1]))
+                self.motors[index].sendW(4 * (output[0] - output[1]))
 		     #self.GA.synchronize()
 
             self.GA.fitness_state()
