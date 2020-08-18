@@ -14,20 +14,24 @@ Follow the instruction in this [README](./../README.md)
 . souce.bash
 ```
 
-- Launch the Gazebo simulation in the same terminal window. A new window showing the Robot Model in an environment would appear. Ignore the yellow colored warnings that appear in the terminal. **However, we should run the headless version of the simulator, when we want to train the algorithm and simple version when we want to test**.
+- Launch the Gazebo simulation in the same terminal window. A new window showing the Robot Model in an environment would appear. Ignore the yellow colored warnings that appear in the terminal. **However, we should run always run the train file of the simulator, when we want to train the algorithm and test version when we want to test**.
 
 ```bash
 # Complete Simulation, only during testing
-roslaunch ./launch/obstacle_avoidance.launch
+roslaunch ./launch/test.launch
 
 # Headless version, only during training
-roslaunch ./launch/obstacle_avoidance_headless.launch
+roslaunch ./launch/train.launch
 ```
 
-- In a new terminal window, execute the academic application that will incorporate your code. This would open a GUI application through which the user can execute the code.
+- In a new terminal window, execute the academic application that will incorporate your code based on whether we want to train or test the robot. This would open a GUI application through which the user can execute the code.
 
 ```bash
-python2 ./exercise.py
+# Only during training
+python2 ./train.py
+
+# Only during testing
+python2 ./test.py
 ```
 
 - The GUI has 4 buttons which provide 4 different ways to run the exercise. The first button `Start Training`, starts the training of the exercise from scratch. All the previous logs are deleted if this button is clicked. The second button `Continue Training` resumes training from the generation which was running the last time the **application was switched off**. The third button `Resume Generation` works with the radio buttons on the right side of the buttons. The radio button specifies from which generation we want to resume our training. The fourth button `Test Best Chromosome` tests the best chromosome that was found in the previous trainings.
