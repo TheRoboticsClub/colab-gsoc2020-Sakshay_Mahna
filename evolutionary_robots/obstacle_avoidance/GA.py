@@ -130,7 +130,10 @@ class GA(object):
 			self.generation = 0
 			try:
 				test_population = self.genetic_algorithm.load_chromosome(self.log_folder + "/best_chromosomes")
-				self.test_individual = test_population[test_number]
+				if(test_number != 0):
+					self.test_individual = test_population[test_number]
+				else:
+					self.test_individual = test_population
 			except IOError:
 				print("File not found!")
 				
@@ -303,6 +306,8 @@ class GA(object):
 		"""
 		Operations to perform in END state
 		"""
+		# Just advance one more step
+		self.genetic_algorithm.current_generation += 1
 		
 		# Print the best fitness and return the chromosome
 		print("The best fitness value acheived is: " + str(self.genetic_algorithm.best_fitness))

@@ -10,9 +10,6 @@ from datetime import datetime
 import math
 import cv2
 import numpy as np
-import logging
-
-logging.basicConfig(filename="./fitness.log", level=logging.INFO)
 
 import MyAlgorithm as algorithm
 
@@ -159,6 +156,7 @@ class MyAlgorithm(threading.Thread):
 				
         elif(self.GA.state == "END"):
 			self.GA.end_state()
+			self.GA.save_state()
 			
 			# Done
 			self.stop()

@@ -68,8 +68,8 @@ class PublisherMotors(object):
         
     def stop(self):
    
-        self.kill_event.set()
         self.pub.unregister()
+        self.kill_event.set()
 
     def start (self):
 

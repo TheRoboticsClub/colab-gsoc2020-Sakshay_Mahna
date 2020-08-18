@@ -4,7 +4,7 @@ import sys
 import rospy
 
 # Practice imports
-from gui.GUI import MainWindow
+from gui.GUI import TrainWindow
 from gui.threadGUI import ThreadGUI
 from PyQt5.QtWidgets import QApplication
 
@@ -37,7 +37,7 @@ if __name__ == "__main__":
     algorithm = MyAlgorithm(infrared, motors)
 
     app = QApplication(sys.argv)
-    myGUI = MainWindow()
+    myGUI = TrainWindow()
     myGUI.setAlgorithm(algorithm)
     myGUI.show()
 

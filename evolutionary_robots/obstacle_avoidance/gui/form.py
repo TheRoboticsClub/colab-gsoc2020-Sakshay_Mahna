@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'evolution_robot.ui'
+# Form implementation generated from reading ui file 'train_robot.ui'
 #
 # Created by: PyQt5 UI code generator 5.10.1
 #
@@ -8,7 +8,8 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-class Ui_MainWindow(object):
+# Train Window
+class Ui_TrainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(471, 592)
@@ -36,7 +37,7 @@ class Ui_MainWindow(object):
         self.best_fitness.setObjectName("best_fitness")
         self.statsLayout.addWidget(self.best_fitness)
         self.layoutWidget_2 = QtWidgets.QWidget(self.centralwidget)
-        self.layoutWidget_2.setGeometry(QtCore.QRect(10, 20, 221, 144))
+        self.layoutWidget_2.setGeometry(QtCore.QRect(10, 20, 222, 144))
         self.layoutWidget_2.setObjectName("layoutWidget_2")
         self.buttonLayout = QtWidgets.QVBoxLayout(self.layoutWidget_2)
         self.buttonLayout.setContentsMargins(0, 0, 0, 0)
@@ -59,15 +60,6 @@ class Ui_MainWindow(object):
         self.generationButton.setFont(font)
         self.generationButton.setObjectName("generationButton")
         self.buttonLayout.addWidget(self.generationButton)
-        self.bestButton = QtWidgets.QPushButton(self.layoutWidget_2)
-        font = QtGui.QFont()
-        font.setPointSize(15)
-        font.setBold(True)
-        font.setItalic(True)
-        font.setWeight(75)
-        self.bestButton.setFont(font)
-        self.bestButton.setObjectName("bestButton")
-        self.buttonLayout.addWidget(self.bestButton)
         self.layoutWidget_3 = QtWidgets.QWidget(self.centralwidget)
         self.layoutWidget_3.setGeometry(QtCore.QRect(210, 180, 81, 379))
         self.layoutWidget_3.setObjectName("layoutWidget_3")
@@ -101,8 +93,59 @@ class Ui_MainWindow(object):
         self.last_generation = QtWidgets.QLabel(self.gridLayoutWidget)
         self.last_generation.setObjectName("last_generation")
         self.generationLayout.addWidget(self.last_generation, 1, 1, 1, 1)
+        MainWindow.setCentralWidget(self.centralwidget)
+        self.statusbar = QtWidgets.QStatusBar(MainWindow)
+        self.statusbar.setObjectName("statusbar")
+        MainWindow.setStatusBar(self.statusbar)
+
+        self.retranslateUi(MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
+    def retranslateUi(self, MainWindow):
+        _translate = QtCore.QCoreApplication.translate
+        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        self.generation.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">CURRENT GENERATION: </span></p></body></html>"))
+        self.individual.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">CURRENT INDIVIDUAL: </span></p></body></html>"))
+        self.best_fitness.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">BEST FITNESS: </span></p></body></html>"))
+        self.trainButton.setText(_translate("MainWindow", "Start Training"))
+        self.generationButton.setText(_translate("MainWindow", "Resume Generation"))
+        self.generation_value.setText(_translate("MainWindow", "<html><head/><body><p><br/></p></body></html>"))
+        self.individual_value.setText(_translate("MainWindow", "<html><head/><body><p><br/></p></body></html>"))
+        self.best_fitness_value.setText(_translate("MainWindow", "<html><head/><body><p><br/></p></body></html>"))
+        self.out_of_generation.setText(_translate("MainWindow", "/ 0"))
+        self.label.setText(_translate("MainWindow", "The last generation was: "))
+        self.last_generation.setText(_translate("MainWindow", "<html><head/><body><p align=\"center\">0</p></body></html>"))
+    
+# Test window    
+class Ui_TestWindow(object):
+    def setupUi(self, MainWindow):
+        MainWindow.setObjectName("MainWindow")
+        MainWindow.resize(471, 279)
+        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.centralwidget.setObjectName("centralwidget")
+        self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
+        self.verticalLayoutWidget.setGeometry(QtCore.QRect(310, 110, 151, 141))
+        self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
+        self.logoLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
+        self.logoLayout.setContentsMargins(0, 0, 0, 0)
+        self.logoLayout.setObjectName("logoLayout")
+        self.layoutWidget_2 = QtWidgets.QWidget(self.centralwidget)
+        self.layoutWidget_2.setGeometry(QtCore.QRect(10, 20, 222, 61))
+        self.layoutWidget_2.setObjectName("layoutWidget_2")
+        self.buttonLayout = QtWidgets.QVBoxLayout(self.layoutWidget_2)
+        self.buttonLayout.setContentsMargins(0, 0, 0, 0)
+        self.buttonLayout.setObjectName("buttonLayout")
+        self.bestButton = QtWidgets.QPushButton(self.layoutWidget_2)
+        font = QtGui.QFont()
+        font.setPointSize(15)
+        font.setBold(True)
+        font.setItalic(True)
+        font.setWeight(75)
+        self.bestButton.setFont(font)
+        self.bestButton.setObjectName("bestButton")
+        self.buttonLayout.addWidget(self.bestButton)
         self.gridLayoutWidget_2 = QtWidgets.QWidget(self.centralwidget)
-        self.gridLayoutWidget_2.setGeometry(QtCore.QRect(240, 90, 221, 71))
+        self.gridLayoutWidget_2.setGeometry(QtCore.QRect(240, 20, 221, 71))
         self.gridLayoutWidget_2.setObjectName("gridLayoutWidget_2")
         self.bestLayout = QtWidgets.QGridLayout(self.gridLayoutWidget_2)
         self.bestLayout.setContentsMargins(0, 0, 0, 0)
@@ -127,18 +170,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.generation.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">CURRENT GENERATION: </span></p></body></html>"))
-        self.individual.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">CURRENT INDIVIDUAL: </span></p></body></html>"))
-        self.best_fitness.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">BEST FITNESS: </span></p></body></html>"))
-        self.trainButton.setText(_translate("MainWindow", "Start Training"))
-        self.generationButton.setText(_translate("MainWindow", "Resume Generation"))
         self.bestButton.setText(_translate("MainWindow", "Test Best Chromosome"))
-        self.generation_value.setText(_translate("MainWindow", "<html><head/><body><p><br/></p></body></html>"))
-        self.individual_value.setText(_translate("MainWindow", "<html><head/><body><p><br/></p></body></html>"))
-        self.best_fitness_value.setText(_translate("MainWindow", "<html><head/><body><p><br/></p></body></html>"))
-        self.out_of_generation.setText(_translate("MainWindow", "/ 0"))
-        self.label.setText(_translate("MainWindow", "The last generation was: "))
-        self.last_generation.setText(_translate("MainWindow", "<html><head/><body><p align=\"center\">0</p></body></html>"))
         self.out_of_generation_2.setText(_translate("MainWindow", "/ 0"))
         self.label_2.setText(_translate("MainWindow", "Select the generation to play "))
 
