@@ -19,9 +19,10 @@
 #
 import threading
 import time
+import rospy
 from datetime import datetime
 
-time_cycle = 5
+time_cycle = 20
 
 
 class ThreadPublisher(threading.Thread):
@@ -36,7 +37,10 @@ class ThreadPublisher(threading.Thread):
         while (not self.kill_event.is_set()):
             start_time = self.clock.getTimeData()
 
-            self.pub.publish()
+            try:
+                self.pub.publish()
+            except rospy.ROSException:
+                pass
 
             finish_Time = self.clock.getTimeData()
 

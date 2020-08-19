@@ -32,7 +32,11 @@ class ThreadGUI(threading.Thread):
 
         while(True):
             start_time = datetime.now()
-            self.gui.updGUI.emit()
+            
+            try:
+                self.gui.updGUI.emit()
+            except AttributeError:
+                pass
 
             finish_Time = datetime.now()
 
