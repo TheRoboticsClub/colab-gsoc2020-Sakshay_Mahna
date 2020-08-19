@@ -59,11 +59,11 @@ class TrainWindow(QMainWindow, Ui_TrainWindow):
         self.logoLayout.addWidget(self.logo)
         self.logo.setVisible(True)
         self.display_stats = False
-        
-        self.clickedButton = False
 
         self.trainButton.clicked.connect(self.trainClicked)
+        self.trainButton.setCheckable(True)
         self.generationButton.clicked.connect(self.generationClicked)
+        self.generationButton.setCheckable(True)
 
         self.updGUI.connect(self.updateGUI)
 
@@ -74,21 +74,23 @@ class TrainWindow(QMainWindow, Ui_TrainWindow):
     def trainClicked(self):
         self.display_stats = True
         self.algorithm.run_state = "TRAIN"
-        if(self.clickedButton == False):
-        	self.algorithm.play()
-        	self.clickedButton = True
+        if self.trainButton.isChecked():
+            self.trainButton.setText('Stop Training')
+            self.algorithm.play()
         else:
-        	self.algorithm.GA.initialize()
+            self.trainButton.setText('Start Training')
+            self.algorithm.stop()
             
     def generationClicked(self):
         generation = int(self.input_generation.value())
         self.algorithm.run_state = "CONTINUE" + str(generation)
         self.display_stats = True
-        if(self.clickedButton == False):
-        	self.algorithm.play()
-        	self.clickedButton = True
+        if self.generationButton.isChecked():
+            self.generationButton.setText('Stop Training')
+            self.algorithm.play()
         else:
-        	self.algorithm.GA.initialize()
+	        self.generationButton.setText('Continue Training')
+	        self.algorithm.stop()
             
     def update_stats(self):
         stats_array = self.algorithm.GA.return_stats()
