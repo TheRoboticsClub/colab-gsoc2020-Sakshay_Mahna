@@ -148,6 +148,14 @@ source /opt/ros/melodic/setup.bash
 ### Obstacle Avoidance
 The code for this exercise is present in [obstacle_avoidance](./obstacle_avoidance)
 
+## Open Issues and Improvements
 
+1. **Speeding up the process**: The current obstacle avoidance exercise takes 2 hours to train, which is acceptable for this exercise. However, scaling this to other exercises will be difficult as they would take even longer time.
+
+2. **Determinisim**: Deterministic environment is important to help students debug and understand their mistakes. The current software is not deterministic, which also does not enable us to use elites.
+
+3. **Collision**: After experiencing a collision, the robot model behaves in an errotic manner. This records errors in the sensor input and motor output, influencing the fitness value. This collision should be avoided or removed.
+
+All of the above issues are mostly part of training. However, all of these problems could be solved using a minimalistic Physics Engine, which can be used to train the robot. The robot can then be tested on the real Gazebo simulator.
 
 
