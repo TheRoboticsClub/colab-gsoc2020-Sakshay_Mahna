@@ -19,6 +19,11 @@ from GA import GA
 
 time_cycle = 20
 
+# The basic machinery of the Robotics Academy Template
+# One special thing in this: the user is not going to make changes in
+# this part of the code. A state machine has already been implemented in 
+# algorithm function whose parameters are to be coded by students in 
+# MyALgorithm.py file
 class MyAlgorithm(threading.Thread):
     def __init__(self, sensor, motors):
         # Initializing the Algorithm object

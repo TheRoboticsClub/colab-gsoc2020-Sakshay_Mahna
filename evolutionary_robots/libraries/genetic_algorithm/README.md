@@ -97,4 +97,4 @@ ga.plot_fitness()
 
 These files are saved in a directory named as `log`.
 
-`ga.plot_fitness()` generates a matplotlib plot of the fitness value as a function of the generation.
+`ga.plot_fitness(filename)` generates a matplotlib plot of the fitness value as a function of the generation.

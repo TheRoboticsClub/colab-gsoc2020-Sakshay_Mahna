@@ -13,6 +13,7 @@ from interfaces.infrared import ListenerInfrared
 from interfaces.motors import PublisherMotors
 from interfaces.clock import ListenerClock
 
+# Execute the application
 if __name__ == "__main__":
     rospy.init_node("ObstacleAvoidanceER")
 

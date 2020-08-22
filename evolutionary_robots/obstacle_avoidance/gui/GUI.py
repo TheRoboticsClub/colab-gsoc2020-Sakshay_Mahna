@@ -16,13 +16,16 @@ class TestWindow(QMainWindow, Ui_TestWindow):
         self.display_stats = False
         
         self.clickedButton = False
-
+        
+        # Attach event handler to bestButton
         self.bestButton.clicked.connect(self.bestClicked)
         
     def updateGUI(self):
         pass
-            
+     
+    # Event handler function of bestButton       
     def bestClicked(self):
+        # Pass the generation number as a string
         generation = int(self.input_generation_2.value())
         self.algorithm.run_state = "TEST" + str(generation)
         self.display_stats = True
@@ -60,6 +63,7 @@ class TrainWindow(QMainWindow, Ui_TrainWindow):
         self.logo.setVisible(True)
         self.display_stats = False
 
+        # Attach event handler to trainButton and generationButton
         self.trainButton.clicked.connect(self.trainClicked)
         self.trainButton.setCheckable(True)
         self.generationButton.clicked.connect(self.generationClicked)
@@ -71,6 +75,7 @@ class TrainWindow(QMainWindow, Ui_TrainWindow):
     	if(self.display_stats == True and self.algorithm.start_state == False):
         	self.update_stats()
         
+    # Event handler function of trainButton
     def trainClicked(self):
         self.display_stats = True
         self.algorithm.run_state = "TRAIN"
@@ -80,7 +85,8 @@ class TrainWindow(QMainWindow, Ui_TrainWindow):
         else:
             self.trainButton.setText('Start Training')
             self.algorithm.stop()
-            
+    
+    # Event Handler function of TestButton       
     def generationClicked(self):
         generation = int(self.input_generation.value())
         self.algorithm.run_state = "CONTINUE" + str(generation)
@@ -91,7 +97,8 @@ class TrainWindow(QMainWindow, Ui_TrainWindow):
         else:
 	        self.generationButton.setText('Continue Training')
 	        self.algorithm.stop()
-            
+    
+    # Function to update the statistics       
     def update_stats(self):
         stats_array = self.algorithm.GA.return_stats()
         

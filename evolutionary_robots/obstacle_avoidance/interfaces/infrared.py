@@ -59,7 +59,8 @@ def message2InfraredData(infra, infrared):
 	
 	return infrared
 	
-
+# Class that subscribes to the Infrared sensor data
+# and interprets it for the user to use
 class ListenerInfrared:
  
     def __init__(self, topic):

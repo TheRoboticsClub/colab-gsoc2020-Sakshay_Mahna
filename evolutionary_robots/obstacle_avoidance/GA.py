@@ -24,6 +24,23 @@ class GA(object):
 	log_folder: string
 		The destination of the folder to which logging should be done
 		
+	Attributes
+	----------
+	run_state: String
+		What the user requested through GUI
+		"TRAIN", "CONTINUE", "TEST"
+		
+	state: string
+		The current state of the exercise, helps in coordinating the steps of
+		the state machine:
+		"FITNESS", "PRINT", "SELECTION", "CROSSOVER", "MUTATION", "NEXT", "END" 
+		
+	log_folder: string
+		The destination of the folder to which logging should be done
+		
+	reset_simulation: array-like
+		A proxy for the Service that resets the simulation
+		
 	Methods
 	-------
 	initialize()
@@ -61,8 +78,6 @@ class GA(object):
 		Initialization function of the class
 		"""
 		self.run_state = "TRAIN"
-		self.start = True
-		self.pause = False
 		self.log_folder = log_folder
 		self.genetic_algorithm = genetic_algorithm
 		self.reset_simulation = (rospy.ServiceProxy('ga1/gazebo/reset_simulation', Empty),
@@ -77,16 +92,20 @@ class GA(object):
 		This function is run when any button on 
 		GUI is clicked
 		"""
+		# Reset the log folder if, TRAIN is the run_state
 		if not os.path.exists(self.log_folder):
 			os.makedirs(self.log_folder)
 		elif(self.run_state == "TRAIN"):
 			shutil.rmtree(self.log_folder)
 			os.makedirs(self.log_folder)
 			
+		# Generate the population
 		self.genetic_algorithm.generate_population()
 		self.genetic_algorithm.generations.append(self.genetic_algorithm.population)
 		
-		# Initializing the Variables
+		# Interpret the string received from the GUI and initialize
+		# the Variables(test_network, best_chromosomes, starting chromosome)
+		# based on the run state
 		if(self.run_state[:8] == "CONTINUE"):
 			generation_number = int(self.run_state[8:])
 			self.genetic_algorithm.load_generation(generation_number)
@@ -159,6 +178,7 @@ class GA(object):
 		self.genetic_algorithm.generation_start = self.generation
 		self.delete_process = None
 		
+		# Reset the simulation
 		if(self.state == "TEST"):
 			self.reset_simulation[0]()
 		else:
@@ -212,20 +232,25 @@ class GA(object):
 							
 			delete_process.start()
 		
+		# Put the next state
 		self.state = "FITNESS"
 		
 	def fitness_state(self):
 		"""
 		Operations to perform in FITNESS state
 		"""
+		# Append the fitness value
 		self.individual_fitness[0].append(self.genetic_algorithm.calculate_fitness(0))
 		self.individual_fitness[1].append(self.genetic_algorithm.calculate_fitness(1))
 		self.individual_fitness[2].append(self.genetic_algorithm.calculate_fitness(2))
 		self.individual_fitness[3].append(self.genetic_algorithm.calculate_fitness(3))
 		self.individual_fitness[4].append(self.genetic_algorithm.calculate_fitness(4))
 		
+		# Increment the fitness iterations
 		self.fitness_iterations = self.fitness_iterations + 1
 	
+		# Keep checking whether we have completed the required fitness iteration
+		# Update the individual being tested and it's network parameters
 		if(self.fitness_iterations == self.evaluation_steps):
 			self.individual_index = self.individual_index + 5
 			if(self.individual_index < self.genetic_algorithm.population_size):
@@ -253,6 +278,7 @@ class GA(object):
 			self.reset_simulation[4]()
 			self.fitness_iterations = 0
 			
+		# Advance to next state when we are done
 		if(self.individual_index == self.genetic_algorithm.population_size):
 			self.state = "PRINT"
 			self.genetic_algorithm.fitness_vector = np.array(self.fitness_vector)
