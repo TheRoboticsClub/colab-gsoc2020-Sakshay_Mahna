@@ -70,7 +70,6 @@ class MyAlgorithm(threading.Thread):
     	ga.number_of_generations = algorithm.NUMBER_OF_GENERATIONS   
     	ga.mutation_probability = algorithm.MUTATION_PROBABILITY
     	ga.evaluation_steps = algorithm.EVALUATION_STEPS
-    	#ga.number_of_elites = algorithm.NUMBER_OF_ELITES
     	ga.fitness_function = self.fitness_function
     	
     	genetic_algorithm = GA(ga, self.log_folder)

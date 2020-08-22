@@ -61,9 +61,9 @@ class GeneticAlgorithm(object):
 	number_of_elites: integer
 		The number of elites in each generation
 		
-	replay_number: float
-		A float between 0 to 1 that specifies the fraction
-		of generations the algorithm should save
+	replay_number: integer
+		An integer specifying the interval through which
+		generations should be saved.
 		
 	Methods
 	-------
@@ -697,8 +697,8 @@ class GeneticAlgorithm(object):
 			
 	@property
 	def replay_number(self):
-		""" Attribute to specify the fraction of 
-			number of generations to save
+		""" Attribute to specify the interval of
+		generations to save
 		"""
 		return self._replay_number
 		

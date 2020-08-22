@@ -16,8 +16,10 @@ The following headings describe the summary of changes and additions to the `Jde
 
 ### Worlds
 
-- `obstacle_avoidance.world` contains the world representation of the obstacle avoidance exercise. The file includes `sun`, `ground_plane_transparent`, `roombaIR` and `simpleWorld` models.
+- `obstacle_avoidance.world` contains the world representation of the obstacle avoidance exercise. The file includes `sun`, `ground_plane_transparent`, `roombaIR` and `cage` models.
 
 ### Models
 
 - `roombaIR` contains the Roomba robot with 8 IR sensors fitted accross it. The file is an edited version of `roombaROS` where the Hokuyo Laser sensor is removed and Sonar sensors are added.
+
+- `cage` contains the environment where the robot is to be trained. It consists of 4 rectangular walls, within which the robot can be placed.

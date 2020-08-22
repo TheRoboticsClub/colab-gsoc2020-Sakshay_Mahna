@@ -42,7 +42,7 @@ ga.population_size = 50
 ga.mutation_probability = 0.01
 
 # Set the number of elites
-ga.number_of_elites = 0
+ga.number_of_elites = 2
 
 # Set the number of generations of the algorithm
 ga.number_of_generations = 1000
