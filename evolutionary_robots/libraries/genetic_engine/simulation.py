@@ -18,14 +18,36 @@ class Simulation(threading.Thread):
 	...
 	Parameters
 	----------
-	delta_time: float
+	delta_time(optional): float
 		The time with which the simulation proceeds
 	
 	Attributes
 	----------
+	delta_time: float
+		The time with which the simulation proceeds
+		
+	bodies: list of Body object
+		The list of bodies in our simulated world
+		
+	number_of_bodies: integer
+		Keeps a count of the number of bodies
 	
 	Methods
 	-------
+	run()
+		This function is supposed to be designed according to
+		the exercise
+	
+	collision_checker()
+		Function to check the pairs between which collision has
+		occured. Simply calls each and every object's collision
+		checker function with another object as parameter.
+	
+	collision_resolver(collision_list)
+		Function to resolve the collisions of the objects
+		
+	add_body(body)
+		Function to append a new body to the world
 	"""
 	def __init__(self, delta_time=0.0001):
 		"""
@@ -52,7 +74,6 @@ class Simulation(threading.Thread):
 		self.delta_time = delta_time
 		self.bodies = []
 		self.number_of_bodies = 0
-		self.states = []
 		
 	def run(self):
 		"""
@@ -103,7 +124,7 @@ class Simulation(threading.Thread):
 		
 		return collision_list
 		
-	def collision_resolution(self, collision_list):
+	def collision_resolver(self, collision_list):
 		"""
 		Function to resolve the collisions of the objects
 		
@@ -122,7 +143,55 @@ class Simulation(threading.Thread):
 		AssertionError
 			Atleast one of the two colliding objects should be
 			mobile.
+			
+		Notes
+		-----
+		For now, the collision resolution is simple, the objects are only
+		placed back at their position
 		"""
+		
+		for tuples in collision_list:
+			object1 = tuples[0]
+			object2 = tuples[1]
+			
+			# Assertion check
+			assert object1.category == 'mobile' or object2.category == 'mobile', \
+				   "One of the two colliding objects should be mobile"
+				   
+			if(object1.category == 'mobile'):
+				# We will reverse all the actions
+				object1.velocity = -1 * object1.velocity
+				object1.angular_velocity = -1 * object1.angular_velocity
+				object1.move_timestep(self.delta_t)
+				object1.velocity = -1 * object1.velocity
+				object1.angular_velocity = -1 * object1.angular_velocity
+			else:
+				object2.velocity = -1 * object2.velocity
+				object2.angular_velocity = -1 * object2.angular_velocity
+				object2.move_timestep(self.delta_t)
+				object2.velocity = -1 * object2.velocity
+				object2.angular_velocity = -1 * object2.angular_velocity
+				
+	def add_body(self, body):
+		"""
+		Function to append a new body to the world
+		
+		...
+		Parameters
+		----------
+		body: Body Object
+			An instance of the Body class
+			
+		Returns
+		-------
+		None
+		
+		Raises
+		------
+		None
+		"""
+		self.bodies.append(body)
+		self.number_of_bodies += 1
 		
 		
 		
