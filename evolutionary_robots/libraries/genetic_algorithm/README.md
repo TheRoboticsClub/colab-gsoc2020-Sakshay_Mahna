@@ -74,10 +74,10 @@ ga.number_of_elites = number_of_elites
 
 **number_of_elites** specifies the number of elites in the algorithm. Elites are not crossovered and directly sent to the next generation. By default, the algorithm runs with 0 elites. **The parity of number of elites and size of population should be same, otherwise the result would be an error**.
 
-**replay_fraction** specifies the fraction of the size of generation to save. This saves all the chromosomes of the generation starting from the fraction amount specified. This number should be between 0 and 1. By default, the value of this attribute is taken as 0.25. An example as shown:
+**replay_number** specifies the interval through which generations to save. This saves all the chromosomes of the generation which occur at intervals of replay number. By default, the value of this attribute is 25. An example as shown:
 
 ```python
-ga.replay_fraction = 0.30
+ga.replay_number = 30
 ```
 
 **Specifiying Fitness Function** The fitness function is set as an attribute for the algorithm. The fitness function variable should be a function object, that takes in a single parameter, which is a numpy list object and returns a single comparable(float or integer) value. In essence, the user-defined fitness function should be able to calculate and return the fitness value of a single chromosome.
@@ -93,10 +93,8 @@ ga.run()
 ga.plot_fitness()
 ```
 
-`ga.run()` function runs a simulation of the genetic algorithm for the specifed number of generations. It also prints some statistics regarding the minimum, maximum and the average fitness values. The function returns the chromosomes with the best fitness value for the whole simulation. Along with it, these statistics are saved in `stats.txt`. The best chromosomes of each generation are stored in `best_chromosomes.txt`, all the chromosomes of each generation according to the replay fraction attribute are saved in `generations<replay_fraction>%.txt`. These represent the populalation when the algorithm has reached certain percentage of total generations to run.
-
-If the user stops the execution via a SIGINT signal, (CTRL + C) the algorithm saves the current population and the current best chromosome in `generation<number>.txt` and `current_best.txt` files respectively.
+`ga.run()` function runs a simulation of the genetic algorithm for the specifed number of generations. It also prints some statistics regarding the minimum, maximum and the average fitness values. The function returns the chromosomes with the best fitness value for the whole simulation. Along with it, these statistics are saved in `stats.txt`. The best chromosomes of each generation are stored in `best_chromosomes.txt`, all the chromosomes of the current generation and generations according to the replay number attribute are saved as `generations<generation_number>.txt`. These represent the populalation when the algorithm has reached certain percentage of total generations to run.
 
 These files are saved in a directory named as `log`.
 
-`ga.plot_fitness()` generates a matplotlib plot of the fitness value as a function of the generation.
+`ga.plot_fitness(filename)` generates a matplotlib plot of the fitness value as a function of the generation.

@@ -16,7 +16,9 @@ def message2TimeData(message):
 	
 	return msecs
 	
-
+# This class subscribes to the clock topic and
+# interprets the milliseconds passed since the
+# execution of the application
 class ListenerClock:
  
     def __init__(self, topic):

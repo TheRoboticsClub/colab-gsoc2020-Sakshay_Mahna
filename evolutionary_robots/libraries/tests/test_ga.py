@@ -22,7 +22,7 @@ class TestGA(unittest.TestCase):
 		ga = GeneticAlgorithm()
 		ga.fitness_function = self.fitness_function
 		ga.run()
-		ga.plot_fitness()
+		ga.plot_fitness('plot')
 		
 if __name__ == "__main__":
 	unittest.main()

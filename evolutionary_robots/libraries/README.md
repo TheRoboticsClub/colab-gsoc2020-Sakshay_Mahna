@@ -11,13 +11,13 @@ The Genetic Algorithm library is present in [genetic_algorithm](./genetic_algori
 
 ## API Reference for the libraries
 
-API Reference for [Neural Networks](./libraries/neural_networks/README.md)
+API Reference for [Neural Networks](./neural_networks/README.md)
 
-API Reference for [Genetic Algorithm](./libraries/genetic_algorithm/README.md)
+API Reference for [Genetic Algorithm](./genetic_algorithm/README.md)
 
-[Examples](./libraries/examples) for the use of APIs
+[Examples](./examples) for the use of APIs
 
 
 ## Tests
 
-All the tests can be found in the [tests directory](./libraries/tests)
+All the tests can be found in the [tests directory](./tests)

@@ -42,7 +42,7 @@ ga.fitness_function = fitness_function
 print(ga.run())
 
 # Plot the fitness value against the generation number
-ga.plot_fitness('./repr/fitness_plot', True)
+ga.plot_fitness('fitness_plot', True)
 
 # If we want to run the generation from 25%
 # completion again

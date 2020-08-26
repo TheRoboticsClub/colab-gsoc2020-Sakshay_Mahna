@@ -14,7 +14,7 @@ Follow the instruction in this [README](./../README.md)
 . souce.bash
 ```
 
-- Launch the Gazebo simulation in the same terminal window. A new window showing the Robot Model in an environment would appear. Ignore the yellow colored warnings that appear in the terminal. **However, we should run always run the train file of the simulator, when we want to train the algorithm and test version when we want to test**.
+- Launch the Gazebo simulation in the same terminal window. Ignore the yellow colored warnings that appear in the terminal. **We should run always run the train file of the simulator, when we want to train the algorithm and test version when we want to test**.
 
 ```bash
 # Complete Simulation, only during testing
@@ -34,9 +34,11 @@ python2 ./train.py
 python2 ./test.py
 ```
 
-- The GUI has 4 buttons which provide 4 different ways to run the exercise. The first button `Start Training`, starts the training of the exercise from scratch. All the previous logs are deleted if this button is clicked. The second button `Continue Training` resumes training from the generation which was running the last time the **application was switched off**. The third button `Resume Generation` works with the radio buttons on the right side of the buttons. The radio button specifies from which generation we want to resume our training. The fourth button `Test Best Chromosome` tests the best chromosome that was found in the previous trainings.
+- The training GUI has 2 buttons. The first button `Start Training`, starts the training of the exercise from scratch. All the previous logs are deleted if this button is clicked. The second button `Resume Generation` works with the input box present alongside. It resumes the training from the specified generation, **if the log file of that generation is present**. Typically, generation numbers with multiples of 25 and the generation at which the user closed the training are available.
 
 **Due to a bug, a button when clicked cannot be deselected. In order to select any other button, please close the GUI application, open it again and then select the button**.
+
+- The test GUI has a single button. `Test Best Chromosome` tests the best chromosome that was found in the previous trainings. It also works with the input box.
 
 ## How to perform the exercise?
 The student has to edit 3 different sections in `MyAlgorithm.py` file:
@@ -49,7 +51,6 @@ POPULATION_SIZE =
 NUMBER_OF_GENERATIONS = 
 MUTATION_PROBABILITY = 
 EVALUATION_STEPS = 
-NUMBER_OF_ELITES = 
 ```
 
 - Enter the fitness function in the function `fitness_function`

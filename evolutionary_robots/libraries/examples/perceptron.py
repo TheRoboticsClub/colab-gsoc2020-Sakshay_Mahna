@@ -10,9 +10,10 @@ import numpy as np
 from neural_networks.activation_functions import LinearActivation, IdentityActivation
 
 print("Static ANN")
-# Simple ANN with 2 Layers, both of them static
-# The input layer consists of 2 neurons and takes input from CAMERA sensor
-# The output layer consists of 3 neurons with Linear activation and gives output to MOTOR actuators
+# Simple ANN with 2 Layers, both of them static.
+# The input layer consists of 2 neurons and takes input from CAMERA sensor.
+# The output layer consists of 3 neurons with Linear activation and 
+# gives output to MOTOR actuators
 
 # The format followed is Layer(name_of_layer, number_of_neurons, activation_function, sensor_input, [list_of_output_connections])
 inputLayer = Layer("inputLayer", 			# Name of the Layer
