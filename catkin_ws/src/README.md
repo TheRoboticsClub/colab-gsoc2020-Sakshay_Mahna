@@ -3,7 +3,7 @@ This catkin workspace contains the assets needed to run the exercises. The `evol
 
 - `launch` contains the launch files for the exercise. The launch file from an exercise is linked to a file here that runs the exercise.
 
-- `models` contains the models used in the exercise. Most of the models used come from the [JdeRobot/assets](https://github.com/JdeRobot/assets) repository. The modified and new models are present in this directory.
+- `models` contains the models used in the exercise.
 
 - `worlds` contains the world files for the exercise. The launch files run the simulation from the world files.
 
