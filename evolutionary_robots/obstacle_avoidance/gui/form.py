@@ -33,6 +33,9 @@ class Ui_TrainWindow(object):
         self.individual = QtWidgets.QLabel(self.layoutWidget)
         self.individual.setObjectName("individual")
         self.statsLayout.addWidget(self.individual)
+        self.timer = QtWidgets.QLabel(self.layoutWidget)
+        self.timer.setObjectName("timer")
+        self.statsLayout.addWidget(self.timer)
         self.best_fitness = QtWidgets.QLabel(self.layoutWidget)
         self.best_fitness.setObjectName("best_fitness")
         self.statsLayout.addWidget(self.best_fitness)
@@ -72,6 +75,9 @@ class Ui_TrainWindow(object):
         self.individual_value = QtWidgets.QLabel(self.layoutWidget_3)
         self.individual_value.setObjectName("individual_value")
         self.valueLayout.addWidget(self.individual_value)
+        self.timer_value = QtWidgets.QLabel(self.layoutWidget_3)
+        self.timer_value.setObjectName("timer_value")
+        self.valueLayout.addWidget(self.timer_value)
         self.best_fitness_value = QtWidgets.QLabel(self.layoutWidget_3)
         self.best_fitness_value.setObjectName("best_fitness_value")
         self.valueLayout.addWidget(self.best_fitness_value)
@@ -106,15 +112,18 @@ class Ui_TrainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.generation.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">CURRENT GENERATION: </span></p></body></html>"))
         self.individual.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">CURRENT INDIVIDUAL: </span></p></body></html>"))
+        self.timer.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">CURRENT TIMER: </span></p></body></html>"))
         self.best_fitness.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">BEST FITNESS: </span></p></body></html>"))
         self.trainButton.setText(_translate("MainWindow", "Start Training"))
         self.generationButton.setText(_translate("MainWindow", "Resume Generation"))
         self.generation_value.setText(_translate("MainWindow", "<html><head/><body><p><br/></p></body></html>"))
         self.individual_value.setText(_translate("MainWindow", "<html><head/><body><p><br/></p></body></html>"))
+        self.timer_value.setText(_translate("MainWindow", "<html><head/><body><p><br/></p></body></html>"))
         self.best_fitness_value.setText(_translate("MainWindow", "<html><head/><body><p><br/></p></body></html>"))
         self.out_of_generation.setText(_translate("MainWindow", "/ 0"))
         self.label.setText(_translate("MainWindow", "The last generation was: "))
         self.last_generation.setText(_translate("MainWindow", "<html><head/><body><p align=\"center\">0</p></body></html>"))
+
     
 # Test window    
 class Ui_TestWindow(object):

@@ -102,11 +102,12 @@ class TrainWindow(QMainWindow, Ui_TrainWindow):
     def update_stats(self):
         stats_array = self.algorithm.GA.return_stats()
         
-        if(len(stats_array) == 3):
+        if(len(stats_array) == 4):
         	_translate = QCoreApplication.translate
         	self.generation_value.setText(_translate("MainWindow", str(stats_array[0])))
         	self.individual_value.setText(_translate("MainWindow", str(stats_array[1])))
         	self.best_fitness_value.setText(_translate("MainWindow", str(stats_array[2])))
+        	self.timer_value.setText(_translate("MainWindow", str(stats_array[3])))
     	
     def update_plot(self):
     	self.plot.update_image()

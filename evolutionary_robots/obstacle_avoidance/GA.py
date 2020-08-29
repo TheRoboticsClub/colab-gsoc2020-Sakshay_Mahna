@@ -202,6 +202,7 @@ class GA(object):
 			stats_array.append(self.generation - 1)
 			stats_array.append(self.individual_index + 1)
 			stats_array.append(self.best_fitness)
+			stats_array.append(self.fitness_iterations)
 		
 		except AttributeError:
 			pass
