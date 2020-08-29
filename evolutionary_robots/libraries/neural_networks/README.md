@@ -114,7 +114,7 @@ layer.output_connections = list_of_output_connections
 
 **activation_function** specifies the activation function class. This is usually taken from the activation functions library. In order to allow an outside class, it should possess a method called `calculate_activation` that takes in a single numpy array and outputs the activation result.
 
-**sensor_input** is a string specifying the sensor from which the layer is to take input. This sensor string determines the keys of the input dictionary that we pass to forward propagate function to calculate the output of the network. It can be any string such as: "CAMERA", "SENSOR" or "INFRARED" . Conventionally, these should be in CAPTIALS.
+**sensor_input** is a string specifying the sensor from which the layer is to take input. This sensor string determines the keys of the input dictionary that we pass to forward propagate function to calculate the output of the network. It can be any string such as: "CAMERA", "SENSOR" or "INFRARED" . Conventionally, these should be in CAPTIALS. **The number of neurons of an input layer should be kept equal to the number of sensors used in the robot**. For example, a robot with 8 sensors should have 8 neurons. Currently, only the INFRARED sensor is supported.
 
 **output_connections** is a list of strings specifying the name of the layers which the current layer provides output to. For layers that output to an actuator or hardware, they have an additional member for that as well. The output dictionary returned by `forward_propagate()` returns the output of these hardware. These hardware outputs can have any name. Conventionally, these outputs should be in CAPITALS. For example: ["layer_0", "layer_1"] or ["layer0", "HARDWARE"]
 
