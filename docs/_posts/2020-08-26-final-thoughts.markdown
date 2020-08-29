@@ -42,7 +42,7 @@ The other 4 branches contain some of the work that was left in progress, or did 
 
 - **tensorflow**: This contains the tensorflow implementation of Neural Network library. However, this could not be included in the final project, as this made the training process even slower. Simple use of numpy library was enough to get the library working.
 
-- **updates**: Contains some final touches to the documentation and code.
+- **update**: Contains some final touches to the documentation and code.
 
 ## Personal Thoughts
 The 3 month journey of GSoC was quite amazing. I really enjoyed writing the code and learning new things about coding, neural networks and evolutionary robotics. It was great being mentored by Álvaro Sir and Luis Roberto Sir.
@@ -51,7 +51,7 @@ I would like to **work further on the project** for one month more and try out t
 
 ## Lessons learnt
 
-1. Before starting work on a project, be sure to check out it's scope whether it is possible or not. If we had checked this repeatbility part of Gazebo before starting to work, we could have come up with another way to train the robots.
+1. Before starting work on a project, be sure to check out it's scope whether it is possible or not. If we had checked this repeatbility part of Gazebo before starting to work, we could have come up with another way to train the robots. However, I am not completely sure whether the exact problem was with Gazebo or my code. I would be really satisfied, if the mistake is in my code, as this would make the exercise complete in itself, just using ROS and Gazebo similar to other Robotics Academy exercises.
 
 2. Simple and easy to use interface is very important for our users. Even the slightest of details should be mentioned in our manual or should be understandable by the context. All of this is very easy to code and create, we just have to be mindful enough to include these things!
 
