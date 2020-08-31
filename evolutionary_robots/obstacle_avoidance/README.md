@@ -53,11 +53,14 @@ MUTATION_PROBABILITY =
 EVALUATION_STEPS = 
 ```
 
-- Enter the fitness function in the function `fitness_function`
+- Enter the fitness function in the function `fitness_function`. The function should return (integer/float) value of fitness.
 
 ```python
 def fitness_function(left_motor_speed, right_motor_speed, infrared):
 	# Code the fitness function here
+	fitness = 0
+	
+	return fitness
 	
 ```
 
