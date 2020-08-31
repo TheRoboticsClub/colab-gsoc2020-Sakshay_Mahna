@@ -17,7 +17,7 @@ The link to the [Github Repository](https://github.com/TheRoboticsClub/colab-gso
 The following installs the software on your system.
 
 ## Prerequisites
-The libraries and exercises are developed and tested in **Python 2.7.17, Pip 20.0.2, ROS Melodic, Ubuntu 18.04**.
+The libraries and exercises are developed and tested in **Python 2.7.17, Pip 20.0.2, ROS Melodic, Ubuntu 18.04**. The final commit was done on **31st August 2020**.
 
 ### Git
 The instructions to install Git(command terminal) for Ubuntu 18.04 are:
