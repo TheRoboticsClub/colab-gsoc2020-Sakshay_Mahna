@@ -27,12 +27,13 @@ class TestWindow(QMainWindow, Ui_TestWindow):
     def bestClicked(self):
         # Pass the generation number as a string
         generation = int(self.input_generation_2.value())
-        self.algorithm.run_state = "TEST" + str(generation)
         self.display_stats = True
         if(self.clickedButton == False):
+        	self.algorithm.run_state = "TEST" + str(generation)
         	self.algorithm.play()
         	self.clickedButton = True
         else:
+        	self.algorithm.GA.run_state = "TEST" + str(generation)
         	self.algorithm.GA.initialize()
     	
     def update_plot(self):
