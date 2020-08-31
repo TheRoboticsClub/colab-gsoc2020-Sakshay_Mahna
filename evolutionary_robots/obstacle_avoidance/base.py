@@ -133,9 +133,10 @@ class MyAlgorithm(threading.Thread):
                 output = output / 2
                 if(max(infrared) > 0.80):
                     self.motors[index].sendV(0)
+                    self.motors[index].sendW(0)
                 else:
                     self.motors[index].sendV(4 * (output[0] + output[1]))
-                self.motors[index].sendW(4 * (output[0] - output[1]))
+                    self.motors[index].sendW(4 * (output[0] - output[1]))
 		     #self.GA.synchronize()
 
             self.GA.fitness_state()

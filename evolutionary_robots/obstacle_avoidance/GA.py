@@ -149,14 +149,14 @@ class GA(object):
 			self.generation = 0
 			try:
 				test_population = self.genetic_algorithm.load_chromosome(self.log_folder + "/best_chromosomes")
-				if(test_number != 0):
+				try:
 					self.test_individual = test_population[test_number]
-				else:
+					self.genetic_algorithm.test_network = (0, self.test_individual)
+				except IndexError:
 					self.test_individual = test_population
+					self.genetic_algorithm.test_network = (0, self.test_individual)
 			except IOError:
 				print("File not found!")
-				
-			self.genetic_algorithm.test_network = (0, self.test_individual)
 			
 		# Print the legend
 		legend = ["Generation", "Maximum Fitness", "Average Fitness", "Minimum Fitness"]
